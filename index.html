@@ -985,7 +985,7 @@
   <div class="header-controls" id="mobile-header-controls" style="display:none;">
     <span class="pin-pill-box" style="padding:4px 12px;">
       <span class="pin-pill-label">PIN</span>
-      <span id="mobile-hdr-pin" style="font-weight:900; font-family:monospace; font-size:16px;">7486</span>
+      <span id="mobile-hdr-pin" style="font-weight:900; font-family:monospace; font-size:16px;">4829</span>
     </span>
     <button class="btn" onclick="exitMobileModeToHost()">🖥 Till Storskärm (Abbe)</button>
   </div>
@@ -1010,7 +1010,7 @@
           <div class="qr-step-badges">
             <div class="pin-pill-box">
               <span class="pin-pill-label">SPEL-PIN:</span>
-              <span class="pin-pill-digits" id="lobby-pin-display">7486</span>
+              <span class="pin-pill-digits" id="lobby-pin-display">4829</span>
             </div>
             <div class="live-sync-pill">
               <span class="pulse-dot"></span>
@@ -1019,20 +1019,20 @@
           </div>
 
           <div style="font-size: 16px; font-weight: 800; color: #fff; line-height: 1.4;">
-            📱 <span style="color:var(--accent-amber);">Så ansluter spelarna med mobilen:</span> Rikta mobilkameran mot QR-koden för att välja sitt namn under <em>"Heter jag Elnour"</em> och få upp svarsknapparna direkt i mobilen!
+            📱 <span style="color:var(--accent-amber);">Så ansluter spelarna med mobilen:</span> Rikta mobilkameran mot QR-koden för att skriva in sitt namn och få upp svarsknapparna direkt i mobilen!
           </div>
 
           <div class="qr-url-bar">
-            <a id="join-url-anchor" href="https://kahoot3.netlify.app/?pin=7486" target="_blank" class="qr-url-link">https://kahoot3.netlify.app/?pin=7486</a>
+            <a id="join-url-anchor" href="#" target="_blank" class="qr-url-link">Laddar anslutningslänk...</a>
             <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="copyJoinLink()">📋 Kopiera länk</button>
+            <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="toggleCustomUrlEditor()">🔗 Ändra URL</button>
             <button class="btn" style="padding:6px 12px; font-size:12px; border-color:var(--accent-blue); color:var(--accent-blue);" onclick="switchToMobilePreview()">📱 Testa mobilvy</button>
           </div>
 
-          <div class="custom-url-editor open" id="custom-url-editor" style="display:flex;">
-            <span style="font-size:12px; color:var(--accent-amber); font-weight:800;">🔗 Bas-URL för QR-kod:</span>
-            <input type="text" id="custom-base-url-input" class="edit-input" style="max-width:340px; padding:7px 10px; font-family:monospace;" placeholder="https://kahoot3.netlify.app/" oninput="updateCustomBaseUrl(this.value)">
-            <button class="btn" style="padding:6px 10px; font-size:12px;" onclick="useCurrentPageUrl()" title="Känn av denna sidas exakta webbadress automatiskt">📍 Använd denna sidas adress</button>
-            <button class="btn" style="padding:6px 10px; font-size:12px;" onclick="resetCustomBaseUrl()">↺ kahoot3.netlify.app</button>
+          <div class="custom-url-editor" id="custom-url-editor">
+            <span style="font-size:12px; color:var(--text-muted); font-weight:700;">Ange publik webbadress om ni kör från egen länk/server:</span>
+            <input type="text" id="custom-base-url-input" class="edit-input" style="max-width:360px; padding:7px 10px;" placeholder="https://exempel.se/abbhoot.html" oninput="updateCustomBaseUrl(this.value)">
+            <button class="btn" style="padding:6px 10px; font-size:12px;" onclick="resetCustomBaseUrl()">↺ Standard</button>
           </div>
         </div>
       </div>
@@ -1207,8 +1207,8 @@
     <div class="mobile-wrap">
       <!-- Steg 1: Skriv in namn -->
       <div id="mobile-join-step" class="mobile-card">
-        <div class="lobby-pin-badge">📱 ANSLUT TILL ABBHOOT // PIN: <span id="mobile-step-pin">7486</span></div>
-        <h2 style="font-size:32px; font-weight:900;">Heter jag Elnour</h2>
+        <div class="lobby-pin-badge">📱 ANSLUT TILL ABBHOOT // PIN: <span id="mobile-step-pin">4829</span></div>
+        <h2 style="font-size:32px; font-weight:900;">Vad heter du?</h2>
         <p style="color:var(--text-muted); font-size:14px;">
           Skriv ditt namn nedan så dyker du direkt upp på Abbes storskärm!
         </p>
@@ -1273,7 +1273,7 @@
     </div>
     <div class="pin-pill-box">
       <span class="pin-pill-label">SPEL-PIN:</span>
-      <span class="pin-pill-digits" id="zoom-pin-display">7486</span>
+      <span class="pin-pill-digits" id="zoom-pin-display">4829</span>
     </div>
     <button class="btn" onclick="closeQrZoomModal()">Stäng</button>
   </div>
@@ -1299,39 +1299,84 @@
 </div>
 
 <script>
-      drop: false
+  const DEFAULT_PLAYERS = ["Cajsa", "Alfred", "Anna", "Iza", "Anna (2)", "Ida", "Denise T", "Theodor"];
+
+  const DEFAULT_QUESTIONS = [
+    {
+      q: "Vilket djur bajsar fyrkantiga kuber (för att kuberna inte ska rulla iväg från reviret)?",
+      answers: ["Sengångare", "Vombat", "Näbbdjur", "Koala"],
+      correct: 1,
+      double: false
+    },
+    {
+      q: "Hur lång tid varade världshistoriens kortaste krig (mellan Storbritannien och Zanzibar 1896)?",
+      answers: ["38 minuter", "4 timmar", "2 dygn", "1 vecka"],
+      correct: 0,
+      double: false
+    },
+    {
+      q: "Vad såldes Ketchup ursprungligen som på apoteken under 1830-talet?",
+      answers: ["Hårfärgningsmedel", "Skokräm", "Medicin mot magsjuka", "Råttgift"],
+      correct: 2,
+      double: false
+    },
+    {
+      q: "Vilket land i världen har flest öar (över 267 000 stycken)?",
+      answers: ["Indonesien", "Kanada", "Filippinerna", "Sverige"],
+      correct: 3,
+      double: true
+    },
+    {
+      q: "Vad stämmer rent botaniskt om bananer och jordgubbar?",
+      answers: [
+        "Båda är stenfrukter",
+        "Bananen är ett bär – jordgubben är en nöt",
+        "Bananen är en rotfrukt",
+        "Båda räknas som grönsaker"
+      ],
+      correct: 1,
+      double: false
+    },
+    {
+      q: "Hur många näsor (lukttentakler) har en vanlig mördarsnigel?",
+      answers: ["Ingen alls", "1 näsa", "2 näsor", "4 näsor"],
+      correct: 3,
+      double: false
+    },
+    {
+      q: "Om du kunde vika ett vanligt A4-papper på mitten 42 gånger – hur tjockt skulle det bli?",
+      answers: [
+        "Som en tjock bok (12 cm)",
+        "Högt som Eiffeltornet (330 m)",
+        "Det når hela vägen till månen",
+        "Ungefär 1 mil"
+      ],
+      correct: 2,
+      double: true
+    },
+    {
+      q: "Hur länge kan en vanlig snigel sova i sträck om vädret är för torrt och tråkigt?",
+      answers: ["Upp till 3 år", "Max 2 veckor", "3 månader", "48 timmar"],
+      correct: 0,
+      double: false
+    },
+    {
+      q: "Vad kallas den officiella fobin för rädslan att vara utan sin mobiltelefon eller få slut på batteri?",
+      answers: ["Fonofobi", "Nomofobi", "Teknofobi", "Telefobi"],
+      correct: 1,
+      double: false
+    },
+    {
+      q: "FINALFRÅGA: Vilken kroppsdel växer inte en enda millimeter, utan är lika stor när du föds som när du är 90 år?",
+      answers: ["Öronen", "Knäskålarna", "Ögongloberna", "Näsan"],
+      correct: 2,
+      double: true
     }
   ];
 
-  const LS_QUESTIONS_KEY = "abbhoot_arena_questions_v3";
-  const LS_PLAYERS_KEY = "abbhoot_arena_players_v3";
-  const LS_BASE_URL_KEY = "abbhoot_custom_base_url_v3";
-
-  function loadStoredQuestions() {
-    try {
-      const raw = localStorage.getItem(LS_QUESTIONS_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch(e) {}
-    return JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
-  }
-
-  function loadStoredPlayerNames() {
-    try {
-      const raw = localStorage.getItem(LS_PLAYERS_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch(e) {}
-    return [...DEFAULT_PLAYERS];
-  }
-
   // In-memory & session state
-  let questions = loadStoredQuestions();
-  let playerNames = loadStoredPlayerNames();
+  let questions = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+  let playerNames = [...DEFAULT_PLAYERS];
   let mobileJoinedSet = new Set();
   let editorDraftQuestions = [];
 
@@ -1355,30 +1400,7 @@
   const urlParams = new URLSearchParams(window.location.search);
   const urlPinParam = urlParams.get("pin");
   let gamePin = urlPinParam || "7486";
-
-  function detectDefaultBaseUrl() {
-    try {
-      const saved = localStorage.getItem(LS_BASE_URL_KEY);
-      if (saved && saved.trim()) return saved.trim();
-    } catch (e) {}
-
-    const proto = window.location.protocol;
-    const host = (window.location.hostname || "").toLowerCase();
-    const isRealWebHost =
-      (proto === "https:" || proto === "http:") &&
-      host &&
-      !host.includes("googleusercontent.com") &&
-      !host.includes("localhost") &&
-      !host.includes("127.0.0.1") &&
-      host !== "null";
-
-    if (isRealWebHost) {
-      return window.location.origin + window.location.pathname;
-    }
-    return "https://kahoot3.netlify.app/";
-  }
-
-  let customBaseUrl = detectDefaultBaseUrl();
+  let customBaseUrl = "https://kahoot3.netlify.app/";
   let isMobileMode = Boolean(urlPinParam);
   let currentMobilePlayerName = "";
   let currentMobileSelectedChoice = null;
@@ -1399,24 +1421,12 @@
   }
 
   function getJoinUrl() {
-    let base = (customBaseUrl || "").trim();
+    let base = customBaseUrl.trim();
     if (!base) {
-      base = detectDefaultBaseUrl();
+      base = "https://kahoot3.netlify.app/";
     }
-    // Strip existing ?pin=... if user pasted full URL with query
-    base = base.split("?")[0];
-    return `${base}?pin=${encodeURIComponent(gamePin)}`;
-  }
-
-  function renderFallbackSvgQr(targetEl, text) {
-    if (typeof qrcode === "function") {
-      try {
-        const qr = qrcode(0, "M");
-        qr.addData(text);
-        qr.make();
-        targetEl.innerHTML = qr.createSvgTag({ scalable: true, margin: 2 });
-      } catch (e) {}
-    }
+    const sep = base.includes("?") ? "&" : "?";
+    return `${base}${sep}pin=${encodeURIComponent(gamePin)}`;
   }
 
   function renderQrCode() {
@@ -1430,17 +1440,13 @@
     anchor.href = joinUrl;
     anchor.textContent = joinUrl;
 
-    const baseInput = document.getElementById("custom-base-url-input");
-    if (baseInput && document.activeElement !== baseInput) {
-      baseInput.value = joinUrl.split("?")[0];
-    }
-
     const qrContainer = document.getElementById("qr-code-container");
     const zoomContainer = document.getElementById("qr-zoom-target");
 
-    const apiImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=10&data=${encodeURIComponent(joinUrl)}`;
-    qrContainer.innerHTML = `<img src="${apiImgUrl}" alt="QR-kod för att gå med i Abbhoot" onerror="renderFallbackSvgQr(this.parentElement, '${esc(joinUrl)}')">`;
-    zoomContainer.innerHTML = `<img src="${apiImgUrl}" alt="QR-kod för att gå med i Abbhoot" onerror="renderFallbackSvgQr(this.parentElement, '${esc(joinUrl)}')">`;
+    // Använder stabil extern QR-tjänst (api.qrserver.com) som garanterat pekar på https://kahoot3.netlify.app/?pin=7486
+    const apiImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=6&data=${encodeURIComponent(joinUrl)}`;
+    qrContainer.innerHTML = `<img src="${apiImgUrl}" alt="QR-kod för att gå med i Abbhoot">`;
+    zoomContainer.innerHTML = `<img src="${apiImgUrl}" alt="QR-kod för att gå med i Abbhoot">`;
   }
 
   window.openQrZoomModal = function() {
@@ -1467,32 +1473,26 @@
     temp.remove();
   };
 
-  window.updateCustomBaseUrl = function(val) {
-    customBaseUrl = val.trim();
-    try {
-      if (customBaseUrl) localStorage.setItem(LS_BASE_URL_KEY, customBaseUrl);
-      else localStorage.removeItem(LS_BASE_URL_KEY);
-    } catch (e) {}
-    renderQrCode();
+  window.toggleCustomUrlEditor = function() {
+    const ed = document.getElementById("custom-url-editor");
+    ed.classList.toggle("open");
+    if (ed.classList.contains("open")) {
+      const inp = document.getElementById("custom-base-url-input");
+      if (!inp.value) inp.value = window.location.href.split("?")[0];
+      inp.focus();
+    }
   };
 
-  window.useCurrentPageUrl = function() {
-    const currentClean = window.location.origin + window.location.pathname;
-    customBaseUrl = currentClean;
-    try { localStorage.setItem(LS_BASE_URL_KEY, customBaseUrl); } catch (e) {}
-    const inp = document.getElementById("custom-base-url-input");
-    if (inp) inp.value = customBaseUrl;
+  window.updateCustomBaseUrl = function(val) {
+    customBaseUrl = val.trim();
     renderQrCode();
-    showToast("📍 QR-koden pekar nu på denna sidas exakta adress!");
   };
 
   window.resetCustomBaseUrl = function() {
-    customBaseUrl = "https://kahoot3.netlify.app/";
-    try { localStorage.removeItem(LS_BASE_URL_KEY); } catch (e) {}
-    const inp = document.getElementById("custom-base-url-input");
-    if (inp) inp.value = customBaseUrl;
+    customBaseUrl = "";
+    document.getElementById("custom-base-url-input").value = "";
     renderQrCode();
-    showToast("↺ Återställde till https://kahoot3.netlify.app/");
+    showToast("↺ Återställde till standard-URL");
   };
 
   // Realtidsbrygga (BroadcastChannel för flikar + ntfy.sh för mobiler över nätet)
@@ -1786,7 +1786,6 @@
     if (!val) return;
     playerNames.push(val);
     inp.value = "";
-    try { localStorage.setItem(LS_PLAYERS_KEY, JSON.stringify(playerNames)); } catch(e) {}
     syncPlayersKeepingScores();
     renderLobby();
     playPopSound(600);
@@ -1798,7 +1797,6 @@
       return;
     }
     playerNames.splice(idx, 1);
-    try { localStorage.setItem(LS_PLAYERS_KEY, JSON.stringify(playerNames)); } catch(e) {}
     syncPlayersKeepingScores();
     renderLobby();
   };
@@ -1806,7 +1804,6 @@
   window.resetDefaultPlayers = function() {
     playerNames = [...DEFAULT_PLAYERS];
     mobileJoinedSet.clear();
-    try { localStorage.setItem(LS_PLAYERS_KEY, JSON.stringify(playerNames)); } catch(e) {}
     syncPlayersKeepingScores();
     renderLobby();
     playPopSound(520);
@@ -2368,7 +2365,6 @@
   window.saveEditor = function() {
     collectEditorInputsIntoDraft();
     questions = JSON.parse(JSON.stringify(editorDraftQuestions));
-    try { localStorage.setItem(LS_QUESTIONS_KEY, JSON.stringify(questions)); } catch(e) {}
     document.getElementById("hdr-q-count").textContent = questions.length;
     closeEditor();
     showToast("💾 Frågorna har sparats!");
