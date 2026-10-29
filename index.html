@@ -1399,8 +1399,8 @@
   // ===== QR CODE, PIN & LIVE MOBILE BRIDGE =====
   const urlParams = new URLSearchParams(window.location.search);
   const urlPinParam = urlParams.get("pin");
-  let gamePin = urlPinParam || String(Math.floor(1000 + Math.random() * 9000));
-  let customBaseUrl = "";
+  let gamePin = urlPinParam || "7486";
+  let customBaseUrl = "https://kahoot3.netlify.app/";
   let isMobileMode = Boolean(urlPinParam);
   let currentMobilePlayerName = "";
   let currentMobileSelectedChoice = null;
@@ -1423,7 +1423,7 @@
   function getJoinUrl() {
     let base = customBaseUrl.trim();
     if (!base) {
-      base = window.location.href.split("?")[0].split("#")[0];
+      base = "https://kahoot3.netlify.app/";
     }
     const sep = base.includes("?") ? "&" : "?";
     return `${base}${sep}pin=${encodeURIComponent(gamePin)}`;
@@ -1443,19 +1443,7 @@
     const qrContainer = document.getElementById("qr-code-container");
     const zoomContainer = document.getElementById("qr-zoom-target");
 
-    if (typeof qrcode === "function") {
-      try {
-        const qr = qrcode(0, "M");
-        qr.addData(joinUrl);
-        qr.make();
-        const svgTag = qr.createSvgTag({ cellSize: 4, margin: 1, scalable: true });
-        qrContainer.innerHTML = svgTag;
-        zoomContainer.innerHTML = svgTag;
-        return;
-      } catch (e) {}
-    }
-
-    // Fallback om CDN-scriptet inte hunnit ladda
+    // Använder stabil extern QR-tjänst (api.qrserver.com) som garanterat pekar på https://kahoot3.netlify.app/?pin=7486
     const apiImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=6&data=${encodeURIComponent(joinUrl)}`;
     qrContainer.innerHTML = `<img src="${apiImgUrl}" alt="QR-kod för att gå med i Abbhoot">`;
     zoomContainer.innerHTML = `<img src="${apiImgUrl}" alt="QR-kod för att gå med i Abbhoot">`;
