@@ -1,0 +1,2556 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABBHOOT! // Live Arena Edition</title>
+<!-- QR-kodbibliotek för blixtsnabb inbyggd SVG/Canvas-rendering på första sidan -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+  :root {
+    --bg-deep: #090418;
+    --bg-arena: #140a2e;
+    --bg-card: rgba(30, 18, 66, 0.85);
+    --bg-card-hover: rgba(45, 28, 95, 0.95);
+    --accent-purple: #a855f7;
+    --accent-pink: #ec4899;
+    --accent-blue: #38bdf8;
+    --accent-green: #10b981;
+    --accent-amber: #fbbf24;
+    --accent-red: #ef4444;
+    --text-main: #ffffff;
+    --text-muted: #cbd5e1;
+    --border-glow: rgba(168, 85, 247, 0.45);
+
+    --k-red: #e21b3c;
+    --k-red-dark: #a81029;
+    --k-blue: #1368ce;
+    --k-blue-dark: #0d4a96;
+    --k-yellow: #d89e00;
+    --k-yellow-dark: #9c7200;
+    --k-green: #26890d;
+    --k-green-dark: #1a6008;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
+  body {
+    background: radial-gradient(circle at 50% 15%, #2e1065 0%, #13072e 55%, #070312 100%);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  .bg-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
+    animation: floatOrb 12s infinite alternate ease-in-out;
+  }
+  .orb-1 { width: 420px; height: 420px; background: #a855f7; top: -100px; left: -100px; }
+  .orb-2 { width: 380px; height: 380px; background: #ec4899; bottom: -120px; right: -80px; animation-delay: -5s; }
+  .orb-3 { width: 300px; height: 300px; background: #38bdf8; top: 40%; left: 60%; animation-delay: -8s; }
+
+  @keyframes floatOrb {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, -40px) scale(1.15); }
+  }
+
+  header {
+    position: relative;
+    z-index: 10;
+    background: rgba(9, 4, 24, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 2px solid var(--border-glow);
+    padding: 12px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+  }
+
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-logo {
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    color: #fff;
+    font-weight: 900;
+    font-size: 24px;
+    padding: 6px 16px;
+    border-radius: 12px;
+    letter-spacing: 2px;
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.6);
+    transform: rotate(-2deg);
+    cursor: pointer;
+  }
+  .brand-sub {
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent-amber);
+  }
+
+  .header-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+  button.btn {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 9px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  button.btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: var(--accent-amber);
+    transform: translateY(-1px);
+  }
+  button.btn-hype {
+    background: linear-gradient(135deg, #f59e0b 0%, #ec4899 100%);
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    font-weight: 900;
+    padding: 13px 26px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 25px rgba(236, 72, 153, 0.5);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  button.btn-hype:hover {
+    filter: brightness(1.12);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 35px rgba(236, 72, 153, 0.75);
+  }
+
+  .arena-container {
+    position: relative;
+    z-index: 5;
+    max-width: 1450px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 20px 28px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .screen { display: none; flex-direction: column; flex: 1; gap: 20px; animation: fadeIn 0.35s ease; }
+  .screen.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 1. LOBBY SCREEN & QR JOIN CARD */
+  .lobby-hero {
+    text-align: center;
+    padding: 26px 24px;
+    background: var(--bg-card);
+    border: 2px solid var(--border-glow);
+    border-radius: 24px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+  .lobby-pin-badge {
+    background: rgba(251, 191, 36, 0.15);
+    border: 2px dashed var(--accent-amber);
+    color: var(--accent-amber);
+    padding: 6px 20px;
+    border-radius: 99px;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .lobby-title {
+    font-size: 52px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #fff, #fbbf24, #ec4899, #38bdf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    line-height: 1.1;
+  }
+
+  /* QR & PIN JOIN BOARD IN LOBBY */
+  .qr-join-banner {
+    width: 100%;
+    max-width: 1050px;
+    background: linear-gradient(135deg, rgba(15, 8, 38, 0.92), rgba(38, 16, 78, 0.92));
+    border: 2px solid rgba(56, 189, 248, 0.55);
+    border-radius: 20px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 26px;
+    align-items: center;
+    text-align: left;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55), 0 0 25px rgba(56, 189, 248, 0.18);
+  }
+  @media (max-width: 780px) {
+    .qr-join-banner {
+      grid-template-columns: 1fr;
+      text-align: center;
+      justify-items: center;
+    }
+  }
+
+  .qr-box-frame {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 18px;
+    box-shadow: 0 0 28px rgba(56, 189, 248, 0.55);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    transition: transform 0.25s ease;
+    cursor: pointer;
+  }
+  .qr-box-frame:hover {
+    transform: scale(1.04);
+  }
+  .qr-render-target {
+    width: 168px;
+    height: 168px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qr-render-target svg,
+  .qr-render-target img {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    border-radius: 8px;
+  }
+  .qr-scan-caption {
+    font-size: 11px;
+    font-weight: 900;
+    color: #0f172a;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .qr-info-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .qr-step-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  .pin-pill-box {
+    background: rgba(251, 191, 36, 0.16);
+    border: 2px solid var(--accent-amber);
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .pin-pill-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent-amber);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .pin-pill-digits {
+    font-size: 26px;
+    font-weight: 900;
+    font-family: monospace;
+    letter-spacing: 3px;
+    color: #ffffff;
+  }
+  .live-sync-pill {
+    background: rgba(16, 185, 129, 0.16);
+    border: 1px solid rgba(16, 185, 129, 0.55);
+    color: #34d399;
+    padding: 7px 13px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .pulse-dot {
+    width: 9px;
+    height: 9px;
+    background: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 10px #10b981;
+    animation: pulseDot 1.4s infinite ease-in-out;
+  }
+  @keyframes pulseDot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.45); opacity: 0.45; }
+  }
+
+  .qr-url-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: rgba(9, 4, 24, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 8px 12px;
+    border-radius: 12px;
+  }
+  .qr-url-link {
+    color: var(--accent-blue);
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: 700;
+    word-break: break-all;
+    text-decoration: none;
+    flex: 1;
+    min-width: 180px;
+  }
+  .qr-url-link:hover {
+    text-decoration: underline;
+  }
+
+  .custom-url-editor {
+    display: none;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 4px;
+    background: rgba(0, 0, 0, 0.35);
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px dashed var(--accent-blue);
+  }
+  .custom-url-editor.open {
+    display: flex;
+  }
+
+  .lobby-players-wrap { width: 100%; max-width: 1050px; margin-top: 4px; }
+  .lobby-players-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .lobby-player-chip {
+    background: linear-gradient(135deg, rgba(56,189,248,0.18), rgba(168,85,247,0.25));
+    border: 2px solid rgba(56,189,248,0.5);
+    border-radius: 14px;
+    padding: 12px 20px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .lobby-player-chip.mobile-joined {
+    border-color: var(--accent-green);
+    background: linear-gradient(135deg, rgba(16,185,129,0.25), rgba(56,189,248,0.22));
+    box-shadow: 0 0 22px rgba(16, 185, 129, 0.35);
+  }
+  .lobby-player-chip button {
+    background: rgba(239,68,68,0.25);
+    border: none;
+    color: #fca5a5;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 12px;
+  }
+  .lobby-player-chip button:hover { background: var(--accent-red); color: #fff; }
+
+  .add-player-bar { display: flex; gap: 10px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+  .add-player-input {
+    background: rgba(9, 4, 24, 0.8);
+    border: 2px solid var(--border-glow);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    width: 240px;
+  }
+
+  /* 2. QUESTION SCREEN */
+  .q-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    background: var(--bg-card);
+    padding: 14px 24px;
+    border-radius: 16px;
+    border: 1px solid var(--border-glow);
+  }
+  .q-badge-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .q-num-pill {
+    background: var(--accent-purple);
+    color: #fff;
+    font-weight: 900;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    text-transform: uppercase;
+  }
+  .q-double-pill {
+    background: linear-gradient(90deg, #f59e0b, #ef4444);
+    color: #fff;
+    font-weight: 900;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    animation: pulseGlow 1s infinite alternate;
+  }
+  @keyframes pulseGlow {
+    from { transform: scale(1); box-shadow: 0 0 10px rgba(245,158,11,0.5); }
+    to { transform: scale(1.06); box-shadow: 0 0 25px rgba(239,68,68,0.9); }
+  }
+
+  .timer-circle {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: #1e1040;
+    border: 4px solid var(--accent-amber);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--accent-amber);
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .timer-circle.urgent {
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+    animation: pulseGlow 0.4s infinite alternate;
+  }
+
+  .question-stage {
+    background: rgba(255, 255, 255, 0.96);
+    color: #0f172a;
+    border-radius: 20px;
+    padding: 28px 36px;
+    text-align: center;
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1.3;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .chart-stage {
+    display: none;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 28px;
+    height: 130px;
+    padding: 16px 20px 4px 20px;
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 1px solid var(--border-glow);
+  }
+  .chart-col { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 90px; }
+  .chart-bar {
+    width: 100%;
+    border-radius: 8px 8px 0 0;
+    min-height: 22px;
+    transition: height 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    color: #fff;
+    font-weight: 900;
+    font-size: 15px;
+    padding-top: 4px;
+  }
+  .chart-col.correct-col .chart-bar {
+    box-shadow: 0 0 25px rgba(255,255,255,0.6);
+    outline: 3px solid #fff;
+  }
+
+  .answers-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 800px) { .answers-grid { grid-template-columns: 1fr; } }
+
+  .k-card {
+    border: none;
+    border-radius: 16px;
+    padding: 24px 26px;
+    min-height: 110px;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    text-align: left;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+  .k-card-0 { background: var(--k-red); box-shadow: 0 7px 0 var(--k-red-dark); }
+  .k-card-1 { background: var(--k-blue); box-shadow: 0 7px 0 var(--k-blue-dark); }
+  .k-card-2 { background: var(--k-yellow); box-shadow: 0 7px 0 var(--k-yellow-dark); }
+  .k-card-3 { background: var(--k-green); box-shadow: 0 7px 0 var(--k-green-dark); }
+
+  .k-shape {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .k-card.dimmed { opacity: 0.25; filter: grayscale(40%); transform: scale(0.98); }
+  .k-card.correct-highlight {
+    outline: 5px solid #fff;
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.9);
+    transform: scale(1.02);
+    z-index: 2;
+  }
+  .k-check-badge {
+    margin-left: auto;
+    background: #fff;
+    color: #10b981;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .k-card.correct-highlight .k-check-badge { display: flex; }
+
+  .presenter-panel {
+    background: var(--bg-card);
+    border: 2px solid var(--border-glow);
+    border-radius: 18px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .presenter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--accent-amber);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .player-control-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+    gap: 10px;
+  }
+  .p-ctrl-card {
+    background: rgba(9, 4, 24, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .p-ctrl-card.locked-in { border-color: var(--accent-blue); background: rgba(56, 189, 248, 0.12); }
+  .p-ctrl-card.got-correct {
+    border-color: var(--accent-green);
+    background: rgba(16, 185, 129, 0.18);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+  }
+  .p-ctrl-top { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 14px; }
+  .p-streak-tag {
+    font-size: 11px;
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--accent-amber);
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+  .p-mini-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+  .mini-ans-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 0;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    opacity: 0.75;
+    transition: all 0.15s;
+  }
+  .mini-ans-btn:hover { opacity: 1; transform: scale(1.08); }
+  .mini-ans-btn.selected { opacity: 1; outline: 2px solid #fff; transform: scale(1.06); }
+  .mini-ans-btn.blind-selected { opacity: 0.9; background: #334155 !important; }
+  .m-0 { background: var(--k-red); }
+  .m-1 { background: var(--k-blue); }
+  .m-2 { background: var(--k-yellow); }
+  .m-3 { background: var(--k-green); }
+
+  .quick-award-btns { display: none; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .award-btn {
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+    transition: all 0.15s;
+  }
+  .award-btn.active-correct { background: var(--accent-green); color: #052e16; border-color: #fff; }
+  .award-btn.active-fast { background: var(--accent-amber); color: #090418; border-color: #fff; }
+
+  /* 3. HYPE LEADERBOARD SCREEN */
+  .hype-board-wrap { max-width: 980px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 18px; }
+  .hype-header { text-align: center; display: flex; flex-direction: column; gap: 6px; }
+  .hype-title {
+    font-size: 42px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    background: linear-gradient(90deg, #fbbf24, #ffffff, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 15px rgba(236,72,153,0.4));
+  }
+  .leaderboard-rows { display: flex; flex-direction: column; gap: 12px; }
+  .lb-row {
+    position: relative;
+    background: rgba(20, 12, 48, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+    animation: slideInRow 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+  }
+  @keyframes slideInRow {
+    from { opacity: 0; transform: translateX(-40px) scale(0.95); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+  }
+  .lb-row-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(168,85,247,0.28), rgba(56,189,248,0.12));
+    z-index: 0;
+    transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .lb-row.rank-1 {
+    border-color: var(--accent-amber);
+    box-shadow: 0 0 30px rgba(251, 191, 36, 0.35);
+    transform: scale(1.02);
+  }
+  .lb-row.rank-1 .lb-row-fill { background: linear-gradient(90deg, rgba(251,191,36,0.35), rgba(236,72,153,0.2)); }
+  .lb-row.rank-2 { border-color: #cbd5e1; }
+  .lb-row.rank-3 { border-color: #d97706; }
+
+  .lb-left { position: relative; z-index: 2; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .lb-rank-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 20px;
+  }
+  .rank-1 .lb-rank-circle { background: var(--accent-amber); color: #090418; font-size: 24px; }
+  .rank-2 .lb-rank-circle { background: #e2e8f0; color: #090418; }
+  .rank-3 .lb-rank-circle { background: #d97706; color: #fff; }
+
+  .lb-name { font-size: 22px; font-weight: 900; letter-spacing: 0.5px; }
+
+  .hype-badge {
+    font-size: 12px;
+    font-weight: 900;
+    padding: 4px 10px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    animation: popIn 0.4s ease;
+  }
+  .badge-climb { background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid #10b981; }
+  .badge-streak { background: rgba(245, 158, 11, 0.25); color: #fbbf24; border: 1px solid #f59e0b; }
+  .badge-fast { background: rgba(56, 189, 248, 0.25); color: #38bdf8; border: 1px solid #38bdf8; }
+
+  .lb-right { position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; }
+  .lb-delta {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--accent-green);
+    background: rgba(16, 185, 129, 0.15);
+    padding: 4px 10px;
+    border-radius: 8px;
+  }
+  .lb-score {
+    font-size: 28px;
+    font-weight: 900;
+    font-family: monospace;
+    color: #fff;
+    min-width: 110px;
+    text-align: right;
+  }
+
+  /* 4. GRAND FINALE 3D PODIUM */
+  .podium-stage {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 24px;
+    height: 370px;
+    margin-top: 20px;
+    padding: 0 20px;
+  }
+  .podium-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 240px;
+    opacity: 0;
+    transform: translateY(60px);
+    transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .podium-column.revealed { opacity: 1; transform: translateY(0); }
+  .podium-avatar { font-size: 46px; margin-bottom: 6px; animation: bounceHero 1.4s infinite alternate ease-in-out; }
+  @keyframes bounceHero {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+  }
+  .podium-name { font-size: 24px; font-weight: 900; margin-bottom: 8px; text-align: center; }
+  .podium-pillar {
+    width: 100%;
+    border-radius: 18px 18px 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 22px;
+    gap: 8px;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+  }
+  .pillar-1 {
+    height: 250px;
+    background: linear-gradient(180deg, #fbbf24 0%, #b45309 100%);
+    color: #090418;
+    border: 3px solid #fde68a;
+    box-shadow: 0 0 50px rgba(251, 191, 36, 0.5);
+  }
+  .pillar-2 {
+    height: 185px;
+    background: linear-gradient(180deg, #e2e8f0 0%, #475569 100%);
+    color: #090418;
+    border: 3px solid #f8fafc;
+  }
+  .pillar-3 {
+    height: 140px;
+    background: linear-gradient(180deg, #f97316 0%, #7c2d12 100%);
+    color: #fff;
+    border: 3px solid #fdba74;
+  }
+  .pillar-place { font-size: 42px; font-weight: 900; line-height: 1; }
+  .pillar-pts { font-size: 20px; font-weight: 900; font-family: monospace; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 99px; color: #fff; }
+
+  /* 5. MOBILE PLAYER CONTROLLER VIEW (?pin=XXXX) */
+  .mobile-wrap {
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    flex: 1;
+  }
+  .mobile-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border-glow);
+    border-radius: 22px;
+    padding: 24px 20px;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.55);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  .mobile-input {
+    background: rgba(9, 4, 24, 0.9);
+    border: 2px solid var(--accent-blue);
+    color: #fff;
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: 800;
+    width: 100%;
+    text-align: center;
+  }
+  .mobile-pad-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-top: 6px;
+  }
+  .mobile-pad-btn {
+    border: none;
+    border-radius: 18px;
+    min-height: 135px;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 900;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: transform 0.15s, filter 0.15s;
+  }
+  .mobile-pad-btn:active {
+    transform: scale(0.95);
+  }
+  .mobile-pad-btn.selected-pad {
+    outline: 5px solid #ffffff;
+    transform: scale(1.03);
+    box-shadow: 0 0 30px rgba(255,255,255,0.65);
+  }
+  .mobile-pad-shape {
+    font-size: 42px;
+    line-height: 1;
+  }
+
+  /* MODALS & TOAST */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+  .modal-box {
+    background: #140a2e;
+    border: 2px solid var(--accent-purple);
+    border-radius: 18px;
+    max-width: 920px;
+    width: 100%;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    box-shadow: 0 0 60px rgba(0,0,0,0.9);
+  }
+  .editor-scroll { overflow-y: auto; flex: 1; padding-right: 8px; margin: 16px 0; display: flex; flex-direction: column; gap: 16px; }
+  .q-edit-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .edit-input {
+    background: #090418;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+  }
+  .toast-msg {
+    background: rgba(20, 10, 46, 0.96);
+    border: 2px solid var(--accent-amber);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-weight: 800;
+    font-size: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    animation: popIn 0.25s ease;
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.6); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  @keyframes screenShake {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-10px, 6px); }
+    40% { transform: translate(10px, -6px); }
+    60% { transform: translate(-8px, -4px); }
+    80% { transform: translate(8px, 4px); }
+  }
+  .shake { animation: screenShake 0.45s ease-in-out 2; }
+
+  #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 1001; }
+</style>
+</head>
+<body>
+
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
+<canvas id="confetti-canvas"></canvas>
+<div class="toast-container" id="toast-container"></div>
+
+<header id="main-header">
+  <div class="brand">
+    <div class="brand-logo" onclick="goToLobby()">ABBHOOT!</div>
+    <div>
+      <div style="font-weight:900; font-size:15px;">PRESENTER ARENA EDITION</div>
+      <div class="brand-sub" id="header-sub-label">👑 Spelledare: Abbe // Delad Storskärm + Mobil-QR</div>
+    </div>
+  </div>
+  <div class="header-controls" id="presenter-header-controls">
+    <button class="btn" onclick="openEditor()">⚙️ Redigera frågor (<span id="hdr-q-count">10</span>)</button>
+    <button class="btn" onclick="toggleSound()" id="sound-btn">🔊 Ljud & Musik: PÅ</button>
+    <button class="btn" onclick="showHypeScoreboardMidGame()">🏆 Visa Topplista</button>
+    <button class="btn" onclick="switchToMobilePreview()">📱 Testa mobilvy</button>
+    <button class="btn" onclick="goToLobby()">🏠 Lobby</button>
+  </div>
+  <div class="header-controls" id="mobile-header-controls" style="display:none;">
+    <span class="pin-pill-box" style="padding:4px 12px;">
+      <span class="pin-pill-label">PIN</span>
+      <span id="mobile-hdr-pin" style="font-weight:900; font-family:monospace; font-size:16px;">4829</span>
+    </span>
+    <button class="btn" onclick="exitMobileModeToHost()">🖥 Till Storskärm (Abbe)</button>
+  </div>
+</header>
+
+<div class="arena-container">
+
+  <!-- 1. LOBBY SCREEN -->
+  <div id="screen-lobby" class="screen active">
+    <div class="lobby-hero">
+      <div class="lobby-pin-badge">⚡ LIVE PÅ ABBES SKÄRM // SKANNA QR ELLER SPELA GEMENSAMT</div>
+      <h1 class="lobby-title">ABBHOOT!</h1>
+
+      <!-- NYTT: QR-KOD & MOBILANSLUTNING PÅ FÖRSTA SIDAN -->
+      <div class="qr-join-banner">
+        <div class="qr-box-frame" onclick="openQrZoomModal()" title="Klicka för att förstora QR-koden på helskärm">
+          <div id="qr-code-container" class="qr-render-target"></div>
+          <div class="qr-scan-caption">🔍 Klicka för stor QR</div>
+        </div>
+
+        <div class="qr-info-col">
+          <div class="qr-step-badges">
+            <div class="pin-pill-box">
+              <span class="pin-pill-label">SPEL-PIN:</span>
+              <span class="pin-pill-digits" id="lobby-pin-display">4829</span>
+            </div>
+            <div class="live-sync-pill">
+              <span class="pulse-dot"></span>
+              <span id="live-sync-status">Realtidsbrygga aktiv – mobiler kan ansluta</span>
+            </div>
+          </div>
+
+          <div style="font-size: 16px; font-weight: 800; color: #fff; line-height: 1.4;">
+            📱 <span style="color:var(--accent-amber);">Så ansluter spelarna med mobilen:</span> Rikta mobilkameran mot QR-koden för att skriva in sitt namn och få upp svarsknapparna direkt i mobilen!
+          </div>
+
+          <div class="qr-url-bar">
+            <a id="join-url-anchor" href="#" target="_blank" class="qr-url-link">Laddar anslutningslänk...</a>
+            <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="copyJoinLink()">📋 Kopiera länk</button>
+            <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="toggleCustomUrlEditor()">🔗 Ändra URL</button>
+            <button class="btn" style="padding:6px 12px; font-size:12px; border-color:var(--accent-blue); color:var(--accent-blue);" onclick="switchToMobilePreview()">📱 Testa mobilvy</button>
+          </div>
+
+          <div class="custom-url-editor" id="custom-url-editor">
+            <span style="font-size:12px; color:var(--text-muted); font-weight:700;">Ange publik webbadress om ni kör från egen länk/server:</span>
+            <input type="text" id="custom-base-url-input" class="edit-input" style="max-width:360px; padding:7px 10px;" placeholder="https://exempel.se/abbhoot.html" oninput="updateCustomBaseUrl(this.value)">
+            <button class="btn" style="padding:6px 10px; font-size:12px;" onclick="resetCustomBaseUrl()">↺ Standard</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lobby-players-wrap">
+        <div style="font-size:13px; font-weight:800; color:var(--accent-amber); text-transform:uppercase; letter-spacing:1.5px;">
+          Deltagare i dagens Abbhoot (<span id="lobby-count">8</span>):
+        </div>
+        <div class="lobby-players-grid" id="lobby-players-grid"></div>
+
+        <div class="add-player-bar">
+          <input type="text" id="new-player-input" class="add-player-input" placeholder="Lägg till deltagare..." onkeydown="if(event.key==='Enter') addPlayer()">
+          <button class="btn" onclick="addPlayer()">➕ Lägg till</button>
+          <button class="btn" onclick="resetDefaultPlayers()" title="Återställ standardnamnen">↺ Återställ 8 standardnamn</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 10px; display:flex; gap:14px; flex-wrap:wrap; justify-content:center;">
+        <button class="btn-hype" id="start-game-btn" onclick="startGame()">🚀 STARTA ABBHOOT! (FRÅGA 1)</button>
+        <button class="btn" id="resume-game-btn" style="display:none; border-color:var(--accent-green); color:#34d399;" onclick="resumeGame()">▶ Fortsätt pågående omgång</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. QUESTION SCREEN -->
+  <div id="screen-question" class="screen">
+    <div class="q-top-bar">
+      <div class="q-badge-group">
+        <span class="q-num-pill" id="q-counter">FRÅGA 1 AV 10</span>
+        <span class="q-double-pill" id="q-double-badge" style="display:none;">⚡ DUBBELPOÄNG (2X)!</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:13px; color:var(--text-muted); font-weight:700;">Klicka på timern för paus/start ➔</span>
+        <div class="timer-circle" id="timer-display" onclick="toggleTimerPause()" title="Klicka för att pausa/starta nedräkningen">20</div>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn" id="reveal-btn" onclick="revealAnswer()" style="background:var(--accent-purple); border-color:#fff;">✨ Avslöja rätt svar</button>
+        <button class="btn-hype" id="to-scoreboard-btn" onclick="goToLeaderboard()" style="display:none; padding:10px 22px; font-size:14px;">🔥 Rulla in Topplistan ➔</button>
+      </div>
+    </div>
+
+    <div class="question-stage" id="question-text">Laddar fråga...</div>
+
+    <!-- Kahoot Bar Chart on Reveal -->
+    <div class="chart-stage" id="chart-stage">
+      <div class="chart-col" id="chart-col-0">
+        <div class="chart-bar" id="chart-bar-0" style="background:var(--k-red); height:22px;">0</div>
+        <span style="font-weight:900; color:var(--k-red);">▲ Röd</span>
+      </div>
+      <div class="chart-col" id="chart-col-1">
+        <div class="chart-bar" id="chart-bar-1" style="background:var(--k-blue); height:22px;">0</div>
+        <span style="font-weight:900; color:var(--k-blue);">◆ Blå</span>
+      </div>
+      <div class="chart-col" id="chart-col-2">
+        <div class="chart-bar" id="chart-bar-2" style="background:var(--k-yellow); height:22px;">0</div>
+        <span style="font-weight:900; color:var(--k-yellow);">● Gul</span>
+      </div>
+      <div class="chart-col" id="chart-col-3">
+        <div class="chart-bar" id="chart-bar-3" style="background:var(--k-green); height:22px;">0</div>
+        <span style="font-weight:900; color:var(--k-green);">■ Grön</span>
+      </div>
+    </div>
+
+    <!-- 4 Answer Cards -->
+    <div class="answers-grid">
+      <div class="k-card k-card-0" id="ans-card-0">
+        <div class="k-shape">▲</div>
+        <span id="ans-label-0">Alternativ 1</span>
+        <div class="k-check-badge">✓</div>
+      </div>
+      <div class="k-card k-card-1" id="ans-card-1">
+        <div class="k-shape">◆</div>
+        <span id="ans-label-1">Alternativ 2</span>
+        <div class="k-check-badge">✓</div>
+      </div>
+      <div class="k-card k-card-2" id="ans-card-2">
+        <div class="k-shape">●</div>
+        <span id="ans-label-2">Alternativ 3</span>
+        <div class="k-check-badge">✓</div>
+      </div>
+      <div class="k-card k-card-3" id="ans-card-3">
+        <div class="k-shape">■</div>
+        <span id="ans-label-3">Alternativ 4</span>
+        <div class="k-check-badge">✓</div>
+      </div>
+    </div>
+
+    <!-- Presenter Control Panel for Players -->
+    <div class="presenter-panel">
+      <div class="presenter-header">
+        <span id="presenter-instruction">🎯 Mobilsvar dyker upp automatiskt här! Du kan även klicka i vad spelarna gissar (▲ ◆ ● ■) eller ge rätt i efterhand.</span>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn" id="blind-mode-btn" style="padding:4px 10px; font-size:11px;" onclick="toggleBlindMode()">👁 Visa färgval direkt</button>
+          <button class="btn" style="padding:4px 10px; font-size:11px;" onclick="markAllCorrect()">✅ Alla hade rätt!</button>
+          <button class="btn" style="padding:4px 10px; font-size:11px;" onclick="clearRoundPicks()">↺ Rensa val</button>
+        </div>
+      </div>
+      <div class="player-control-grid" id="player-control-grid"></div>
+    </div>
+  </div>
+
+  <!-- 3. HYPE LEADERBOARD SCREEN -->
+  <div id="screen-leaderboard" class="screen">
+    <div class="hype-board-wrap">
+      <div class="hype-header">
+        <div style="font-size:14px; font-weight:900; color:var(--accent-amber); letter-spacing:2px; text-transform:uppercase;" id="lb-subtitle">STÄLLNING EFTER FRÅGA 1</div>
+        <h2 class="hype-title">🔥 ABBHOOT TOPPLISTA 🔥</h2>
+      </div>
+
+      <div class="leaderboard-rows" id="leaderboard-rows"></div>
+
+      <div style="display:flex; justify-content:center; margin-top:14px; gap:16px; flex-wrap:wrap;">
+        <button class="btn" id="lb-back-btn" onclick="backFromLeaderboard()">⬅ Tillbaka till frågan</button>
+        <button class="btn-hype" id="next-q-btn" onclick="nextQuestion()">Nästa Fråga ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. GRAND FINALE PODIUM SCREEN -->
+  <div id="screen-podium" class="screen">
+    <div style="text-align:center;">
+      <div style="font-size:15px; font-weight:900; color:var(--accent-amber); letter-spacing:3px; text-transform:uppercase;">SLUTRESULTAT // ABBHOOT CHAMPION</div>
+      <h2 class="hype-title" style="font-size:48px;">🏆 PALLPLATS & VINNARE 🏆</h2>
+    </div>
+
+    <div class="podium-stage">
+      <!-- 2nd Place -->
+      <div class="podium-column" id="podium-col-2">
+        <div class="podium-avatar">🥈</div>
+        <div class="podium-name" id="podium-name-2">–</div>
+        <div class="podium-pillar pillar-2">
+          <div class="pillar-place">2</div>
+          <div class="pillar-pts" id="podium-pts-2">0 p</div>
+        </div>
+      </div>
+
+      <!-- 1st Place -->
+      <div class="podium-column" id="podium-col-1">
+        <div class="podium-avatar">👑</div>
+        <div class="podium-name" id="podium-name-1" style="color:var(--accent-amber); font-size:28px;">–</div>
+        <div class="podium-pillar pillar-1">
+          <div class="pillar-place">1</div>
+          <div class="pillar-pts" id="podium-pts-1" style="background:#090418; color:var(--accent-amber);">0 p</div>
+        </div>
+      </div>
+
+      <!-- 3rd Place -->
+      <div class="podium-column" id="podium-col-3">
+        <div class="podium-avatar">🥉</div>
+        <div class="podium-name" id="podium-name-3">–</div>
+        <div class="podium-pillar pillar-3">
+          <div class="pillar-place">3</div>
+          <div class="pillar-pts" id="podium-pts-3">0 p</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hype-board-wrap" style="margin-top:20px;">
+      <h3 style="text-align:center; color:var(--text-muted); font-size:14px; text-transform:uppercase; letter-spacing:1.5px;">Övriga placeringar</h3>
+      <div class="leaderboard-rows" id="final-runnerups"></div>
+      <div style="display:flex; justify-content:center; gap:14px; margin-top:16px; flex-wrap:wrap;">
+        <button class="btn" onclick="backToLastQuestionFromPodium()">⬅ Ändra poäng på sista frågan</button>
+        <button class="btn-hype" onclick="resetScoresAndRestart()">🔄 Spela en ny omgång!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. MOBILE PLAYER SCREEN (Öppnas automatiskt när man skannar QR-koden) -->
+  <div id="screen-mobile" class="screen">
+    <div class="mobile-wrap">
+      <!-- Steg 1: Skriv in namn -->
+      <div id="mobile-join-step" class="mobile-card">
+        <div class="lobby-pin-badge">📱 ANSLUT TILL ABBHOOT // PIN: <span id="mobile-step-pin">4829</span></div>
+        <h2 style="font-size:32px; font-weight:900;">Vad heter du?</h2>
+        <p style="color:var(--text-muted); font-size:14px;">
+          Skriv ditt namn nedan så dyker du direkt upp på Abbes storskärm!
+        </p>
+        <input type="text" id="mobile-player-name-input" class="mobile-input" placeholder="Ditt namn..." maxlength="22" onkeydown="if(event.key==='Enter') submitMobileJoin()">
+        <button class="btn-hype" style="width:100%; justify-content:center;" onclick="submitMobileJoin()">🚀 Gå med i Abbhoot!</button>
+
+        <div style="margin-top:6px;">
+          <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Eller välj ditt namn direkt:</div>
+          <div id="mobile-quick-names" style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center;"></div>
+        </div>
+      </div>
+
+      <!-- Steg 2: Svarskontroll i mobilen -->
+      <div id="mobile-controller-step" class="mobile-card" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <span class="live-sync-pill"><span class="pulse-dot"></span> Inloggad: <strong id="mobile-active-name">Spelare</strong></span>
+          <button class="btn" style="padding:5px 10px; font-size:11px;" onclick="changeMobileName()">✎ Byt namn</button>
+        </div>
+
+        <div style="background:rgba(9,4,24,0.75); border:1px solid rgba(255,255,255,0.15); border-radius:14px; padding:12px;">
+          <div id="mobile-q-badge" style="font-size:12px; font-weight:900; color:var(--accent-amber); text-transform:uppercase; letter-spacing:1px;">
+            KOLLA PÅ STORSKÄRMEN & TRYCK DITT SVAR:
+          </div>
+          <div id="mobile-q-preview" style="font-size:15px; font-weight:800; color:#fff; margin-top:4px;">
+            Tryck på rätt färg/symbol nedan!
+          </div>
+        </div>
+
+        <div class="mobile-pad-grid">
+          <button class="mobile-pad-btn k-card-0" id="mpad-0" onclick="sendMobileAnswer(0)">
+            <span class="mobile-pad-shape">▲</span>
+            <span id="mpad-label-0">Röd</span>
+          </button>
+          <button class="mobile-pad-btn k-card-1" id="mpad-1" onclick="sendMobileAnswer(1)">
+            <span class="mobile-pad-shape">◆</span>
+            <span id="mpad-label-1">Blå</span>
+          </button>
+          <button class="mobile-pad-btn k-card-2" id="mpad-2" onclick="sendMobileAnswer(2)">
+            <span class="mobile-pad-shape">●</span>
+            <span id="mpad-label-2">Gul</span>
+          </button>
+          <button class="mobile-pad-btn k-card-3" id="mpad-3" onclick="sendMobileAnswer(3)">
+            <span class="mobile-pad-shape">■</span>
+            <span id="mpad-label-3">Grön</span>
+          </button>
+        </div>
+
+        <div id="mobile-answer-feedback" style="font-size:14px; font-weight:800; color:var(--accent-blue); min-height:22px;"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- STOR QR-KOD MODAL -->
+<div class="modal-overlay" id="qr-zoom-modal" onclick="closeQrZoomModal()">
+  <div class="modal-box" style="max-width:480px; align-items:center; text-align:center; gap:16px;" onclick="event.stopPropagation()">
+    <div class="lobby-pin-badge">📱 SKANNA MED MOBILKAMERAN</div>
+    <h3 style="font-size:28px; font-weight:900;">Gå med i ABBHOOT!</h3>
+    <div style="background:#fff; padding:18px; border-radius:22px; box-shadow:0 0 40px rgba(56,189,248,0.6);">
+      <div id="qr-zoom-target" style="width:280px; height:280px; display:flex; align-items:center; justify-content:center;"></div>
+    </div>
+    <div class="pin-pill-box">
+      <span class="pin-pill-label">SPEL-PIN:</span>
+      <span class="pin-pill-digits" id="zoom-pin-display">4829</span>
+    </div>
+    <button class="btn" onclick="closeQrZoomModal()">Stäng</button>
+  </div>
+</div>
+
+<!-- QUESTION EDITOR MODAL -->
+<div class="modal-overlay" id="editor-modal">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.15); padding-bottom:12px; flex-wrap:wrap; gap:10px;">
+      <h3 style="color:var(--accent-amber); font-size:20px;">⚙️ Anpassa Abbhoot-frågorna</h3>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn" onclick="addNewQuestionInEditor()">➕ Lägg till ny fråga</button>
+        <button class="btn" onclick="resetDefaultQuestions()">↺ Återställ 10 originalfrågor</button>
+        <button class="btn" onclick="closeEditor()">Avbryt</button>
+      </div>
+    </div>
+    <div class="editor-scroll" id="editor-list"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid rgba(255,255,255,0.15); flex-wrap:wrap; gap:10px;">
+      <span style="font-size:12px; color:var(--text-muted);">Tips: Markera radioknappen framför det alternativ som ska vara rätt svar.</span>
+      <button class="btn-hype" style="padding:10px 24px; font-size:14px;" onclick="saveEditor()">💾 Spara frågor & Stäng</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const DEFAULT_PLAYERS = ["Cajsa", "Alfred", "Anna", "Iza", "Anna (2)", "Ida", "Denise T", "Theodor"];
+
+  const DEFAULT_QUESTIONS = [
+    {
+      q: "Vilket djur bajsar fyrkantiga kuber (för att kuberna inte ska rulla iväg från reviret)?",
+      answers: ["Sengångare", "Vombat", "Näbbdjur", "Koala"],
+      correct: 1,
+      double: false
+    },
+    {
+      q: "Hur lång tid varade världshistoriens kortaste krig (mellan Storbritannien och Zanzibar 1896)?",
+      answers: ["38 minuter", "4 timmar", "2 dygn", "1 vecka"],
+      correct: 0,
+      double: false
+    },
+    {
+      q: "Vad såldes Ketchup ursprungligen som på apoteken under 1830-talet?",
+      answers: ["Hårfärgningsmedel", "Skokräm", "Medicin mot magsjuka", "Råttgift"],
+      correct: 2,
+      double: false
+    },
+    {
+      q: "Vilket land i världen har flest öar (över 267 000 stycken)?",
+      answers: ["Indonesien", "Kanada", "Filippinerna", "Sverige"],
+      correct: 3,
+      double: true
+    },
+    {
+      q: "Vad stämmer rent botaniskt om bananer och jordgubbar?",
+      answers: [
+        "Båda är stenfrukter",
+        "Bananen är ett bär – jordgubben är en nöt",
+        "Bananen är en rotfrukt",
+        "Båda räknas som grönsaker"
+      ],
+      correct: 1,
+      double: false
+    },
+    {
+      q: "Hur många näsor (lukttentakler) har en vanlig mördarsnigel?",
+      answers: ["Ingen alls", "1 näsa", "2 näsor", "4 näsor"],
+      correct: 3,
+      double: false
+    },
+    {
+      q: "Om du kunde vika ett vanligt A4-papper på mitten 42 gånger – hur tjockt skulle det bli?",
+      answers: [
+        "Som en tjock bok (12 cm)",
+        "Högt som Eiffeltornet (330 m)",
+        "Det når hela vägen till månen",
+        "Ungefär 1 mil"
+      ],
+      correct: 2,
+      double: true
+    },
+    {
+      q: "Hur länge kan en vanlig snigel sova i sträck om vädret är för torrt och tråkigt?",
+      answers: ["Upp till 3 år", "Max 2 veckor", "3 månader", "48 timmar"],
+      correct: 0,
+      double: false
+    },
+    {
+      q: "Vad kallas den officiella fobin för rädslan att vara utan sin mobiltelefon eller få slut på batteri?",
+      answers: ["Fonofobi", "Nomofobi", "Teknofobi", "Telefobi"],
+      correct: 1,
+      double: false
+    },
+    {
+      q: "FINALFRÅGA: Vilken kroppsdel växer inte en enda millimeter, utan är lika stor när du föds som när du är 90 år?",
+      answers: ["Öronen", "Knäskålarna", "Ögongloberna", "Näsan"],
+      correct: 2,
+      double: true
+    }
+  ];
+
+  // In-memory & session state
+  let questions = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+  let playerNames = [...DEFAULT_PLAYERS];
+  let mobileJoinedSet = new Set();
+  let editorDraftQuestions = [];
+
+  let players = [];
+  let gameHasStarted = false;
+  let currentQIndex = 0;
+  let timer = 20;
+  let timerPaused = false;
+  let timerInterval = null;
+  let isAnswerRevealed = false;
+  let blindMode = false;
+  let returnScreenFromPeek = "screen-lobby";
+  let isMidGamePeek = false;
+  let podiumTimers = [];
+  let tickAnimFrame = null;
+
+  let roundStartSnapshot = {};
+  let roundPicks = {};
+
+  // ===== QR CODE, PIN & LIVE MOBILE BRIDGE =====
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlPinParam = urlParams.get("pin");
+  let gamePin = urlPinParam || String(Math.floor(1000 + Math.random() * 9000));
+  let customBaseUrl = "";
+  let isMobileMode = Boolean(urlPinParam);
+  let currentMobilePlayerName = "";
+  let currentMobileSelectedChoice = null;
+  let ntfyEventSource = null;
+  let localBroadcast = null;
+
+  function showToast(msg) {
+    const container = document.getElementById("toast-container");
+    const el = document.createElement("div");
+    el.className = "toast-msg";
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.style.opacity = "0";
+      el.style.transition = "opacity 0.3s";
+      setTimeout(() => el.remove(), 300);
+    }, 2800);
+  }
+
+  function getJoinUrl() {
+    let base = customBaseUrl.trim();
+    if (!base) {
+      base = window.location.href.split("?")[0].split("#")[0];
+    }
+    const sep = base.includes("?") ? "&" : "?";
+    return `${base}${sep}pin=${encodeURIComponent(gamePin)}`;
+  }
+
+  function renderQrCode() {
+    const joinUrl = getJoinUrl();
+    document.getElementById("lobby-pin-display").textContent = gamePin;
+    document.getElementById("zoom-pin-display").textContent = gamePin;
+    document.getElementById("mobile-hdr-pin").textContent = gamePin;
+    document.getElementById("mobile-step-pin").textContent = gamePin;
+
+    const anchor = document.getElementById("join-url-anchor");
+    anchor.href = joinUrl;
+    anchor.textContent = joinUrl;
+
+    const qrContainer = document.getElementById("qr-code-container");
+    const zoomContainer = document.getElementById("qr-zoom-target");
+
+    if (typeof qrcode === "function") {
+      try {
+        const qr = qrcode(0, "M");
+        qr.addData(joinUrl);
+        qr.make();
+        const svgTag = qr.createSvgTag({ cellSize: 4, margin: 1, scalable: true });
+        qrContainer.innerHTML = svgTag;
+        zoomContainer.innerHTML = svgTag;
+        return;
+      } catch (e) {}
+    }
+
+    // Fallback om CDN-scriptet inte hunnit ladda
+    const apiImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=6&data=${encodeURIComponent(joinUrl)}`;
+    qrContainer.innerHTML = `<img src="${apiImgUrl}" alt="QR-kod för att gå med i Abbhoot">`;
+    zoomContainer.innerHTML = `<img src="${apiImgUrl}" alt="QR-kod för att gå med i Abbhoot">`;
+  }
+
+  window.openQrZoomModal = function() {
+    renderQrCode();
+    document.getElementById("qr-zoom-modal").style.display = "flex";
+  };
+
+  window.closeQrZoomModal = function() {
+    document.getElementById("qr-zoom-modal").style.display = "none";
+  };
+
+  window.copyJoinLink = function() {
+    const url = getJoinUrl();
+    const temp = document.createElement("textarea");
+    temp.value = url;
+    document.body.appendChild(temp);
+    temp.select();
+    try {
+      document.execCommand("copy");
+      showToast("📋 Anslutningslänken kopierad!");
+    } catch (e) {
+      showToast("Kunde inte kopiera automatiskt – markera länken.");
+    }
+    temp.remove();
+  };
+
+  window.toggleCustomUrlEditor = function() {
+    const ed = document.getElementById("custom-url-editor");
+    ed.classList.toggle("open");
+    if (ed.classList.contains("open")) {
+      const inp = document.getElementById("custom-base-url-input");
+      if (!inp.value) inp.value = window.location.href.split("?")[0];
+      inp.focus();
+    }
+  };
+
+  window.updateCustomBaseUrl = function(val) {
+    customBaseUrl = val.trim();
+    renderQrCode();
+  };
+
+  window.resetCustomBaseUrl = function() {
+    customBaseUrl = "";
+    document.getElementById("custom-base-url-input").value = "";
+    renderQrCode();
+    showToast("↺ Återställde till standard-URL");
+  };
+
+  // Realtidsbrygga (BroadcastChannel för flikar + ntfy.sh för mobiler över nätet)
+  function getChannelTopic() {
+    return `abbhoot_live_arena_${gamePin}`;
+  }
+
+  function initRealtimeBridge() {
+    const topic = getChannelTopic();
+
+    // 1. Lokal BroadcastChannel mellan flikar på samma enhet
+    if ("BroadcastChannel" in window) {
+      if (localBroadcast) localBroadcast.close();
+      localBroadcast = new BroadcastChannel(topic);
+      localBroadcast.onmessage = (ev) => {
+        if (ev && ev.data) handleIncomingBridgeMessage(ev.data);
+      };
+    }
+
+    // 2. Publik SSE-ström via ntfy.sh så mobiler på 4G/WiFi kan skicka namn & svar till storskärmen
+    try {
+      if (ntfyEventSource) ntfyEventSource.close();
+      ntfyEventSource = new EventSource(`https://ntfy.sh/${topic}/sse`);
+      ntfyEventSource.onmessage = (event) => {
+        try {
+          const outer = JSON.parse(event.data);
+          if (outer && outer.message) {
+            const payload = JSON.parse(outer.message);
+            handleIncomingBridgeMessage(payload);
+          }
+        } catch (err) {}
+      };
+    } catch (err) {}
+  }
+
+  function sendBridgeMessage(payload) {
+    const topic = getChannelTopic();
+    if (localBroadcast) {
+      try { localBroadcast.postMessage(payload); } catch (e) {}
+    }
+    // Om man testar mobilvyn i samma flik, hantera även direkt:
+    handleIncomingBridgeMessage(payload);
+
+    // Skicka över ntfy.sh för riktiga externa mobiler
+    fetch(`https://ntfy.sh/${topic}`, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    }).catch(() => {});
+  }
+
+  function handleIncomingBridgeMessage(msg) {
+    if (!msg || !msg.type) return;
+
+    if (msg.type === "PLAYER_JOIN" && msg.name) {
+      const cleanName = String(msg.name).trim();
+      if (!cleanName) return;
+      mobileJoinedSet.add(cleanName.toLowerCase());
+
+      const exists = playerNames.some(n => n.toLowerCase() === cleanName.toLowerCase());
+      if (!exists) {
+        playerNames.push(cleanName);
+        syncPlayersKeepingScores();
+        renderLobby();
+        if (document.getElementById("screen-question").classList.contains("active")) {
+          renderPresenterPlayerGrid();
+        }
+        playPopSound(680);
+        showToast(`📱 ${cleanName} anslöt från mobilen!`);
+      } else {
+        renderLobby();
+        showToast(`📱 ${cleanName} är redo på mobilen!`);
+      }
+    }
+
+    if (msg.type === "PLAYER_ANSWER" && msg.name && typeof msg.choice === "number") {
+      const targetPlayer = players.find(p => p.name.toLowerCase() === String(msg.name).trim().toLowerCase());
+      if (targetPlayer && !isAnswerRevealed) {
+        roundPicks[targetPlayer.id] = {
+          choice: msg.choice,
+          manualCorrect: false,
+          fastest: false
+        };
+        playPopSound(540 + msg.choice * 70);
+        renderPresenterPlayerGrid();
+      }
+    }
+
+    if (msg.type === "HOST_QUESTION_SYNC" && isMobileMode) {
+      updateMobileQuestionDetails(msg.qIndex, msg.qText, msg.answers);
+    }
+  }
+
+  function broadcastCurrentQuestionToMobiles() {
+    const q = questions[currentQIndex];
+    if (!q) return;
+    sendBridgeMessage({
+      type: "HOST_QUESTION_SYNC",
+      qIndex: currentQIndex,
+      qText: q.q,
+      answers: q.answers
+    });
+  }
+
+  // ===== MOBILVY-FUNKTIONER =====
+  window.switchToMobilePreview = function() {
+    isMobileMode = true;
+    document.getElementById("presenter-header-controls").style.display = "none";
+    document.getElementById("mobile-header-controls").style.display = "flex";
+    document.getElementById("header-sub-label").textContent = "📱 MOBILVY // SPELARKONTROLL";
+    renderMobileQuickNames();
+    const q = questions[currentQIndex] || questions[0];
+    updateMobileQuestionDetails(currentQIndex, q.q, q.answers);
+    showScreen("screen-mobile");
+  };
+
+  window.exitMobileModeToHost = function() {
+    isMobileMode = false;
+    document.getElementById("presenter-header-controls").style.display = "flex";
+    document.getElementById("mobile-header-controls").style.display = "none";
+    document.getElementById("header-sub-label").textContent = "👑 Spelledare: Abbe // Delad Storskärm + Mobil-QR";
+    if (gameHasStarted) {
+      showScreen("screen-question");
+      renderPresenterPlayerGrid();
+    } else {
+      goToLobby();
+    }
+  };
+
+  function renderMobileQuickNames() {
+    const wrap = document.getElementById("mobile-quick-names");
+    wrap.innerHTML = playerNames.map(n => `
+      <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="quickSelectMobileName('${esc(n)}')">${esc(n)}</button>
+    `).join("");
+  }
+
+  window.quickSelectMobileName = function(name) {
+    document.getElementById("mobile-player-name-input").value = name;
+    submitMobileJoin();
+  };
+
+  window.submitMobileJoin = function() {
+    const inp = document.getElementById("mobile-player-name-input");
+    const name = inp.value.trim();
+    if (!name) {
+      showToast("Skriv in ditt namn först!");
+      return;
+    }
+    currentMobilePlayerName = name;
+    document.getElementById("mobile-active-name").textContent = name;
+    document.getElementById("mobile-join-step").style.display = "none";
+    document.getElementById("mobile-controller-step").style.display = "flex";
+
+    sendBridgeMessage({
+      type: "PLAYER_JOIN",
+      name: name
+    });
+  };
+
+  window.changeMobileName = function() {
+    document.getElementById("mobile-controller-step").style.display = "none";
+    document.getElementById("mobile-join-step").style.display = "flex";
+  };
+
+  function updateMobileQuestionDetails(qIdx, qText, answers) {
+    currentMobileSelectedChoice = null;
+    for (let i = 0; i < 4; i++) {
+      const btn = document.getElementById(`mpad-${i}`);
+      if (btn) btn.classList.remove("selected-pad");
+      const lbl = document.getElementById(`mpad-label-${i}`);
+      if (lbl && answers && answers[i]) {
+        lbl.textContent = answers[i];
+      }
+    }
+    document.getElementById("mobile-q-badge").textContent = `FRÅGA ${(qIdx || 0) + 1} PÅ STORSKÄRMEN`;
+    document.getElementById("mobile-q-preview").textContent = qText || "Tryck på ditt svar nedan!";
+    document.getElementById("mobile-answer-feedback").textContent = "";
+  }
+
+  window.sendMobileAnswer = function(choiceIdx) {
+    if (!currentMobilePlayerName) return;
+    currentMobileSelectedChoice = choiceIdx;
+    for (let i = 0; i < 4; i++) {
+      const btn = document.getElementById(`mpad-${i}`);
+      if (i === choiceIdx) btn.classList.add("selected-pad");
+      else btn.classList.remove("selected-pad");
+    }
+    const shapes = ["▲ Röd", "◆ Blå", "● Gul", "■ Grön"];
+    document.getElementById("mobile-answer-feedback").textContent = `✅ Ditt svar (${shapes[choiceIdx]}) är inskickat till storskärmen!`;
+    playPopSound(640);
+
+    sendBridgeMessage({
+      type: "PLAYER_ANSWER",
+      name: currentMobilePlayerName,
+      choice: choiceIdx
+    });
+  };
+
+  // ===== PLAYERS & GAME STATE =====
+  function initPlayers() {
+    players = playerNames.map((name, idx) => ({
+      id: "p_" + idx + "_" + Date.now(),
+      name: name,
+      score: 0,
+      prevScore: 0,
+      lastDelta: 0,
+      streak: 0,
+      prevRank: 1,
+      rankClimb: 0,
+      wasFastest: false
+    }));
+    takeRoundSnapshot();
+  }
+
+  function syncPlayersKeepingScores() {
+    const existingByName = {};
+    players.forEach(p => { existingByName[p.name.toLowerCase()] = p; });
+    players = playerNames.map((name, idx) => {
+      const found = existingByName[name.toLowerCase()];
+      if (found) {
+        found.name = name;
+        return found;
+      }
+      return {
+        id: "p_" + idx + "_" + Date.now(),
+        name: name,
+        score: 0,
+        prevScore: 0,
+        lastDelta: 0,
+        streak: 0,
+        prevRank: players.length + 1,
+        rankClimb: 0,
+        wasFastest: false
+      };
+    });
+    takeRoundSnapshot();
+  }
+
+  function computeRanks(playerList) {
+    const sorted = [...playerList].sort((a, b) => b.score - a.score);
+    const rankMap = {};
+    let currentRank = 1;
+    sorted.forEach((p, idx) => {
+      if (idx > 0 && p.score < sorted[idx - 1].score) {
+        currentRank = idx + 1;
+      }
+      rankMap[p.id] = currentRank;
+    });
+    return rankMap;
+  }
+
+  function takeRoundSnapshot() {
+    const ranks = computeRanks(players);
+    roundStartSnapshot = {};
+    players.forEach(p => {
+      roundStartSnapshot[p.id] = {
+        score: p.score,
+        streak: p.streak,
+        rank: ranks[p.id] || 1
+      };
+    });
+  }
+
+  initPlayers();
+
+  // ===== LOBBY FUNCTIONS =====
+  function renderLobby() {
+    document.getElementById("hdr-q-count").textContent = questions.length;
+    document.getElementById("lobby-count").textContent = playerNames.length;
+    document.getElementById("resume-game-btn").style.display = gameHasStarted ? "inline-flex" : "none";
+    document.getElementById("start-game-btn").textContent = gameHasStarted
+      ? "🔄 STARTA NY OMGÅNG (NOLLSTÄLL POÄNG)"
+      : "🚀 STARTA ABBHOOT! (FRÅGA 1)";
+
+    const grid = document.getElementById("lobby-players-grid");
+    grid.innerHTML = playerNames.map((name, i) => {
+      const isMob = mobileJoinedSet.has(name.toLowerCase());
+      return `
+        <div class="lobby-player-chip ${isMob ? 'mobile-joined' : ''}">
+          <span>${isMob ? '📱' : '🎮'} ${esc(name)}</span>
+          <button onclick="removePlayer(${i})" title="Ta bort">✕</button>
+        </div>
+      `;
+    }).join("");
+
+    renderQrCode();
+  }
+
+  window.addPlayer = function() {
+    const inp = document.getElementById("new-player-input");
+    const val = inp.value.trim();
+    if (!val) return;
+    playerNames.push(val);
+    inp.value = "";
+    syncPlayersKeepingScores();
+    renderLobby();
+    playPopSound(600);
+  };
+
+  window.removePlayer = function(idx) {
+    if (playerNames.length <= 1) {
+      showToast("Minst 1 deltagare måste vara med!");
+      return;
+    }
+    playerNames.splice(idx, 1);
+    syncPlayersKeepingScores();
+    renderLobby();
+  };
+
+  window.resetDefaultPlayers = function() {
+    playerNames = [...DEFAULT_PLAYERS];
+    mobileJoinedSet.clear();
+    syncPlayersKeepingScores();
+    renderLobby();
+    playPopSound(520);
+    showToast("↺ Återställde de 8 standarddeltagarna");
+  };
+
+  window.goToLobby = function() {
+    clearAllTimers();
+    isMobileMode = false;
+    document.getElementById("presenter-header-controls").style.display = "flex";
+    document.getElementById("mobile-header-controls").style.display = "none";
+    showScreen("screen-lobby");
+    renderLobby();
+  };
+
+  window.resumeGame = function() {
+    showScreen("screen-question");
+  };
+
+  window.startGame = function() {
+    clearAllTimers();
+    initPlayers();
+    gameHasStarted = true;
+    currentQIndex = 0;
+    loadQuestion(0);
+    showScreen("screen-question");
+  };
+
+  // ===== QUESTION & PRESENTER LOGIC =====
+  function loadQuestion(idx) {
+    clearAllTimers();
+    currentQIndex = Math.max(0, Math.min(idx, questions.length - 1));
+    isAnswerRevealed = false;
+    timer = 20;
+    timerPaused = false;
+    roundPicks = {};
+    takeRoundSnapshot();
+
+    const q = questions[currentQIndex];
+    document.getElementById("hdr-q-count").textContent = questions.length;
+    document.getElementById("q-counter").textContent = `FRÅGA ${currentQIndex + 1} AV ${questions.length}`;
+    document.getElementById("q-double-badge").style.display = q.double ? "inline-block" : "none";
+    document.getElementById("question-text").textContent = q.q;
+
+    document.getElementById("reveal-btn").style.display = "inline-flex";
+    document.getElementById("to-scoreboard-btn").style.display = "none";
+    document.getElementById("chart-stage").style.display = "none";
+    document.getElementById("presenter-instruction").textContent =
+      "🎯 Mobilsvar dyker upp automatiskt! Du kan även klicka i vad spelarna gissar (▲ ◆ ● ■) eller avslöja svaret direkt.";
+
+    for (let i = 0; i < 4; i++) {
+      const card = document.getElementById(`ans-card-${i}`);
+      card.classList.remove("dimmed", "correct-highlight");
+      document.getElementById(`ans-label-${i}`).textContent = q.answers[i];
+    }
+
+    renderPresenterPlayerGrid();
+    updateTimerUI();
+    playQuestionIntroSound();
+    broadcastCurrentQuestionToMobiles();
+
+    timerInterval = setInterval(() => {
+      if (!timerPaused && !isAnswerRevealed) {
+        timer--;
+        updateTimerUI();
+        if (timer > 0) {
+          playTickSound(timer <= 5);
+        } else {
+          clearInterval(timerInterval);
+          revealAnswer();
+        }
+      }
+    }, 1000);
+  }
+
+  function updateTimerUI() {
+    const el = document.getElementById("timer-display");
+    el.textContent = timerPaused ? "⏸" : timer;
+    if (timer <= 5 && !timerPaused && !isAnswerRevealed) el.classList.add("urgent");
+    else el.classList.remove("urgent");
+  }
+
+  window.toggleTimerPause = function() {
+    if (isAnswerRevealed) return;
+    timerPaused = !timerPaused;
+    updateTimerUI();
+  };
+
+  window.toggleBlindMode = function() {
+    blindMode = !blindMode;
+    document.getElementById("blind-mode-btn").textContent = blindMode
+      ? "🙈 Färgval dolda under nedräkning"
+      : "👁 Visa färgval direkt";
+    renderPresenterPlayerGrid();
+  };
+
+  window.clearRoundPicks = function() {
+    roundPicks = {};
+    if (isAnswerRevealed) updateChartBars();
+    renderPresenterPlayerGrid();
+  };
+
+  function renderPresenterPlayerGrid() {
+    const grid = document.getElementById("player-control-grid");
+    const q = questions[currentQIndex] || questions[0];
+
+    grid.innerHTML = players.map(p => {
+      const snap = roundStartSnapshot[p.id] || { score: p.score, streak: p.streak };
+      const pick = roundPicks[p.id] || { choice: null, manualCorrect: false, fastest: false };
+      const isCorrectNow = isAnswerRevealed && (pick.manualCorrect || pick.choice === q.correct);
+      const hasPicked = pick.choice !== null;
+
+      return `
+        <div class="p-ctrl-card ${hasPicked && !isAnswerRevealed ? 'locked-in' : ''} ${isCorrectNow ? 'got-correct' : ''}">
+          <div class="p-ctrl-top">
+            <span>${esc(p.name)}</span>
+            <span class="p-streak-tag">${snap.streak >= 2 ? '🔥 x' + snap.streak : snap.score.toLocaleString("sv-SE") + ' p'}</span>
+          </div>
+
+          <div class="p-mini-btns" style="display:${isAnswerRevealed ? 'none' : 'grid'};">
+            <button class="mini-ans-btn m-0 ${hasPicked && pick.choice === 0 ? (blindMode ? 'blind-selected' : 'selected') : ''}" onclick="setPlayerPick('${p.id}', 0)">${blindMode && hasPicked && pick.choice === 0 ? '🔒' : '▲'}</button>
+            <button class="mini-ans-btn m-1 ${hasPicked && pick.choice === 1 ? (blindMode ? 'blind-selected' : 'selected') : ''}" onclick="setPlayerPick('${p.id}', 1)">${blindMode && hasPicked && pick.choice === 1 ? '🔒' : '◆'}</button>
+            <button class="mini-ans-btn m-2 ${hasPicked && pick.choice === 2 ? (blindMode ? 'blind-selected' : 'selected') : ''}" onclick="setPlayerPick('${p.id}', 2)">${blindMode && hasPicked && pick.choice === 2 ? '🔒' : '●'}</button>
+            <button class="mini-ans-btn m-3 ${hasPicked && pick.choice === 3 ? (blindMode ? 'blind-selected' : 'selected') : ''}" onclick="setPlayerPick('${p.id}', 3)">${blindMode && hasPicked && pick.choice === 3 ? '🔒' : '■'}</button>
+          </div>
+
+          <div class="quick-award-btns" style="display:${isAnswerRevealed ? 'grid' : 'none'};">
+            <button class="award-btn ${isCorrectNow ? 'active-correct' : ''}" onclick="togglePlayerCorrectAfterReveal('${p.id}')">
+              ${isCorrectNow ? '✅ Hade Rätt!' : '➕ Ge Rätt'}
+            </button>
+            <button class="award-btn ${pick.fastest ? 'active-fast' : ''}" onclick="togglePlayerFastest('${p.id}')">
+              ⚡ Snabbast (+250p)
+            </button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  window.setPlayerPick = function(playerId, choiceIdx) {
+    if (isAnswerRevealed) return;
+    const cur = roundPicks[playerId];
+    if (cur && cur.choice === choiceIdx) {
+      delete roundPicks[playerId];
+    } else {
+      roundPicks[playerId] = {
+        choice: choiceIdx,
+        manualCorrect: false,
+        fastest: false
+      };
+      playPopSound(520 + choiceIdx * 80);
+    }
+    renderPresenterPlayerGrid();
+  };
+
+  window.revealAnswer = function() {
+    if (isAnswerRevealed) return;
+    isAnswerRevealed = true;
+    clearInterval(timerInterval);
+    updateTimerUI();
+
+    const q = questions[currentQIndex];
+
+    for (let i = 0; i < 4; i++) {
+      const card = document.getElementById(`ans-card-${i}`);
+      if (i === q.correct) card.classList.add("correct-highlight");
+      else card.classList.add("dimmed");
+    }
+
+    updateChartBars();
+    document.getElementById("chart-stage").style.display = "flex";
+    document.getElementById("reveal-btn").style.display = "none";
+    document.getElementById("to-scoreboard-btn").style.display = "inline-flex";
+    document.getElementById("presenter-instruction").textContent =
+      "✨ Rätt svar avslöjat! Klicka på '➕ Ge Rätt' eller '⚡ Snabbast (+250p)' nedan för de som klarade frågan, och rulla sen in Topplistan!";
+
+    playRevealGong();
+    launchConfetti(45);
+    renderPresenterPlayerGrid();
+  };
+
+  function updateChartBars() {
+    const q = questions[currentQIndex];
+    const counts = [0, 0, 0, 0];
+    Object.values(roundPicks).forEach(pk => {
+      if (pk.choice !== null && pk.choice >= 0 && pk.choice <= 3) counts[pk.choice]++;
+      else if (pk.manualCorrect) counts[q.correct]++;
+    });
+    const maxCount = Math.max(1, ...counts);
+
+    for (let i = 0; i < 4; i++) {
+      const bar = document.getElementById(`chart-bar-${i}`);
+      const col = document.getElementById(`chart-col-${i}`);
+      const h = Math.round((counts[i] / maxCount) * 82) + 22;
+      bar.style.height = h + "px";
+      bar.textContent = counts[i] + (i === q.correct ? " ✓" : "");
+      if (i === q.correct) col.classList.add("correct-col");
+      else col.classList.remove("correct-col");
+    }
+  }
+
+  window.togglePlayerCorrectAfterReveal = function(playerId) {
+    const q = questions[currentQIndex];
+    const cur = roundPicks[playerId] || { choice: null, manualCorrect: false, fastest: false };
+    const currentlyRight = cur.manualCorrect || cur.choice === q.correct;
+
+    if (currentlyRight) {
+      cur.manualCorrect = false;
+      cur.fastest = false;
+      if (cur.choice === q.correct) cur.choice = null;
+    } else {
+      cur.manualCorrect = true;
+      cur.choice = q.correct;
+      playPopSound(750);
+    }
+    roundPicks[playerId] = cur;
+    updateChartBars();
+    renderPresenterPlayerGrid();
+  };
+
+  window.togglePlayerFastest = function(playerId) {
+    const q = questions[currentQIndex];
+    const cur = roundPicks[playerId] || { choice: q.correct, manualCorrect: true, fastest: false };
+    cur.fastest = !cur.fastest;
+    if (cur.fastest) {
+      cur.manualCorrect = true;
+      cur.choice = q.correct;
+      playPopSound(920);
+    }
+    roundPicks[playerId] = cur;
+    updateChartBars();
+    renderPresenterPlayerGrid();
+  };
+
+  window.markAllCorrect = function() {
+    if (!isAnswerRevealed) revealAnswer();
+    const q = questions[currentQIndex];
+    players.forEach(p => {
+      const prevFast = roundPicks[p.id]?.fastest || false;
+      roundPicks[p.id] = { choice: q.correct, manualCorrect: true, fastest: prevFast };
+    });
+    updateChartBars();
+    renderPresenterPlayerGrid();
+    playPopSound(880);
+  };
+
+  // ===== SCORE CALCULATION & HYPE LEADERBOARD =====
+  function calculateRoundScores() {
+    const q = questions[currentQIndex];
+    const multiplier = q.double ? 2 : 1;
+
+    players.forEach(p => {
+      const snap = roundStartSnapshot[p.id] || { score: 0, streak: 0, rank: 1 };
+      p.prevScore = snap.score;
+      p.score = snap.score;
+      p.streak = snap.streak;
+      p.prevRank = snap.rank;
+
+      const pick = roundPicks[p.id];
+      const isRight = Boolean(pick && (pick.manualCorrect || pick.choice === q.correct));
+
+      if (isRight) {
+        p.streak = snap.streak + 1;
+        const basePts = 1000 * multiplier;
+        const streakBonus = p.streak >= 2 ? Math.min((p.streak - 1) * 150, 600) : 0;
+        const fastBonus = pick.fastest ? 250 : 0;
+
+        p.lastDelta = basePts + streakBonus + fastBonus;
+        p.score = snap.score + p.lastDelta;
+        p.wasFastest = Boolean(pick.fastest);
+      } else {
+        p.streak = 0;
+        p.lastDelta = 0;
+        p.wasFastest = false;
+      }
+    });
+
+    const newRanks = computeRanks(players);
+    players.forEach(p => {
+      const hadPointsBefore = players.some(x => (roundStartSnapshot[x.id]?.score || 0) > 0);
+      p.rankClimb = hadPointsBefore ? Math.max(0, p.prevRank - newRanks[p.id]) : 0;
+    });
+  }
+
+  window.goToLeaderboard = function() {
+    clearAllTimers();
+    isMidGamePeek = false;
+    calculateRoundScores();
+    renderHypeLeaderboard(true);
+    showScreen("screen-leaderboard");
+  };
+
+  window.showHypeScoreboardMidGame = function() {
+    const activeEl = document.querySelector(".screen.active");
+    if (activeEl && activeEl.id !== "screen-leaderboard") {
+      returnScreenFromPeek = activeEl.id;
+    }
+    if (returnScreenFromPeek === "screen-question" && !isAnswerRevealed) {
+      timerPaused = true;
+      updateTimerUI();
+    }
+    isMidGamePeek = true;
+    renderHypeLeaderboard(false);
+    showScreen("screen-leaderboard");
+  };
+
+  window.backFromLeaderboard = function() {
+    if (isMidGamePeek) {
+      showScreen(returnScreenFromPeek || "screen-lobby");
+    } else {
+      showScreen("screen-question");
+    }
+  };
+
+  function renderHypeLeaderboard(animateCountUp) {
+    if (tickAnimFrame) cancelAnimationFrame(tickAnimFrame);
+
+    const sorted = [...players].sort((a, b) => b.score - a.score);
+    const rankMap = computeRanks(players);
+    const maxScore = Math.max(1000, sorted[0]?.score || 1000);
+    const anyScorePositive = sorted.some(p => p.score > 0);
+
+    document.getElementById("lb-subtitle").textContent = isMidGamePeek
+      ? `AKTUELL STÄLLNING I ABBHOOT`
+      : `STÄLLNING EFTER FRÅGA ${currentQIndex + 1} AV ${questions.length}`;
+
+    const nextBtn = document.getElementById("next-q-btn");
+    const backBtn = document.getElementById("lb-back-btn");
+
+    if (isMidGamePeek) {
+      nextBtn.style.display = "none";
+      backBtn.textContent = "⬅ Tillbaka";
+    } else {
+      nextBtn.style.display = "inline-flex";
+      backBtn.textContent = "⬅ Tillbaka & ändra svar på frågan";
+      if (currentQIndex + 1 >= questions.length) {
+        nextBtn.textContent = "🏆 AVSLÖJA SLUTPODIET! ➔";
+      } else {
+        nextBtn.textContent = `Nästa Fråga (${currentQIndex + 2}/${questions.length}) ➔`;
+      }
+    }
+
+    const container = document.getElementById("leaderboard-rows");
+    container.innerHTML = sorted.map((p, idx) => {
+      const rank = anyScorePositive ? rankMap[p.id] : (idx + 1);
+      const pct = anyScorePositive ? Math.round((p.score / maxScore) * 100) : 0;
+      const rankIcon = !anyScorePositive
+        ? `#${idx + 1}`
+        : rank === 1 ? "👑" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `#${rank}`;
+      const rowRankClass = anyScorePositive ? `rank-${rank}` : "";
+
+      let badgesHtml = "";
+      if (animateCountUp && p.rankClimb > 0) {
+        badgesHtml += `<span class="hype-badge badge-climb">🚀 KLÄTTRADE +${p.rankClimb}</span>`;
+      }
+      if (p.streak >= 2) {
+        badgesHtml += `<span class="hype-badge badge-streak">🔥 STREAK x${p.streak}</span>`;
+      }
+      if (animateCountUp && p.wasFastest) {
+        badgesHtml += `<span class="hype-badge badge-fast">⚡ SNABBAST</span>`;
+      }
+
+      const initialShownScore = animateCountUp ? p.prevScore : p.score;
+
+      return `
+        <div class="lb-row ${rowRankClass}" style="animation-delay: ${idx * 0.06}s;">
+          <div class="lb-row-fill" style="width: ${pct}%;"></div>
+          <div class="lb-left">
+            <div class="lb-rank-circle">${rankIcon}</div>
+            <span class="lb-name">${esc(p.name)}</span>
+            ${badgesHtml}
+          </div>
+          <div class="lb-right">
+            ${animateCountUp && p.lastDelta > 0 ? `<span class="lb-delta">+${p.lastDelta.toLocaleString("sv-SE")} p</span>` : ''}
+            <span class="lb-score" id="lb-score-${p.id}">${initialShownScore.toLocaleString("sv-SE")} p</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    playLeaderboardFanfare();
+
+    if (animateCountUp) {
+      const duration = 900;
+      const startTime = performance.now();
+
+      function tickNumbers(now) {
+        const progress = Math.min(1, (now - startTime) / duration);
+        sorted.forEach(p => {
+          const el = document.getElementById(`lb-score-${p.id}`);
+          if (el) {
+            const currentVal = Math.round(p.prevScore + (p.score - p.prevScore) * progress);
+            el.textContent = currentVal.toLocaleString("sv-SE") + " p";
+          }
+        });
+        if (progress < 1) {
+          tickAnimFrame = requestAnimationFrame(tickNumbers);
+        }
+      }
+      tickAnimFrame = requestAnimationFrame(tickNumbers);
+    }
+  }
+
+  window.nextQuestion = function() {
+    if (currentQIndex + 1 >= questions.length) {
+      showFinalPodium();
+    } else {
+      loadQuestion(currentQIndex + 1);
+      showScreen("screen-question");
+    }
+  };
+
+  window.backToLastQuestionFromPodium = function() {
+    clearAllTimers();
+    showScreen("screen-question");
+  };
+
+  // ===== GRAND FINALE PODIUM =====
+  function showFinalPodium() {
+    clearAllTimers();
+    showScreen("screen-podium");
+    const sorted = [...players].sort((a, b) => b.score - a.score);
+
+    const p1 = sorted[0] || { name: "–", score: 0 };
+    const p2 = sorted[1] || { name: "–", score: 0 };
+    const p3 = sorted[2] || { name: "–", score: 0 };
+
+    document.getElementById("podium-name-1").textContent = p1.name;
+    document.getElementById("podium-pts-1").textContent = p1.score.toLocaleString("sv-SE") + " p";
+
+    document.getElementById("podium-name-2").textContent = p2.name;
+    document.getElementById("podium-pts-2").textContent = p2.score.toLocaleString("sv-SE") + " p";
+
+    document.getElementById("podium-name-3").textContent = p3.name;
+    document.getElementById("podium-pts-3").textContent = p3.score.toLocaleString("sv-SE") + " p";
+
+    const col1 = document.getElementById("podium-col-1");
+    const col2 = document.getElementById("podium-col-2");
+    const col3 = document.getElementById("podium-col-3");
+    col1.classList.remove("revealed");
+    col2.classList.remove("revealed");
+    col3.classList.remove("revealed");
+
+    podiumTimers.push(setTimeout(() => {
+      col3.classList.add("revealed");
+      playPopSound(440);
+    }, 400));
+
+    podiumTimers.push(setTimeout(() => {
+      col2.classList.add("revealed");
+      playPopSound(587);
+    }, 1250));
+
+    podiumTimers.push(setTimeout(() => {
+      col1.classList.add("revealed");
+      document.body.classList.add("shake");
+      podiumTimers.push(setTimeout(() => document.body.classList.remove("shake"), 1000));
+      playChampionFanfare();
+      launchConfetti(140);
+    }, 2200));
+
+    const runners = sorted.slice(3);
+    const runnerEl = document.getElementById("final-runnerups");
+    runnerEl.innerHTML = runners.map((p, i) => `
+      <div class="lb-row">
+        <div class="lb-left">
+          <div class="lb-rank-circle">#${i + 4}</div>
+          <span class="lb-name">${esc(p.name)}</span>
+        </div>
+        <div class="lb-right">
+          <span class="lb-score">${p.score.toLocaleString("sv-SE")} p</span>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  window.resetScoresAndRestart = function() {
+    clearAllTimers();
+    gameHasStarted = false;
+    initPlayers();
+    goToLobby();
+  };
+
+  // ===== EDITOR MODAL =====
+  window.openEditor = function() {
+    editorDraftQuestions = JSON.parse(JSON.stringify(questions));
+    renderEditorList();
+    document.getElementById("editor-modal").style.display = "flex";
+  };
+
+  function collectEditorInputsIntoDraft() {
+    editorDraftQuestions.forEach((q, qi) => {
+      const qEl = document.getElementById(`ed_q_${qi}`);
+      if (!qEl) return;
+      q.q = qEl.value.trim() || q.q;
+      q.double = document.getElementById(`ed_double_${qi}`).checked;
+      for (let ai = 0; ai < 4; ai++) {
+        const aEl = document.getElementById(`ed_a_${qi}_${ai}`);
+        if (aEl) q.answers[ai] = aEl.value.trim() || q.answers[ai];
+      }
+      const radios = document.getElementsByName(`ed_corr_${qi}`);
+      radios.forEach((r, idx) => { if (r.checked) q.correct = idx; });
+    });
+  }
+
+  function renderEditorList() {
+    const list = document.getElementById("editor-list");
+    list.innerHTML = editorDraftQuestions.map((q, qi) => `
+      <div class="q-edit-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+          <strong style="color:var(--accent-amber);">Fråga #${qi + 1}</strong>
+          <div style="display:flex; align-items:center; gap:14px;">
+            <label style="font-size:13px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="ed_double_${qi}" ${q.double ? "checked" : ""}> ⚡ Dubbelpoäng (2x)
+            </label>
+            <button class="btn" style="padding:4px 8px; font-size:11px; color:#fca5a5;" onclick="removeQuestionInEditor(${qi})">🗑 Ta bort</button>
+          </div>
+        </div>
+        <input class="edit-input" id="ed_q_${qi}" value="${esc(q.q)}">
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
+          ${q.answers.map((ans, ai) => `
+            <div style="display:flex; align-items:center; gap:6px;">
+              <input type="radio" name="ed_corr_${qi}" value="${ai}" ${q.correct === ai ? "checked" : ""} title="Markera som rätt svar">
+              <input class="edit-input" id="ed_a_${qi}_${ai}" value="${esc(ans)}">
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `).join("");
+  }
+
+  window.addNewQuestionInEditor = function() {
+    collectEditorInputsIntoDraft();
+    editorDraftQuestions.push({
+      q: "Ny fråga...",
+      answers: ["Alternativ 1", "Alternativ 2", "Alternativ 3", "Alternativ 4"],
+      correct: 0,
+      double: false
+    });
+    renderEditorList();
+    const sc = document.getElementById("editor-list");
+    sc.scrollTop = sc.scrollHeight;
+  };
+
+  window.removeQuestionInEditor = function(qi) {
+    if (editorDraftQuestions.length <= 1) {
+      showToast("Spelet måste ha minst 1 fråga!");
+      return;
+    }
+    collectEditorInputsIntoDraft();
+    editorDraftQuestions.splice(qi, 1);
+    renderEditorList();
+  };
+
+  window.closeEditor = function() {
+    document.getElementById("editor-modal").style.display = "none";
+  };
+
+  window.saveEditor = function() {
+    collectEditorInputsIntoDraft();
+    questions = JSON.parse(JSON.stringify(editorDraftQuestions));
+    document.getElementById("hdr-q-count").textContent = questions.length;
+    closeEditor();
+    showToast("💾 Frågorna har sparats!");
+
+    if (currentQIndex >= questions.length) {
+      currentQIndex = questions.length - 1;
+    }
+    if (document.getElementById("screen-question").classList.contains("active")) {
+      loadQuestion(currentQIndex);
+    }
+  };
+
+  window.resetDefaultQuestions = function() {
+    editorDraftQuestions = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+    renderEditorList();
+    showToast("↺ Återställde de 10 originalfrågorna");
+  };
+
+  // ===== UTILITIES & AUDIO SYNTH =====
+  function clearAllTimers() {
+    clearInterval(timerInterval);
+    podiumTimers.forEach(t => clearTimeout(t));
+    podiumTimers = [];
+    if (tickAnimFrame) cancelAnimationFrame(tickAnimFrame);
+    document.body.classList.remove("shake");
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  function esc(s) {
+    return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+  }
+
+  let soundEnabled = true;
+  let audioCtx = null;
+
+  function getAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+
+  window.toggleSound = function() {
+    soundEnabled = !soundEnabled;
+    document.getElementById("sound-btn").textContent = soundEnabled ? "🔊 Ljud & Musik: PÅ" : "🔇 Ljud & Musik: AV";
+  };
+
+  function playPopSound(freq = 600) {
+    if (!soundEnabled) return;
+    const a = getAudio(), osc = a.createOscillator(), g = a.createGain();
+    osc.type = "triangle";
+    osc.connect(g); g.connect(a.destination);
+    osc.frequency.setValueAtTime(freq, a.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.35, a.currentTime + 0.09);
+    g.gain.setValueAtTime(0.18, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.01, a.currentTime + 0.09);
+    osc.start(); osc.stop(a.currentTime + 0.09);
+  }
+
+  function playTickSound(urgent) {
+    if (!soundEnabled) return;
+    const a = getAudio(), osc = a.createOscillator(), g = a.createGain();
+    osc.type = urgent ? "sawtooth" : "sine";
+    osc.connect(g); g.connect(a.destination);
+    osc.frequency.setValueAtTime(urgent ? 440 : 280, a.currentTime);
+    g.gain.setValueAtTime(0.12, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.008, a.currentTime + 0.07);
+    osc.start(); osc.stop(a.currentTime + 0.07);
+  }
+
+  function playQuestionIntroSound() {
+    if (!soundEnabled) return;
+    const a = getAudio();
+    [330, 440, 554.37, 659.25].forEach((f, i) => {
+      const osc = a.createOscillator(), g = a.createGain();
+      osc.type = "triangle";
+      osc.connect(g); g.connect(a.destination);
+      const t = a.currentTime + i * 0.08;
+      osc.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.16, t);
+      g.gain.exponentialRampToValueAtTime(0.01, t + 0.22);
+      osc.start(t); osc.stop(t + 0.22);
+    });
+  }
+
+  function playRevealGong() {
+    if (!soundEnabled) return;
+    const a = getAudio();
+    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+      const osc = a.createOscillator(), g = a.createGain();
+      osc.type = "sawtooth";
+      osc.connect(g); g.connect(a.destination);
+      const t = a.currentTime + i * 0.06;
+      osc.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.15, t);
+      g.gain.exponentialRampToValueAtTime(0.008, t + 0.4);
+      osc.start(t); osc.stop(t + 0.4);
+    });
+  }
+
+  function playLeaderboardFanfare() {
+    if (!soundEnabled) return;
+    const a = getAudio();
+    [392, 493.88, 587.33, 783.99].forEach((f, i) => {
+      const osc = a.createOscillator(), g = a.createGain();
+      osc.type = "triangle";
+      osc.connect(g); g.connect(a.destination);
+      const t = a.currentTime + i * 0.09;
+      osc.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.2, t);
+      g.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+      osc.start(t); osc.stop(t + 0.3);
+    });
+  }
+
+  function playChampionFanfare() {
+    if (!soundEnabled) return;
+    const a = getAudio();
+    const notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5];
+    notes.forEach((f, i) => {
+      const osc = a.createOscillator(), g = a.createGain();
+      osc.type = "triangle";
+      osc.connect(g); g.connect(a.destination);
+      const t = a.currentTime + i * 0.12;
+      osc.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.24, t);
+      g.gain.exponentialRampToValueAtTime(0.01, t + 0.45);
+      osc.start(t); osc.stop(t + 0.45);
+    });
+  }
+
+  // ===== CONFETTI =====
+  const canvas = document.getElementById("confetti-canvas"), cctx = canvas.getContext("2d");
+  let particles = [], animating = false;
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener("resize", resize); resize();
+
+  function launchConfetti(count) {
+    const colors = ["#fbbf24", "#ec4899", "#38bdf8", "#10b981", "#a855f7", "#e21b3c"];
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+        vx: (Math.random() - 0.5) * 22,
+        vy: (Math.random() - 0.8) * 22,
+        size: Math.random() * 9 + 5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 110
+      });
+    }
+    if (!animating) { animating = true; requestAnimationFrame(updateConfetti); }
+  }
+
+  function updateConfetti() {
+    cctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(q => {
+      q.x += q.vx; q.y += q.vy; q.vy += 0.35; q.life -= 1.1;
+      cctx.fillStyle = q.color;
+      cctx.fillRect(q.x, q.y, q.size, q.size);
+    });
+    particles = particles.filter(q => q.life > 0);
+    if (particles.length) requestAnimationFrame(updateConfetti);
+    else { animating = false; cctx.clearRect(0, 0, canvas.width, canvas.height); }
+  }
+
+  // Initiera vid sidladdning
+  initRealtimeBridge();
+  renderLobby();
+  if (isMobileMode) {
+    switchToMobilePreview();
+  }
+</script>
+</body>
+</html>
