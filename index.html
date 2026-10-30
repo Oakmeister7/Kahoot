@@ -1064,6 +1064,25 @@
   #screen-podium.pod-beat .winner-rays { filter: brightness(1.6); }
   @keyframes beatBump { 0% { transform: scale(1.035); } 100% { transform: scale(1); } }
   #screen-podium.pod-winner #podium-name-1 { font-size: 64px; }
+
+  /* ===== KLISTRA IN FRÅGOR ===== */
+  .ed-tabs { display: flex; gap: 6px; margin-top: 12px; border-bottom: 1px solid rgba(255,255,255,0.15); }
+  .ed-tab { background: transparent; border: 1px solid transparent; border-bottom: none; color: var(--text-muted); font-weight: 800; font-size: 14px; padding: 10px 16px; border-radius: 10px 10px 0 0; cursor: pointer; }
+  .ed-tab.active { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); color: #fff; }
+  .paste-help { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+  .paste-area { width: 100%; min-height: 240px; background: #090418; color: #e2e8f0; border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; padding: 12px; font-family: ui-monospace, Consolas, monospace; font-size: 13px; line-height: 1.5; resize: vertical; }
+  .paste-ok { background: rgba(16,185,129,0.15); border: 1px solid var(--accent-green); color: #6ee7b7; padding: 10px 14px; border-radius: 10px; font-weight: 800; font-size: 14px; }
+  .paste-err { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.6); color: #fecaca; padding: 10px 14px; border-radius: 10px; font-weight: 700; font-size: 13px; margin-top: 6px; }
+  .paste-err ul { margin: 6px 0 0 18px; }
+  .paste-status { display: flex; flex-direction: column; gap: 6px; }
+  .paste-preview { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
+  .pv-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 8px 12px; font-size: 13px; }
+  .pv-top { font-weight: 800; display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
+  .pv-time { margin-left: auto; color: var(--text-muted); font-weight: 700; }
+  .pv-dbl { color: var(--accent-amber); }
+  .pv-det { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 4px; color: var(--text-muted); }
+  .pv-right { color: #6ee7b7; font-weight: 800; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -1261,8 +1280,29 @@
         <button type="button" class="btn" onclick="closeEditor()">✕ Stäng</button>
       </div>
     </div>
+    <div class="ed-tabs">
+      <button type="button" class="ed-tab active" id="tab-edit" onclick="edTab('edit')">✏️ Redigera frågor</button>
+      <button type="button" class="ed-tab" id="tab-paste" onclick="edTab('paste')">📋 Klistra in frågor och svar</button>
+    </div>
     <div class="editor-scroll" id="editor-list"></div>
-    <div style="display:flex; justify-content:flex-end; padding-top:12px; border-top:1px solid rgba(255,255,255,0.15);">
+    <div class="editor-scroll" id="paste-panel" style="display:none;">
+      <div class="q-edit-card">
+        <div class="paste-help">Klistra in en färdig mall (t.ex. från Claude). Alla fyra frågetyper stöds: <b>Flerval</b>, <b>Skriv svar</b>, <b>Pussel</b> och <b>Skjutreglage</b>.</div>
+        <div class="ed-tools">
+          <button type="button" class="btn ed-mini" onclick="pasteInsertExample()">📄 Visa exempelmall</button>
+          <button type="button" class="btn ed-mini" onclick="copyPromptForClaude()">🤖 Kopiera beställning till Claude</button>
+          <button type="button" class="btn ed-mini" onclick="exportCurrentAsTemplate()">⬇️ Nuvarande frågor som mall</button>
+        </div>
+        <textarea class="paste-area" id="paste-text" spellcheck="false" placeholder="Klistra in mallen här…" oninput="pastePreview()"></textarea>
+        <div class="paste-status" id="paste-status"></div>
+        <div class="paste-preview" id="paste-preview"></div>
+        <div class="ed-tools" style="justify-content:flex-end;">
+          <button type="button" class="btn" id="paste-append" onclick="pasteImport('append')">➕ Lägg till efter mina frågor</button>
+          <button type="button" class="btn-hype" style="padding:10px 20px; font-size:14px;" id="paste-replace" onclick="pasteImport('replace')">✅ Ersätt alla frågor med dessa</button>
+        </div>
+      </div>
+    </div>
+    <div class="ed-footer" id="ed-footer" style="display:flex; justify-content:flex-end; padding-top:12px; border-top:1px solid rgba(255,255,255,0.15);">
       <button type="button" class="btn-hype" style="padding:10px 24px; font-size:14px;" onclick="saveEditor()">💾 Spara frågor & Stäng</button>
     </div>
   </div>
@@ -2654,6 +2694,7 @@
   window.openEditor = function() {
     edQ = JSON.parse(JSON.stringify(questions)).map(q => Object.assign({ type: qType(q) }, q));
     edReadTime = readTime;
+    if ($("paste-panel")) { $("paste-panel").style.display = "none"; $("editor-list").style.display = "flex"; $("ed-footer").style.display = "flex"; $("tab-edit").classList.add("active"); $("tab-paste").classList.remove("active"); }
     renderEditor();
     $("editor-modal").style.display = "flex";
   };
@@ -2709,6 +2750,267 @@
     if (!confirm("Ersätta alla frågor med originalfrågorna?")) return;
     edQ = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
     renderEditor();
+  };
+
+  // =====================================================================
+  // ===== KLISTRA IN FRÅGOR OCH SVAR (mall → frågor) =====================
+  // =====================================================================
+  //  Format (en fråga per block, block separeras med en rad "---"):
+  //    # FLERVAL | # SKRIV SVAR | # PUSSEL | # REGLAGE      (typen kan också gissas)
+  //    F: frågetext
+  //    Flerval:  A: alternativ   (rätt svar markeras A*: …)          4 st
+  //    Skriv:    SVAR: rätt; variant; variant
+  //    Pussel:   1: … 2: … 3: … 4: …  (i RÄTT ordning)  ÖVERST: / NEDERST: (valfritt)
+  //    Reglage:  MIN: MAX: STEG: RÄTT: MARGINAL: ENHET:
+  //    Valfritt: TID: sekunder   DUBBEL: ja
+  //    Överst i mallen (valfritt): LÄSTID: sekunder
+  const TEMPLATE_EXAMPLE = `LÄSTID: 5
+
+# FLERVAL
+F: Vilket djur bajsar fyrkantiga kuber?
+A: Sengångare
+A*: Vombat
+A: Näbbdjur
+A: Koala
+TID: 20
+---
+# SKRIV SVAR
+F: Vilket grundämne har kemiska tecknet Fe?
+SVAR: Järn; Jarn; Iron
+TID: 30
+---
+# PUSSEL
+F: Sortera djuren från minst till störst!
+1: Myra
+2: Katt
+3: Häst
+4: Blåval
+ÖVERST: Minst
+NEDERST: Störst
+TID: 30
+---
+# REGLAGE
+F: Vilket år invigdes Öresundsbron?
+MIN: 1980
+MAX: 2020
+STEG: 1
+RÄTT: 2000
+MARGINAL: 3
+ENHET:
+TID: 20
+DUBBEL: ja`;
+
+  const PROMPT_FOR_CLAUDE = `Skapa [ANTAL] quizfrågor om [ÄMNE] till mitt quiz ABBHOOT.
+Blanda de fyra frågetyperna (flerval, skriv svar, pussel, reglage). Frågorna ska vara faktamässigt korrekta och ha ett entydigt rätt svar.
+Svara ENDAST med mallen nedan i ett kodblock – inga förklaringar – så att jag kan klistra in den direkt.
+
+Regler för mallen:
+- En fråga per block, block separeras med en rad: ---
+- Börja varje block med typen: # FLERVAL, # SKRIV SVAR, # PUSSEL eller # REGLAGE
+- F: frågetexten
+- FLERVAL: exakt 4 rader "A: …", rätt svar markeras "A*: …"
+- SKRIV SVAR: "SVAR: rätt; stavningsvariant; variant" (skilj med semikolon, ta med varianter utan å/ä/ö)
+- PUSSEL: "1: … 2: … 3: … 4: …" i RÄTT ordning, valfritt "ÖVERST: …" och "NEDERST: …"
+- REGLAGE: MIN, MAX, STEG, RÄTT, MARGINAL (godkänd felmarginal), ENHET (t.ex. %, år, kr eller tomt)
+- Valfritt per fråga: TID: sekunder (5–240), DUBBEL: ja
+- Valfritt överst: LÄSTID: sekunder
+
+Exempel:
+${TEMPLATE_EXAMPLE}`;
+
+  function parseTemplate(text) {
+    const res = { questions: [], errors: [], readTime: null };
+    const lines = String(text || "").replace(/\r/g, "").split("\n");
+    // Dela upp i block: "---" eller ny "# TYP"/"F:" när blocket redan har en fråga
+    const blocks = []; let cur = null;
+    const startBlock = (ln) => { cur = { lines: [], start: ln }; blocks.push(cur); };
+    lines.forEach((raw, idx) => {
+      const ln = idx + 1;
+      const line = raw.replace(/^\s*[-*•]\s+(?=[A-Za-zÅÄÖåäö0-9#])/, "").trim();   // tål punktlistor
+      if (!line || /^```/.test(line)) return;
+      if (/^-{3,}$/.test(line) || /^={3,}$/.test(line)) { cur = null; return; }
+      const m = line.match(/^(LÄSTID|LASTID|READ ?TIME)\s*[:=]\s*(\d+)/i);
+      if (m) { res.readTime = Math.max(0, Math.min(30, Number(m[2]))); return; }
+      const isHeader = /^#{1,3}\s*\S/.test(line);
+      const isQ = /^(F|FRÅGA|FRAGA|Q|QUESTION)\s*[:.]/i.test(line);
+      if (!cur || (isHeader && cur.lines.some(l => /^#/.test(l.t) || /^(F|FRÅGA|FRAGA|Q|QUESTION)\s*[:.]/i.test(l.t))) ||
+          (isQ && cur.lines.some(l => /^(F|FRÅGA|FRAGA|Q|QUESTION)\s*[:.]/i.test(l.t)))) startBlock(ln);
+      cur.lines.push({ t: line, ln });
+    });
+
+    blocks.forEach((b, bi) => {
+      const nr = bi + 1, where = `Fråga ${nr} (rad ${b.start})`;
+      let type = null, q = "", answers = [], correctIdx = -1, accepted = null, ordered = {}, labels = { first: "", last: "" };
+      const sl = {}; let time = null, dbl = false;
+      const kv = (t) => { const m = t.match(/^([^:=]{1,20})\s*[:=]\s*(.*)$/); return m ? [m[1].trim().toUpperCase(), m[2].trim()] : null; };
+      b.lines.forEach(({ t }) => {
+        if (/^#/.test(t)) {
+          const h = t.replace(/^#+\s*/, "").toUpperCase();
+          if (/FLERVAL|CHOICE|QUIZ|ALTERNATIV/.test(h)) type = "choice";
+          else if (/SKRIV|TYPE|FRITEXT/.test(h)) type = "type";
+          else if (/PUSSEL|PUZZLE|ORDNING|SORTER/.test(h)) type = "puzzle";
+          else if (/REGLAGE|SLIDER|SKJUT/.test(h)) type = "slider";
+          return;
+        }
+        // A*: / A (rätt): / A: … ✓
+        let m = t.match(/^(A|ALT|SVARSALTERNATIV|[▲◆●■])\s*(\*|\(rätt\)|\(r\)|✓|✔)?\s*[:.)]\s*(.*)$/i);
+        if (m && !/^ALT\w/i.test(t.split(":")[0].replace(/^ALT$/i, "x"))) {
+          let txt = m[3].trim(); let right = !!m[2];
+          if (/\s*(\*|✓|✔|\(rätt\))\s*$/i.test(txt)) { right = true; txt = txt.replace(/\s*(\*|✓|✔|\(rätt\))\s*$/i, "").trim(); }
+          if (right) correctIdx = answers.length;
+          answers.push(txt); return;
+        }
+        m = t.match(/^([1-9])\s*[:.)]\s*(.*)$/);
+        if (m) { ordered[Number(m[1])] = m[2].trim(); return; }
+        const p = kv(t); if (!p) return;
+        const [k, v] = p;
+        if (/^(F|FRÅGA|FRAGA|Q|QUESTION)$/.test(k)) q = v;
+        else if (/^(SVAR|RÄTT SVAR|RATT SVAR|ANSWER|ANSWERS|GODKÄNDA SVAR)$/.test(k)) accepted = v.split(/[;|]/).map(x => x.trim()).filter(Boolean);
+        else if (/^(RÄTT|RATT|CORRECT)$/.test(k)) {
+          if (/^[A-D]$/i.test(v)) correctIdx = "ABCD".indexOf(v.toUpperCase());
+          else if (/^[1-4]$/.test(v) && answers.length === 4 && !Number.isFinite(sl.min)) correctIdx = Number(v) - 1;
+          else sl.correct = num2(v);
+        }
+        else if (/^(MIN)$/.test(k)) sl.min = num2(v);
+        else if (/^(MAX)$/.test(k)) sl.max = num2(v);
+        else if (/^(STEG|STEP)$/.test(k)) sl.step = num2(v);
+        else if (/^(MARGINAL|FELMARGINAL|MARGIN|TOLERANS)$/.test(k)) sl.margin = num2(v);
+        else if (/^(ENHET|UNIT)$/.test(k)) sl.unit = v;
+        else if (/^(ÖVERST|OVERST|FÖRST|FORST|TOP)$/.test(k)) labels.first = v;
+        else if (/^(NEDERST|SIST|BOTTOM)$/.test(k)) labels.last = v;
+        else if (/^(TID|TIME|SEKUNDER)$/.test(k)) time = num2(v);
+        else if (/^(DUBBEL|DOUBLE|2X|DUBBELPOÄNG)$/.test(k)) dbl = /^(ja|yes|j|y|1|true|x)$/i.test(v);
+      });
+      // Gissa typ om rubrik saknas
+      if (!type) {
+        if (Number.isFinite(sl.min) || Number.isFinite(sl.max)) type = "slider";
+        else if (accepted) type = "type";
+        else if (Object.keys(ordered).length) type = "puzzle";
+        else if (answers.length) type = "choice";
+      }
+      const errs = [];
+      if (!q) errs.push("frågetext saknas (F: …)");
+      if (!type) errs.push("okänd frågetyp – börja blocket med # FLERVAL, # SKRIV SVAR, # PUSSEL eller # REGLAGE");
+      const out = { type: type || "choice", q, double: dbl };
+      if (Number.isFinite(time)) out.time = Math.max(5, Math.min(240, Math.round(time)));
+      if (type === "choice") {
+        if (answers.length !== 4) errs.push(`flerval kräver exakt 4 alternativ (hittade ${answers.length})`);
+        if (correctIdx < 0) errs.push("rätt svar saknas – markera det med A*: …");
+        out.answers = answers.slice(0, 4); out.correct = Math.max(0, correctIdx);
+      }
+      if (type === "type") {
+        if (!accepted || !accepted.length) errs.push("godkänt svar saknas (SVAR: …)");
+        out.accepted = accepted || [];
+      }
+      if (type === "puzzle") {
+        const items = [1, 2, 3, 4].map(n => ordered[n] || "");
+        if (items.some(x => !x)) errs.push("pussel kräver raderna 1: 2: 3: 4: i rätt ordning");
+        out.answers = items; out.labels = labels;
+      }
+      if (type === "slider") {
+        out.slider = { min: sl.min, max: sl.max, step: Number.isFinite(sl.step) ? sl.step : 1, correct: sl.correct, margin: Number.isFinite(sl.margin) ? sl.margin : 0, unit: sl.unit || "" };
+        ["min", "max", "correct"].forEach(k => { if (!Number.isFinite(sl[k])) errs.push(`reglage saknar ${k === "correct" ? "RÄTT" : k.toUpperCase()}`); });
+      }
+      if (!errs.length) errorsFromEditor(out).forEach(e => errs.push(e));
+      if (errs.length) res.errors.push(`${where}: ${errs.join(", ")}`);
+      else res.questions.push(out);
+    });
+    if (!blocks.length) res.errors.push("Ingen fråga hittades i texten.");
+    return res;
+  }
+  function num2(v) { const n = Number(String(v).replace(/\s/g, "").replace(",", ".")); return String(v).trim() === "" ? NaN : n; }
+  function errorsFromEditor(q) { return editorProblems(q, 0).map(e => e.replace(/^#1:\s*/, "")); }
+
+  function toTemplate(qs, rt) {
+    const out = [`LÄSTID: ${rt}`, ""];
+    qs.forEach((q, i) => {
+      const t = qType(q), L = [];
+      L.push({ choice: "# FLERVAL", type: "# SKRIV SVAR", puzzle: "# PUSSEL", slider: "# REGLAGE" }[t]);
+      L.push(`F: ${q.q}`);
+      if (t === "choice") q.answers.forEach((a, k) => L.push(`${k === q.correct ? "A*" : "A"}: ${a}`));
+      if (t === "type") L.push(`SVAR: ${(q.accepted || []).join("; ")}`);
+      if (t === "puzzle") { q.answers.forEach((a, k) => L.push(`${k + 1}: ${a}`)); if (q.labels && q.labels.first) L.push(`ÖVERST: ${q.labels.first}`); if (q.labels && q.labels.last) L.push(`NEDERST: ${q.labels.last}`); }
+      if (t === "slider") { const s = q.slider; L.push(`MIN: ${s.min}`, `MAX: ${s.max}`, `STEG: ${s.step}`, `RÄTT: ${s.correct}`, `MARGINAL: ${s.margin || 0}`, `ENHET: ${s.unit || ""}`); }
+      L.push(`TID: ${q.time || TYPES[t].time}`);
+      if (q.double) L.push("DUBBEL: ja");
+      out.push(L.join("\n")); if (i < qs.length - 1) out.push("---");
+    });
+    return out.join("\n");
+  }
+
+  window.edTab = function(which) {
+    const paste = which === "paste";
+    if (!paste) renderEditor(); else collectEditor();
+    $("editor-list").style.display = paste ? "none" : "flex";
+    $("paste-panel").style.display = paste ? "flex" : "none";
+    $("ed-footer").style.display = paste ? "none" : "flex";
+    $("tab-edit").classList.toggle("active", !paste);
+    $("tab-paste").classList.toggle("active", paste);
+    if (paste) pastePreview();
+  };
+
+  window.pastePreview = function() {
+    const txt = $("paste-text").value;
+    const st = $("paste-status"), pv = $("paste-preview");
+    if (!txt.trim()) { st.innerHTML = ""; pv.innerHTML = ""; $("paste-replace").disabled = $("paste-append").disabled = true; return; }
+    const r = parseTemplate(txt);
+    const counts = {}; r.questions.forEach(q => { counts[q.type] = (counts[q.type] || 0) + 1; });
+    const summary = Object.entries(counts).map(([k, n]) => `${TYPES[k].icon} ${n} ${TYPES[k].label.toLowerCase()}`).join(" · ");
+    st.innerHTML = (r.questions.length ? `<div class="paste-ok">✅ ${r.questions.length} frågor klara att importera${summary ? " – " + summary : ""}${r.readTime !== null ? ` · 📖 lästid ${r.readTime} s` : ""}</div>` : "")
+      + (r.errors.length ? `<div class="paste-err">⚠️ ${r.errors.length} att rätta (importeras inte förrän de är rättade):<ul>${r.errors.map(e => `<li>${esc(e)}</li>`).join("")}</ul></div>` : "");
+    pv.innerHTML = r.questions.map((q, i) => {
+      const t = qType(q); let det = "";
+      if (t === "choice") det = q.answers.map((a, k) => `<span class="${k === q.correct ? "pv-right" : ""}">${SHAPES[k]} ${esc(a)}</span>`).join("");
+      if (t === "type") det = `<span class="pv-right">✓ ${esc(q.accepted.join(" / "))}</span>`;
+      if (t === "puzzle") det = q.answers.map((a, k) => `<span>${k + 1}. ${esc(a)}</span>`).join("");
+      if (t === "slider") det = `<span>${fmtNum(q.slider.min)}–${fmtNum(q.slider.max)}${q.slider.unit ? " " + esc(q.slider.unit) : ""}</span><span class="pv-right">✓ ${fmtNum(q.slider.correct)} ±${fmtNum(q.slider.margin)}</span>`;
+      return `<div class="pv-card"><div class="pv-top"><b>${i + 1}.</b> ${TYPES[t].icon} ${esc(q.q)}${q.double ? " <span class='pv-dbl'>⚡2x</span>" : ""}<span class="pv-time">⏱ ${q.time || TYPES[t].time} s</span></div><div class="pv-det">${det}</div></div>`;
+    }).join("");
+    $("paste-replace").disabled = $("paste-append").disabled = !r.questions.length || r.errors.length > 0;
+  };
+
+  window.pasteImport = function(mode) {
+    const r = parseTemplate($("paste-text").value);
+    if (!r.questions.length || r.errors.length) { pastePreview(); return; }
+    collectEditor();
+    if (mode === "replace" && !confirm(`Ersätta alla ${edQ.length} nuvarande frågor med ${r.questions.length} nya?`)) return;
+    edQ = mode === "replace" ? r.questions : edQ.concat(r.questions);
+    if (r.readTime !== null) edReadTime = r.readTime;
+    // Spara direkt så att inget försvinner om fönstret stängs
+    questions = JSON.parse(JSON.stringify(edQ));
+    lsSet(LS_QUESTIONS_KEY, questions);
+    readTime = edReadTime; lsSet("abbhoot_read_time", readTime);
+    if (pin) upd({ "state/total": questions.length });
+    $("paste-text").value = "";
+    edTab("edit");
+    const banner = document.createElement("div");
+    banner.className = "paste-ok"; banner.style.margin = "0 0 6px";
+    banner.textContent = `✅ ${r.questions.length} frågor importerade och sparade (${mode === "replace" ? "ersatte de gamla" : "lades till sist"}). Totalt ${questions.length} frågor.`;
+    $("editor-list").prepend(banner);
+  };
+
+  window.pasteInsertExample = function() {
+    const ta = $("paste-text");
+    if (ta.value.trim() && !confirm("Ersätta texten i rutan med exempelmallen?")) return;
+    ta.value = TEMPLATE_EXAMPLE; pastePreview();
+  };
+  async function copyText(t) {
+    try { await navigator.clipboard.writeText(t); return true; } catch (e) {
+      const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select();
+      let ok = false; try { ok = document.execCommand("copy"); } catch (e2) {} ta.remove(); return ok;
+    }
+  }
+  window.copyPromptForClaude = async function() {
+    const ok = await copyText(PROMPT_FOR_CLAUDE);
+    $("paste-status").innerHTML = ok
+      ? `<div class="paste-ok">🤖 Beställningen är kopierad! Klistra in den hos Claude, byt ut [ANTAL] och [ÄMNE], och klistra sedan in svaret här.</div>`
+      : `<div class="paste-err">Kunde inte kopiera automatiskt – markera texten nedan och kopiera själv.</div><textarea class="paste-area" readonly>${esc(PROMPT_FOR_CLAUDE)}</textarea>`;
+  };
+  window.exportCurrentAsTemplate = function() {
+    collectEditor();
+    const ta = $("paste-text");
+    if (ta.value.trim() && !confirm("Ersätta texten i rutan med dina nuvarande frågor?")) return;
+    ta.value = toTemplate(edQ, edReadTime); pastePreview();
   };
 
   // ---------- TANGENTER: → nästa steg, P kontroller ----------
