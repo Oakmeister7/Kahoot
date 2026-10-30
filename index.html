@@ -829,6 +829,56 @@
   .p-result .big { font-size: 40px; font-weight: 900; }
   .p-result .pts { font-size: 26px; font-weight: 900; font-family: monospace; background: rgba(0,0,0,0.2); padding: 4px 16px; border-radius: 99px; }
   .p-rank { font-size: 64px; font-weight: 900; color: var(--accent-amber); line-height: 1; }
+
+  /* ===== NYA FRÅGETYPER ===== */
+  .q-type-pill { background: rgba(56,189,248,0.18); border: 1px solid var(--accent-blue); color: #7dd3fc; font-weight: 900; padding: 6px 12px; border-radius: 8px; font-size: 13px; letter-spacing: 1px; }
+  .alt-stage { flex-direction: column; align-items: center; gap: 14px; background: var(--bg-card); border: 2px solid var(--border-glow); border-radius: 20px; padding: 26px 24px; text-align: center; }
+  .alt-hint { font-size: 34px; font-weight: 900; line-height: 1.3; }
+  .alt-sub { font-size: 16px; font-weight: 800; color: var(--text-muted); }
+  .alt-correct { font-size: 40px; font-weight: 900; background: var(--accent-green); color: #052e16; padding: 10px 30px; border-radius: 16px; box-shadow: 0 0 40px rgba(16,185,129,0.5); }
+  .alt-chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 1000px; }
+  .alt-chip { padding: 8px 14px; border-radius: 12px; font-size: 18px; font-weight: 800; border: 2px solid; }
+  .alt-chip.ok { background: rgba(16,185,129,0.2); border-color: var(--accent-green); color: #6ee7b7; }
+  .alt-chip.bad { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.6); color: #fca5a5; }
+  .alt-order { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 760px; }
+  .alt-order-row { display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-radius: 14px; font-size: 24px; font-weight: 900; color: #fff; text-align: left; }
+  .alt-order-row .n { background: #fff; color: #090418; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .alt-order-row .s { font-size: 26px; opacity: 0.85; }
+  .slider-track { position: relative; width: 100%; max-width: 900px; height: 34px; background: rgba(255,255,255,0.1); border-radius: 99px; margin: 18px 0 4px; }
+  .slider-band { position: absolute; top: 0; bottom: 0; background: rgba(16,185,129,0.35); border-radius: 99px; }
+  .slider-dot { position: absolute; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: #fca5a5; border: 2px solid #fff; }
+  .slider-dot.ok { background: #34d399; }
+  .slider-mark { position: absolute; top: -12px; bottom: -12px; width: 6px; margin-left: -3px; background: var(--accent-amber); border-radius: 4px; box-shadow: 0 0 18px rgba(251,191,36,0.9); }
+  .slider-ends { width: 100%; max-width: 900px; display: flex; justify-content: space-between; font-weight: 800; color: var(--text-muted); }
+
+  /* Mobil: skriv svar / pussel / reglage */
+  .p-text-input { width: 100%; background: #fff; color: #0f172a; border: none; border-radius: 14px; padding: 18px; font-size: 24px; font-weight: 800; text-align: center; }
+  .p-submit { width: 100%; }
+  .p-puzzle { display: flex; flex-direction: column; gap: 10px; }
+  .p-puzzle-row { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 14px; color: #fff; font-weight: 800; font-size: 17px; }
+  .p-puzzle-row .n { background: #fff; color: #090418; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 900; }
+  .p-puzzle-row .t { flex: 1; text-align: left; }
+  .p-puzzle-row .mv { display: flex; flex-direction: column; gap: 4px; }
+  .p-puzzle-row .mv button { background: rgba(0,0,0,0.3); color: #fff; border: none; width: 44px; height: 30px; border-radius: 8px; font-size: 16px; font-weight: 900; cursor: pointer; touch-action: manipulation; }
+  .p-puzzle-row .mv button:disabled { opacity: 0.25; }
+  .p-puzzle-label { font-size: 13px; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+  .p-slider-val { font-size: 54px; font-weight: 900; font-family: monospace; text-align: center; color: var(--accent-amber); }
+  .p-range { width: 100%; height: 44px; accent-color: var(--accent-amber); }
+  .p-range-ends { display: flex; justify-content: space-between; font-weight: 800; color: var(--text-muted); font-size: 14px; }
+  .p-step-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Redigerare */
+  .ed-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ed-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .ed-label { font-size: 12px; font-weight: 800; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; }
+  .ed-tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .ed-tools select { background: #090418; color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; padding: 6px 8px; font-weight: 800; }
+  .ed-mini { padding: 4px 9px !important; font-size: 12px !important; }
+
+  /* ===== INLOGGNING SPELLEDARE ===== */
+  .host-login { position: relative; z-index: 6; flex: 1; align-items: center; justify-content: center; padding: 30px 16px; }
+  body.role-host.host-locked .host-auth-only,
+  body.role-host:not(.host-ready) .host-auth-only { display: none !important; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -848,17 +898,33 @@
   </div>
   <div class="header-controls">
     <span class="screen-status" id="conn-status">⏳ Ansluter…</span>
-    <button type="button" class="btn host-only" id="btn-toggle-panel" onclick="togglePanel()">🎛 Visa kontroller (P)</button>
-    <button type="button" class="btn host-only" onclick="openEditor()">⚙️ Redigera frågor</button>
-    <button type="button" class="btn host-only" id="sound-btn" onclick="toggleSound()">🔊 Ljud & Musik: PÅ</button>
-    <button type="button" class="btn host-only" onclick="confirmNewGame()">🆕 Nytt spel (ny PIN)</button>
+    <button type="button" class="btn host-only host-auth-only" id="btn-toggle-panel" onclick="togglePanel()">🎛 Visa kontroller (P)</button>
+    <button type="button" class="btn host-only host-auth-only" onclick="openEditor()">⚙️ Redigera frågor</button>
+    <button type="button" class="btn host-only host-auth-only" id="sound-btn" onclick="toggleSound()">🔊 Ljud & Musik: PÅ</button>
+    <button type="button" class="btn host-only host-auth-only" onclick="confirmNewGame()">🆕 Nytt spel (ny PIN)</button>
+    <span class="screen-status on host-only host-auth-only" id="host-user">👤</span>
+    <button type="button" class="btn host-only host-auth-only" onclick="hostLogout()">🚪 Logga ut</button>
   </div>
 </header>
 
 <div class="db-error" id="db-error"></div>
 
+<!-- ===================== INLOGGNING SPELLEDARE ===================== -->
+<div class="host-login host-only" id="host-login" style="display:none;">
+  <div class="p-card" style="max-width:420px; width:100%;">
+    <div style="font-size:54px;">🔒</div>
+    <h2>Spelledare</h2>
+    <p>Logga in för att skapa och leda ett spel.</p>
+    <input class="p-input" id="hl-user" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="Användarnamn" onkeydown="if(event.key==='Enter') document.getElementById('hl-pass').focus()">
+    <input class="p-input" id="hl-pass" type="password" autocomplete="current-password" placeholder="Lösenord" onkeydown="if(event.key==='Enter') hostLogin()">
+    <div class="p-err" id="hl-err"></div>
+    <button type="button" class="btn-hype" style="width:100%;" id="hl-btn" onclick="hostLogin()">LOGGA IN ➔</button>
+    <p style="font-size:13px;">Ska du spela? Gå till startsidan utan <b>?host</b> i adressen.</p>
+  </div>
+</div>
+
 <!-- ===================== SPELLEDARE / STORSKÄRM ===================== -->
-<div class="arena-container host-only">
+<div class="arena-container host-only host-auth-only">
 
   <div id="screen-lobby" class="screen active">
     <div class="lobby-hero">
@@ -887,6 +953,7 @@
     <div class="q-top-bar">
       <div class="q-badge-group">
         <span class="q-num-pill" id="q-counter">FRÅGA 1 AV 10</span>
+        <span class="q-type-pill" id="q-type-badge">🔘 FLERVAL</span>
         <span class="q-double-pill" id="q-double-badge" style="display:none;">⚡ DUBBELPOÄNG (2X)!</span>
       </div>
       <div style="display:flex; align-items:center; gap:12px;">
@@ -908,7 +975,9 @@
       <div class="chart-col" id="chart-col-3"><div class="chart-bar" id="chart-bar-3" style="background:var(--k-green);">0</div><span style="font-weight:900; color:var(--k-green);">■</span></div>
     </div>
 
-    <div class="answers-grid">
+    <div class="alt-stage" id="alt-stage" style="display:none;"></div>
+
+    <div class="answers-grid" id="answers-grid">
       <div class="k-card k-card-0" id="ans-card-0"><div class="k-shape">▲</div><span id="ans-label-0"></span><div class="k-check-badge">✓</div></div>
       <div class="k-card k-card-1" id="ans-card-1"><div class="k-shape">◆</div><span id="ans-label-1"></span><div class="k-check-badge">✓</div></div>
       <div class="k-card k-card-2" id="ans-card-2"><div class="k-shape">●</div><span id="ans-label-2"></span><div class="k-check-badge">✓</div></div>
@@ -1019,8 +1088,16 @@
   document.body.classList.add(ROLE === "host" ? "role-host" : "role-player");
   if (ROLE === "host") document.body.classList.add("hide-controls");
 
-  const QT = 20;
+  const QT = 20;   // standardtid (sekunder)
   const SHAPES = ["▲", "◆", "●", "■"];
+  const KCOLORS = ["var(--k-red)", "var(--k-blue)", "var(--k-yellow)", "var(--k-green)"];
+  const TYPES = {
+    choice: { label: "Flerval",       icon: "🔘", time: 20 },
+    type:   { label: "Skriv svar",    icon: "✍️", time: 30 },
+    puzzle: { label: "Pussel",        icon: "🧩", time: 30 },
+    slider: { label: "Skjutreglage",  icon: "🎚️", time: 20 }
+  };
+  const qType = (q) => (q && TYPES[q.type]) ? q.type : "choice";
 
   const DEFAULT_QUESTIONS = [
     {
@@ -1088,6 +1165,28 @@
       double: false
     },
     {
+      type: "type",
+      q: "SKRIV SVAR: Vilket grundämne har det kemiska tecknet Fe?",
+      accepted: ["Järn", "Jarn", "Iron"],
+      double: false,
+      time: 30
+    },
+    {
+      type: "puzzle",
+      q: "PUSSEL: Sortera djuren från minst till störst!",
+      answers: ["Myra", "Katt", "Häst", "Blåval"],
+      labels: { first: "Minst", last: "Störst" },
+      double: false,
+      time: 30
+    },
+    {
+      type: "slider",
+      q: "SKJUTREGLAGE: Vilket år invigdes Öresundsbron?",
+      slider: { min: 1980, max: 2020, step: 1, correct: 2000, margin: 3, unit: "" },
+      double: false,
+      time: 20
+    },
+    {
       q: "FINALFRÅGA: Vilken kroppsdel växer inte en enda millimeter, utan är lika stor när du föds som när du är 90 år?",
       answers: ["Öronen", "Knäskålarna", "Ögongloberna", "Näsan"],
       correct: 2,
@@ -1095,7 +1194,7 @@
     }
   ];
 
-  const LS_QUESTIONS_KEY = "abbhoot_online_questions_v1";
+  const LS_QUESTIONS_KEY = "abbhoot_online_questions_v2";
 
   // ===== HJÄLPARE =====
   function lsGet(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
@@ -1124,10 +1223,23 @@
     if (on && ROLE === "player") playerReconnected();
   });
 
-  function isValidQuestions(arr) {
-    return Array.isArray(arr) && arr.length > 0 && arr.every(q =>
-      q && typeof q.q === "string" && Array.isArray(q.answers) && q.answers.length === 4 &&
-      Number.isInteger(q.correct) && q.correct >= 0 && q.correct <= 3);
+  function isValidQuestion(q) {
+    if (!q || typeof q.q !== "string") return false;
+    const t = qType(q);
+    if (t === "choice") return Array.isArray(q.answers) && q.answers.length === 4 && Number.isInteger(q.correct) && q.correct >= 0 && q.correct <= 3;
+    if (t === "puzzle") return Array.isArray(q.answers) && q.answers.length === 4;
+    if (t === "type") return Array.isArray(q.accepted) && q.accepted.some(a => String(a).trim());
+    if (t === "slider") return q.slider && [q.slider.min, q.slider.max, q.slider.correct].every(Number.isFinite) && q.slider.min < q.slider.max;
+    return false;
+  }
+  function isValidQuestions(arr) { return Array.isArray(arr) && arr.length > 0 && arr.every(isValidQuestion); }
+
+  // Normalisering för "Skriv svar": skiftläge, mellanslag, skiljetecken, decimalkomma
+  function normText(s) {
+    let t = String(s ?? "").toLowerCase().trim().replace(/\s+/g, " ").replace(/[.!?"'´`]+$/g, "").replace(/^["'´`]+/, "");
+    const compact = t.replace(/\s/g, "").replace(",", ".");
+    if (/^-?\d+(\.\d+)?$/.test(compact)) return String(Number(compact));   // "1 000" = "1000", "3,0" = "3"
+    return t;
   }
 
   // Gemensamt: spelare ur databasen (filtrerar bort halva poster från t.ex. onDisconnect)
@@ -1139,22 +1251,66 @@
   const answersOf = (G, i) => (G && G.answers && G.answers[i]) || {};
   const manualOf = (G, i) => (G && G.manual && G.manual[i]) || {};
 
-  function isRight(G, pid, i, correct) {
-    const a = answersOf(G, i)[pid];
-    const m = manualOf(G, i)[pid];
-    if (m && typeof m.correct === "boolean") return m.correct;
-    return !!a && a.choice === correct;
+  // Bedömning av ett svar. st = state (med current.type och correct, som sätts först vid avslöjande).
+  // Returnerar { right, factor } där factor 0–1 skalar poängen (skjutreglage ger lägre poäng ju längre ifrån).
+  function judgeAnswer(type, a, correct) {
+    if (!a || correct === undefined || correct === null) return { right: false, factor: 0 };
+    if (type === "choice") { const r = a.choice === correct; return { right: r, factor: r ? 1 : 0 }; }
+    if (type === "type") {
+      const acc = (correct.accepted || []).map(normText);
+      const r = typeof a.text === "string" && acc.includes(normText(a.text));
+      return { right: r, factor: r ? 1 : 0 };
+    }
+    if (type === "puzzle") {
+      const r = Array.isArray(a.order) && Array.isArray(correct) && a.order.length === correct.length && a.order.every((v, k) => v === correct[k]);
+      return { right: r, factor: r ? 1 : 0 };
+    }
+    if (type === "slider") {
+      if (typeof a.value !== "number") return { right: false, factor: 0 };
+      const dist = Math.abs(a.value - correct.value);
+      const margin = Math.max(0, correct.margin || 0);
+      if (dist > margin) return { right: false, factor: 0 };
+      return { right: true, factor: margin > 0 ? 1 - 0.5 * (dist / margin) : 1 };   // exakt = 100 %, i kanten = 50 %
+    }
+    return { right: false, factor: 0 };
   }
 
-  function fastestPid(G, i, correct) {
+  function judge(G, pid, i, st) {
+    const m = manualOf(G, i)[pid];
+    if (m && typeof m.correct === "boolean") return { right: m.correct, factor: m.correct ? 1 : 0 };
+    const type = (st && st.current && st.current.type) || "choice";
+    return judgeAnswer(type, answersOf(G, i)[pid], st && st.correct);
+  }
+  const isRight = (G, pid, i, st) => judge(G, pid, i, st).right;
+
+  function fastestPid(G, i, st) {
     const ov = G && G.fastest && G.fastest[i];
     if (ov === "none") return null;
     if (ov) return ov;
     let best = null, bestAt = Infinity;
     Object.entries(answersOf(G, i)).forEach(([pid, a]) => {
-      if (a && typeof a.at === "number" && a.at < bestAt && isRight(G, pid, i, correct)) { bestAt = a.at; best = pid; }
+      if (a && typeof a.at === "number" && a.at < bestAt && isRight(G, pid, i, st)) { bestAt = a.at; best = pid; }
     });
     return best;
+  }
+
+  // Text som beskriver rätt svar (efter avslöjande)
+  function correctText(st) {
+    const cur = st.current || {}, c = st.correct;
+    if (c === undefined || c === null) return "";
+    if (cur.type === "type") return (c.accepted || [])[0] || "";
+    if (cur.type === "puzzle") return c.map((d, k) => `${k + 1}. ${(cur.items || [])[d]}`).join("  →  ");
+    if (cur.type === "slider") return `${fmtNum(c.value)}${cur.unit ? " " + cur.unit : ""}`;
+    return `${SHAPES[c]} ${(cur.answers || [])[c] || ""}`;
+  }
+  function fmtNum(n) { return Number(n).toLocaleString("sv-SE", { maximumFractionDigits: 4 }); }
+
+  function answerText(cur, a) {
+    if (!a) return "";
+    if (cur.type === "type") return a.text || "";
+    if (cur.type === "puzzle") return (a.order || []).map(d => SHAPES[d]).join(" ");
+    if (cur.type === "slider") return `${fmtNum(a.value)}${cur.unit ? " " + cur.unit : ""}`;
+    return SHAPES[a.choice] || "";
   }
 
   let soundEnabled = true;
@@ -1334,6 +1490,62 @@
   function genPin() { return String(Math.floor(100000 + Math.random() * 900000)); }
   function joinBaseUrl() { return location.origin + location.pathname; }
 
+  // ---------- INLOGGNING (spelledare) ----------
+  // SHA-256 av "användarnamn(gemener):lösenord" – lösenordet står inte i klartext i filen
+  const HOST_HASH = "391fb3de9d75d80502fccf86849847e3fcacacc8daaa546d7aa6053b3b72a856";
+  const HOST_SESSION_KEY = "abbhoot_host_session";
+
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  function hostGate() {
+    $("brand-title").textContent = "SPELLEDARE // STORSKÄRM";
+    $("brand-sub").textContent = "🔒 Logga in för att leda spelet";
+    if (lsGet(HOST_SESSION_KEY) === HOST_HASH) { hostLoggedIn(); return; }
+    document.body.classList.add("host-locked");
+    $("host-login").style.display = "flex";
+    const f = $("hl-user"); if (f && f.focus) f.focus();
+  }
+
+  let loginFails = 0;
+  window.hostLogin = async function() {
+    const user = ($("hl-user").value || "").trim().toLowerCase();
+    const pw = $("hl-pass").value || "";
+    if (!user || !pw) { $("hl-err").textContent = "Fyll i användarnamn och lösenord."; return; }
+    $("hl-btn").disabled = true;
+    try {
+      if (await sha256(user + ":" + pw) === HOST_HASH) {
+        $("hl-pass").value = "";
+        lsSet(HOST_SESSION_KEY, HOST_HASH);
+        hostLoggedIn();
+      } else {
+        loginFails++;
+        $("hl-pass").value = "";
+        $("hl-err").textContent = "Fel användarnamn eller lösenord.";
+        await new Promise(r => setTimeout(r, Math.min(5000, 500 * loginFails)));   // bromsar gissningar
+      }
+    } catch (e) {
+      $("hl-err").textContent = "Inloggningen kräver https (fungerar på Netlify).";
+    } finally { $("hl-btn").disabled = false; }
+  };
+
+  let hostStarted = false;
+  function hostLoggedIn() {
+    document.body.classList.remove("host-locked");
+    document.body.classList.add("host-ready");
+    $("host-login").style.display = "none";
+    $("host-user").textContent = "👤 Oakmeister95";
+    if (!hostStarted) { hostStarted = true; hostInit(); }
+  }
+
+  window.hostLogout = function() {
+    if (!confirm("Logga ut? Spelet ligger kvar och du kan logga in igen.")) return;
+    try { localStorage.removeItem(HOST_SESSION_KEY); } catch (e) {}
+    location.reload();
+  };
+
   async function hostInit() {
     $("brand-title").textContent = "SPELLEDARE // STORSKÄRM";
     $("brand-sub").textContent = "👑 Dela den här skärmen – spelarna svarar i mobilen";
@@ -1418,7 +1630,7 @@
 
   // ---------- SPELFLÖDE ----------
   function resetScoresUpdates() {
-    const u = { answers: null, manual: null, fastest: null, preScore: null, "state/scoredQ": -1 };
+    const u = { answers: null, manual: null, fastest: null, secret: null, preScore: null, "state/scoredQ": -1 };
     listPlayers(G).forEach(p => Object.assign(u, {
       [`players/${p.id}/score`]: 0, [`players/${p.id}/prevScore`]: 0, [`players/${p.id}/lastDelta`]: 0,
       [`players/${p.id}/streak`]: 0, [`players/${p.id}/rankClimb`]: 0, [`players/${p.id}/wasFastest`]: false
@@ -1432,15 +1644,58 @@
     startQuestion(0);
   };
 
+  const timeOf = (q) => Math.max(5, Math.min(240, Math.round(Number(q.time) || TYPES[qType(q)].time)));
+
+  function shuffledPerm(n) {
+    let p;
+    do {
+      p = [...Array(n).keys()];
+      for (let k = n - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [p[k], p[j]] = [p[j], p[k]]; }
+    } while (p.every((v, k) => v === k));   // aldrig redan i rätt ordning
+    return p;
+  }
+
+  // Det som skickas till mobilerna – aldrig rätt svar förrän vid avslöjandet
+  function publicQuestion(q, i) {
+    const type = qType(q);
+    const cur = { type, q: q.q, double: !!q.double };
+    const extra = {};
+    if (type === "choice") cur.answers = q.answers;
+    if (type === "puzzle") {
+      const perm = shuffledPerm(4);           // perm[visad position] = ursprungligt index
+      cur.items = perm.map(o => q.answers[o]);
+      cur.labels = q.labels && (q.labels.first || q.labels.last) ? { first: q.labels.first || "", last: q.labels.last || "" } : null;
+      extra[`secret/${i}`] = perm;
+    }
+    if (type === "slider") {
+      const s = q.slider;
+      cur.min = s.min; cur.max = s.max; cur.step = s.step > 0 ? s.step : 1; cur.unit = s.unit || "";
+    }
+    return { cur, extra };
+  }
+
   function startQuestion(i) {
     const q = questions[i];
     if (!q) return;
-    upd({
+    const { cur, extra } = publicQuestion(q, i);
+    const tl = timeOf(q);
+    upd(Object.assign({
       [`answers/${i}`]: null, [`manual/${i}`]: null, [`fastest/${i}`]: null,
-      "state/phase": "question", "state/qIndex": i, "state/timer": QT, "state/paused": false,
+      "state/phase": "question", "state/qIndex": i, "state/timer": tl, "state/timeLimit": tl, "state/paused": false,
       "state/correct": null, "state/total": questions.length,
-      "state/current": { q: q.q, answers: q.answers, double: !!q.double }
-    });
+      "state/current": cur
+    }, extra));
+  }
+
+  function correctFor(q, i) {
+    const type = qType(q);
+    if (type === "type") return { accepted: q.accepted.map(a => String(a).trim()).filter(Boolean) };
+    if (type === "slider") return { value: q.slider.correct, margin: Math.max(0, Number(q.slider.margin) || 0) };
+    if (type === "puzzle") {
+      const perm = (G.secret && G.secret[i]) || [0, 1, 2, 3];
+      return [0, 1, 2, 3].map(orig => perm.indexOf(orig));   // rätt ordning uttryckt i visade positioner
+    }
+    return q.correct;
   }
 
   window.reveal = function() {
@@ -1448,13 +1703,13 @@
     if (st.phase !== "question") return;
     stopTick();
     const q = questions[st.qIndex];
-    upd({ "state/phase": "reveal", "state/correct": q.correct, "state/paused": false });
+    upd({ "state/phase": "reveal", "state/correct": correctFor(q, st.qIndex), "state/paused": false });
   };
 
   window.toBoard = function() {
     const st = S();
     if (st.phase !== "reveal") return;
-    const i = st.qIndex, q = questions[i], mult = q.double ? 2 : 1, correct = st.correct;
+    const i = st.qIndex, mult = (st.current && st.current.double) ? 2 : 1, TL = st.timeLimit || QT;
     const list = listPlayers(G);
 
     // Samma fråga igen? Utgå från läget före frågan → ingen dubbelräkning
@@ -1466,19 +1721,19 @@
     const prevRank = {};
     [...list].sort((a, b) => baseOf(b.id).score - baseOf(a.id).score).forEach((p, k) => { prevRank[p.id] = k + 1; });
 
-    const fast = fastestPid(G, i, correct);
+    const fast = fastestPid(G, i, st);
     const newScore = {};
     const u = { preScore: base, "state/phase": "board", "state/scoredQ": i, "state/boardAt": Date.now() };
 
     list.forEach(p => {
       const b = baseOf(p.id);
-      const right = isRight(G, p.id, i, correct);
+      const { right, factor } = judge(G, p.id, i, st);
       const a = answersOf(G, i)[p.id];
       let delta = 0, streak = 0;
       if (right) {
         streak = b.streak + 1;
-        const t = Math.min(QT, Math.max(0, a && typeof a.timeLeft === "number" ? a.timeLeft : Math.round(QT * 0.6)));
-        const basePts = (600 + Math.round((t / QT) * 400)) * mult;
+        const t = Math.min(TL, Math.max(0, a && typeof a.timeLeft === "number" ? a.timeLeft : Math.round(TL * 0.6)));
+        const basePts = Math.round((600 + Math.round((t / TL) * 400)) * factor) * mult;
         const streakBonus = streak >= 2 ? Math.min(streak * 100, 500) : 0;
         const fastBonus = fast === p.id ? 250 : 0;
         delta = basePts + streakBonus + fastBonus;
@@ -1519,11 +1774,11 @@
   // Manuella justeringar (t.ex. någon svarade muntligt)
   window.toggleRight = function(pid) {
     const st = S(); if (st.phase !== "reveal") return;
-    upd({ [`manual/${st.qIndex}/${pid}/correct`]: !isRight(G, pid, st.qIndex, st.correct) });
+    upd({ [`manual/${st.qIndex}/${pid}/correct`]: !isRight(G, pid, st.qIndex, st) });
   };
   window.toggleFast = function(pid) {
     const st = S(); if (st.phase !== "reveal") return;
-    const cur = fastestPid(G, st.qIndex, st.correct);
+    const cur = fastestPid(G, st.qIndex, st);
     upd({ [`fastest/${st.qIndex}`]: cur === pid ? "none" : pid });
   };
 
@@ -1574,15 +1829,20 @@
     $("q-counter").textContent = `FRÅGA ${i + 1} AV ${st.total || questions.length}`;
     $("q-double-badge").style.display = cur.double ? "inline-block" : "none";
     $("question-text").textContent = cur.q || "";
+    const type = cur.type || "choice";
+    $("q-type-badge").textContent = `${TYPES[type].icon} ${TYPES[type].label.toUpperCase()}`;
+    const cardTexts = type === "puzzle" ? (cur.items || []) : (cur.answers || []);
+    const showCards = type === "choice" || (type === "puzzle" && !revealed);
+    $("answers-grid").style.display = showCards ? "grid" : "none";
     for (let k = 0; k < 4; k++) {
-      $(`ans-label-${k}`).textContent = (cur.answers && cur.answers[k]) || "";
-      $(`ans-card-${k}`).classList.toggle("correct-highlight", revealed && k === st.correct);
-      $(`ans-card-${k}`).classList.toggle("dimmed", revealed && k !== st.correct);
+      $(`ans-label-${k}`).textContent = cardTexts[k] || "";
+      $(`ans-card-${k}`).classList.toggle("correct-highlight", type === "choice" && revealed && k === st.correct);
+      $(`ans-card-${k}`).classList.toggle("dimmed", type === "choice" && revealed && k !== st.correct);
     }
 
     // Timer
     const tEl = $("timer-display");
-    const t = typeof st.timer === "number" ? st.timer : QT;
+    const t = typeof st.timer === "number" ? st.timer : (st.timeLimit || QT);
     tEl.textContent = st.paused ? "⏸" : (revealed ? "✓" : t);
     tEl.classList.toggle("urgent", !revealed && !st.paused && t <= 5);
 
@@ -1595,7 +1855,7 @@
 
     $("reveal-btn").style.display = revealed ? "none" : "inline-flex";
     $("to-scoreboard-btn").style.display = revealed ? "inline-flex" : "none";
-    $("chart-stage").style.display = revealed ? "flex" : "none";
+    $("chart-stage").style.display = revealed && type === "choice" ? "flex" : "none";
 
     // Alla (online) har svarat → avslöja automatiskt
     const online = list.filter(p => p.online !== false);
@@ -1603,13 +1863,14 @@
       if (!autoRevealT) autoRevealT = setTimeout(() => { autoRevealT = null; reveal(); }, 1200);
     }
 
-    if (revealed) {
-      if (lastQuestionKey !== `rev-${i}`) { lastQuestionKey = `rev-${i}`; playRevealGong(); launchConfetti(45); }
+    if (revealed && lastQuestionKey !== `rev-${i}`) { lastQuestionKey = `rev-${i}`; playRevealGong(); launchConfetti(45); }
+
+    if (revealed && type === "choice") {
       const counts = [0, 0, 0, 0];
       list.forEach(p => {
         const a = ans[p.id];
         if (a && a.choice >= 0 && a.choice <= 3) counts[a.choice]++;
-        else if (isRight(G, p.id, i, st.correct)) counts[st.correct]++;
+        else if (isRight(G, p.id, i, st)) counts[st.correct]++;
       });
       const max = Math.max(1, ...counts);
       for (let k = 0; k < 4; k++) {
@@ -1619,7 +1880,74 @@
       }
     }
 
+    renderAltStage(type, cur, st, list, ans, revealed);
     renderPresenterPanel(list, ans, revealed);
+  }
+
+  // Storskärmsvy för Skriv svar / Pussel / Skjutreglage
+  function renderAltStage(type, cur, st, list, ans, revealed) {
+    const el = $("alt-stage");
+    if (type === "choice") { el.style.display = "none"; el.innerHTML = ""; return; }
+    el.style.display = "flex";
+    const i = st.qIndex;
+    const nRight = list.filter(p => isRight(G, p.id, i, st)).length;
+    const rightLine = `<div class="alt-sub">✅ ${nRight} av ${list.length} hade rätt</div>`;
+
+    if (type === "type") {
+      if (!revealed) { el.innerHTML = `<div class="alt-hint">✍️ Skriv ditt svar i mobilen!</div>`; return; }
+      const groups = {};
+      list.forEach(p => {
+        const a = ans[p.id]; if (!a || typeof a.text !== "string") return;
+        const key = normText(a.text);
+        if (!groups[key]) groups[key] = { text: a.text.trim(), n: 0, right: judgeAnswer("type", a, st.correct).right };
+        groups[key].n++;
+      });
+      const rows = Object.values(groups).sort((a, b) => (b.right - a.right) || (b.n - a.n)).slice(0, 10);
+      el.innerHTML = `
+        <div class="alt-correct">✓ ${esc(correctText(st))}</div>
+        ${(st.correct.accepted || []).length > 1 ? `<div class="alt-sub">Godkänt även: ${esc(st.correct.accepted.slice(1).join(", "))}</div>` : ""}
+        ${rightLine}
+        <div class="alt-chips">${rows.map(r => `<span class="alt-chip ${r.right ? "ok" : "bad"}">${esc(r.text)} <b>×${r.n}</b></span>`).join("") || `<span class="alt-sub">Inga svar</span>`}</div>`;
+      return;
+    }
+
+    if (type === "puzzle") {
+      const lab = cur.labels;
+      if (!revealed) {
+        el.innerHTML = `<div class="alt-hint">🧩 Sortera i rätt ordning i mobilen!${lab ? `<br><span class="alt-sub">${esc(lab.first)} ⬆ först · sist ⬇ ${esc(lab.last)}</span>` : ""}</div>`;
+        return;
+      }
+      el.innerHTML = `
+        ${lab && lab.first ? `<div class="alt-sub">⬆ ${esc(lab.first)}</div>` : ""}
+        <div class="alt-order">${st.correct.map((d, k) => `
+          <div class="alt-order-row" style="background:${KCOLORS[d]};"><span class="n">${k + 1}</span><span class="s">${SHAPES[d]}</span><span>${esc((cur.items || [])[d])}</span></div>`).join("")}
+        </div>
+        ${lab && lab.last ? `<div class="alt-sub">⬇ ${esc(lab.last)}</div>` : ""}
+        ${rightLine}`;
+      return;
+    }
+
+    if (type === "slider") {
+      const span = (cur.max - cur.min) || 1;
+      const pos = v => Math.max(0, Math.min(100, ((v - cur.min) / span) * 100));
+      const unit = cur.unit ? " " + esc(cur.unit) : "";
+      if (!revealed) {
+        el.innerHTML = `<div class="alt-hint">🎚️ Dra reglaget i mobilen!</div><div class="alt-sub">Mellan ${fmtNum(cur.min)} och ${fmtNum(cur.max)}${unit}</div>`;
+        return;
+      }
+      const c = st.correct;
+      const dots = list.map(p => ans[p.id]).filter(a => a && typeof a.value === "number");
+      el.innerHTML = `
+        <div class="alt-correct">✓ ${esc(correctText(st))}</div>
+        ${c.margin > 0 ? `<div class="alt-sub">Godkänt: ±${fmtNum(c.margin)}${unit} (närmare = fler poäng)</div>` : `<div class="alt-sub">Måste vara exakt</div>`}
+        <div class="slider-track">
+          <div class="slider-band" style="left:${pos(c.value - c.margin)}%; width:${Math.max(0.8, pos(c.value + c.margin) - pos(c.value - c.margin))}%;"></div>
+          ${dots.map(a => `<div class="slider-dot ${judgeAnswer("slider", a, c).right ? "ok" : ""}" style="left:${pos(a.value)}%;"></div>`).join("")}
+          <div class="slider-mark" style="left:${pos(c.value)}%;"></div>
+        </div>
+        <div class="slider-ends"><span>${fmtNum(cur.min)}${unit}</span><span>${fmtNum(cur.max)}${unit}</span></div>
+        ${rightLine}`;
+    }
   }
 
   function renderPresenterPanel(list, ans, revealed) {
@@ -1627,10 +1955,11 @@
     $("presenter-instruction").textContent = revealed
       ? "🎛 Justera vid behov: ge rätt till någon som svarade muntligt, eller ändra ⚡ Snabbast (räknas automatiskt)."
       : "🎛 Vilka som har svarat (inte vad). Klicka på timern för paus.";
-    const fast = revealed ? fastestPid(G, st.qIndex, st.correct) : null;
+    const fast = revealed ? fastestPid(G, st.qIndex, st) : null;
+    const cur = st.current || {};
     $("player-control-grid").innerHTML = list.map(p => {
       const has = !!ans[p.id];
-      const right = revealed && isRight(G, p.id, st.qIndex, st.correct);
+      const right = revealed && isRight(G, p.id, st.qIndex, st);
       return `
         <div class="p-ctrl-card ${has && !revealed ? "locked-in" : ""} ${right ? "got-correct" : ""}">
           <div class="p-ctrl-top">
@@ -1638,6 +1967,7 @@
             ${revealed ? `<span class="p-streak-tag">${fmt(p.score)} p</span>`
                        : `<span class="p-answered-tag ${has ? "yes" : "no"}">${has ? "✓ Svarat" : "…"}</span>`}
           </div>
+          ${revealed && has ? `<div style="font-size:13px; font-weight:800; color:var(--text-muted);">Svar: ${esc(answerText(cur, ans[p.id]))}</div>` : ""}
           <div class="quick-award-btns" style="display:${revealed ? "grid" : "none"};">
             <button type="button" class="award-btn ${right ? "active-correct" : ""}" onclick="toggleRight('${p.id}')">${right ? "✅ Rätt" : "➕ Ge rätt"}</button>
             <button type="button" class="award-btn ${fast === p.id ? "active-fast" : ""}" onclick="toggleFast('${p.id}')">⚡ Snabbast</button>
@@ -1714,42 +2044,154 @@
   }
 
   // ---------- REDIGERARE ----------
-  window.openEditor = function() {
-    $("editor-list").innerHTML = questions.map((q, qi) => `
+  // Arbetskopia – ändras först på riktigt vid "Spara"
+  let edQ = [];
+  const ival = (id) => { const el = $(id); return el ? el.value : ""; };
+  const num = (id, fb) => { const v = Number(String(ival(id)).replace(",", ".")); return Number.isFinite(v) && ival(id) !== "" ? v : fb; };
+
+  function defaultsFor(type, q) {
+    const answers = Array.isArray(q.answers) && q.answers.length === 4 ? q.answers.slice() : ["", "", "", ""];
+    const base = { type, q: q.q || "", double: !!q.double, time: TYPES[type].time };
+    if (type === "choice") return Object.assign(base, { answers, correct: Number.isInteger(q.correct) ? q.correct : 0 });
+    if (type === "puzzle") return Object.assign(base, { answers, labels: q.labels || { first: "", last: "" } });
+    if (type === "type") return Object.assign(base, { accepted: Array.isArray(q.accepted) ? q.accepted : [""] });
+    return Object.assign(base, { slider: q.slider || { min: 0, max: 100, step: 1, correct: 50, margin: 5, unit: "" } });
+  }
+
+  // Läs in fälten i arbetskopian
+  function collectEditor() {
+    edQ = edQ.map((q, qi) => {
+      const t = qType(q);
+      const n = { type: t, q: ival(`ed_q_${qi}`).trim(), double: !!($(`ed_double_${qi}`) || {}).checked, time: num(`ed_time_${qi}`, TYPES[t].time) };
+      if (t === "choice" || t === "puzzle") n.answers = [0, 1, 2, 3].map(ai => ival(`ed_a_${qi}_${ai}`).trim());
+      if (t === "choice") { n.correct = 0; document.getElementsByName(`ed_corr_${qi}`).forEach((r, idx) => { if (r.checked) n.correct = idx; }); }
+      if (t === "puzzle") n.labels = { first: ival(`ed_lf_${qi}`).trim(), last: ival(`ed_ll_${qi}`).trim() };
+      if (t === "type") n.accepted = ival(`ed_acc_${qi}`).split(";").map(s => s.trim()).filter(Boolean);
+      if (t === "slider") n.slider = {
+        min: num(`ed_smin_${qi}`, 0), max: num(`ed_smax_${qi}`, 100), step: num(`ed_sstep_${qi}`, 1),
+        correct: num(`ed_scor_${qi}`, 0), margin: num(`ed_smar_${qi}`, 0), unit: ival(`ed_sunit_${qi}`).trim()
+      };
+      return n;
+    });
+  }
+
+  function editorTypeFields(q, qi) {
+    const t = qType(q);
+    if (t === "choice") return `
+      <div class="ed-row">${q.answers.map((ans, ai) => `
+        <div style="display:flex; align-items:center; gap:6px;">
+          <input type="radio" name="ed_corr_${qi}" value="${ai}" ${q.correct === ai ? "checked" : ""} title="Rätt svar">
+          <span style="color:${KCOLORS[ai]}; font-weight:900;">${SHAPES[ai]}</span>
+          <input class="edit-input" id="ed_a_${qi}_${ai}" value="${esc(ans)}" placeholder="Alternativ ${ai + 1}">
+        </div>`).join("")}
+      </div><div class="alt-sub" style="font-size:12px;">● = rätt svar</div>`;
+    if (t === "puzzle") return `
+      <div class="alt-sub" style="font-size:12px;">Skriv i <b>rätt ordning</b> – de blandas automatiskt för spelarna.</div>
+      <div class="ed-row">${q.answers.map((ans, ai) => `
+        <div style="display:flex; align-items:center; gap:6px;"><b>${ai + 1}.</b>
+          <input class="edit-input" id="ed_a_${qi}_${ai}" value="${esc(ans)}" placeholder="Plats ${ai + 1}"></div>`).join("")}
+      </div>
+      <div class="ed-row">
+        <label class="ed-label">Etikett överst (valfri)<input class="edit-input" id="ed_lf_${qi}" value="${esc((q.labels || {}).first)}" placeholder="t.ex. Minst / Äldst"></label>
+        <label class="ed-label">Etikett nederst (valfri)<input class="edit-input" id="ed_ll_${qi}" value="${esc((q.labels || {}).last)}" placeholder="t.ex. Störst / Nyast"></label>
+      </div>`;
+    if (t === "type") return `
+      <label class="ed-label">Godkända svar – separera med semikolon (;). Skiftläge, mellanslag och "1 000"/"1000" spelar ingen roll.
+        <input class="edit-input" id="ed_acc_${qi}" value="${esc((q.accepted || []).join("; "))}" placeholder="t.ex. järn; jarn; Fe"></label>`;
+    const s = q.slider || {};
+    return `
+      <div class="ed-row-4">
+        <label class="ed-label">Min<input class="edit-input" id="ed_smin_${qi}" inputmode="decimal" value="${esc(s.min)}"></label>
+        <label class="ed-label">Max<input class="edit-input" id="ed_smax_${qi}" inputmode="decimal" value="${esc(s.max)}"></label>
+        <label class="ed-label">Steg<input class="edit-input" id="ed_sstep_${qi}" inputmode="decimal" value="${esc(s.step)}"></label>
+        <label class="ed-label">Enhet<input class="edit-input" id="ed_sunit_${qi}" value="${esc(s.unit)}" placeholder="t.ex. %, år, kr"></label>
+      </div>
+      <div class="ed-row">
+        <label class="ed-label">✅ Rätt värde<input class="edit-input" id="ed_scor_${qi}" inputmode="decimal" value="${esc(s.correct)}"></label>
+        <label class="ed-label">Felmarginal ± (0 = exakt; inom marginal: 50–100 % av poängen)<input class="edit-input" id="ed_smar_${qi}" inputmode="decimal" value="${esc(s.margin)}"></label>
+      </div>`;
+  }
+
+  function renderEditor() {
+    $("editor-list").innerHTML = edQ.map((q, qi) => `
       <div class="q-edit-card">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
           <strong style="color:var(--accent-amber);">Fråga #${qi + 1}</strong>
-          <label style="font-size:13px; display:flex; align-items:center; gap:6px; cursor:pointer;">
-            <input type="checkbox" id="ed_double_${qi}" ${q.double ? "checked" : ""}> ⚡ Dubbelpoäng (2x)
-          </label>
+          <div class="ed-tools">
+            <select onchange="edChangeType(${qi}, this.value)">
+              ${Object.entries(TYPES).map(([k, v]) => `<option value="${k}" ${qType(q) === k ? "selected" : ""}>${v.icon} ${v.label}</option>`).join("")}
+            </select>
+            <label style="font-size:12px; font-weight:800;">⏱ <input class="edit-input" style="width:64px; padding:6px;" id="ed_time_${qi}" inputmode="numeric" value="${esc(q.time || TYPES[qType(q)].time)}"> s</label>
+            <label style="font-size:13px; display:flex; align-items:center; gap:4px; cursor:pointer;">
+              <input type="checkbox" id="ed_double_${qi}" ${q.double ? "checked" : ""}> ⚡ 2x</label>
+            <button type="button" class="btn ed-mini" onclick="edMove(${qi}, -1)" ${qi === 0 ? "disabled" : ""}>↑</button>
+            <button type="button" class="btn ed-mini" onclick="edMove(${qi}, 1)" ${qi === edQ.length - 1 ? "disabled" : ""}>↓</button>
+            <button type="button" class="btn ed-mini" onclick="edRemove(${qi})" title="Ta bort fråga">🗑</button>
+          </div>
         </div>
-        <input class="edit-input" id="ed_q_${qi}" value="${esc(q.q)}">
-        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
-          ${q.answers.map((ans, ai) => `
-            <div style="display:flex; align-items:center; gap:6px;">
-              <input type="radio" name="ed_corr_${qi}" value="${ai}" ${q.correct === ai ? "checked" : ""} title="Rätt svar">
-              <input class="edit-input" id="ed_a_${qi}_${ai}" value="${esc(ans)}">
-            </div>`).join("")}
-        </div>
-      </div>`).join("");
+        <input class="edit-input" id="ed_q_${qi}" value="${esc(q.q)}" placeholder="Skriv frågan…">
+        ${editorTypeFields(q, qi)}
+      </div>`).join("") + `
+      <div class="ed-tools" style="justify-content:center;">
+        ${Object.entries(TYPES).map(([k, v]) => `<button type="button" class="btn" onclick="edAdd('${k}')">➕ ${v.icon} ${v.label}</button>`).join("")}
+      </div>`;
+  }
+
+  window.openEditor = function() {
+    edQ = JSON.parse(JSON.stringify(questions)).map(q => Object.assign({ type: qType(q) }, q));
+    renderEditor();
     $("editor-modal").style.display = "flex";
   };
+  window.edChangeType = function(qi, type) { collectEditor(); edQ[qi] = defaultsFor(type, edQ[qi]); renderEditor(); };
+  window.edMove = function(qi, d) {
+    collectEditor();
+    const j = qi + d; if (j < 0 || j >= edQ.length) return;
+    [edQ[qi], edQ[j]] = [edQ[j], edQ[qi]];
+    renderEditor();
+  };
+  window.edRemove = function(qi) {
+    collectEditor();
+    if (edQ.length <= 1) { alert("Minst en fråga behövs."); return; }
+    if (!confirm(`Ta bort fråga #${qi + 1}?`)) return;
+    edQ.splice(qi, 1); renderEditor();
+  };
+  window.edAdd = function(type) {
+    collectEditor();
+    edQ.push(defaultsFor(type, {}));
+    renderEditor();
+    const last = $(`ed_q_${edQ.length - 1}`); if (last && last.scrollIntoView) last.scrollIntoView({ block: "center" });
+  };
   window.closeEditor = function() { $("editor-modal").style.display = "none"; };
+
+  function editorProblems(q, qi) {
+    const t = qType(q), n = `#${qi + 1}`, p = [];
+    if (!q.q) p.push(`${n}: frågetext saknas`);
+    if ((t === "choice" || t === "puzzle") && q.answers.some(a => !a)) p.push(`${n}: alla 4 alternativ måste fyllas i`);
+    if (t === "type" && !q.accepted.length) p.push(`${n}: minst ett godkänt svar behövs`);
+    if (t === "slider") {
+      const s = q.slider;
+      if (!(s.min < s.max)) p.push(`${n}: min måste vara mindre än max`);
+      else if (s.correct < s.min || s.correct > s.max) p.push(`${n}: rätt värde måste ligga mellan min och max`);
+      if (!(s.step > 0)) p.push(`${n}: steg måste vara större än 0`);
+      else if (s.max - s.min > 0 && (s.max - s.min) / s.step > 100000) p.push(`${n}: för litet steg för intervallet`);
+      if (s.margin < 0) p.push(`${n}: felmarginal kan inte vara negativ`);
+    }
+    return p;
+  }
+
   window.saveEditor = function() {
-    questions.forEach((q, qi) => {
-      q.q = $(`ed_q_${qi}`).value.trim() || q.q;
-      q.double = $(`ed_double_${qi}`).checked;
-      for (let ai = 0; ai < 4; ai++) q.answers[ai] = $(`ed_a_${qi}_${ai}`).value.trim() || q.answers[ai];
-      document.getElementsByName(`ed_corr_${qi}`).forEach((r, idx) => { if (r.checked) q.correct = idx; });
-    });
+    collectEditor();
+    const problems = edQ.flatMap(editorProblems);
+    if (problems.length) { alert("Rätta först:\n\n• " + problems.join("\n• ")); return; }
+    questions = JSON.parse(JSON.stringify(edQ));
     lsSet(LS_QUESTIONS_KEY, questions);
     closeEditor();
-    if (S().phase === "lobby") upd({ "state/total": questions.length });
+    if (pin) upd({ "state/total": questions.length });
   };
   window.resetDefaultQuestions = function() {
-    questions = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
-    lsSet(LS_QUESTIONS_KEY, questions);
-    openEditor();
+    if (!confirm("Ersätta alla frågor med originalfrågorna?")) return;
+    edQ = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+    renderEditor();
   };
 
   // ---------- TANGENTER: → nästa steg, P kontroller ----------
@@ -1758,6 +2200,7 @@
       const tag = (e.target && e.target.tagName) || "";
       if (tag === "INPUT" || tag === "TEXTAREA") return;
       if ($("editor-modal").style.display === "flex") return;
+      if (document.body.classList.contains("host-locked")) return;
       if (e.key === "p" || e.key === "P") { togglePanel(); return; }
       if (e.key !== "ArrowRight") return;
       e.preventDefault();
@@ -1836,17 +2279,96 @@
     onDisconnect(R(`${pPin}/players/${pid}/online`)).set(false);
   }
 
-  window.pickAnswer = function(choice) {
+  function submitAnswer(payload) {
     if (!PG || !PG.state) return;
     const st = PG.state;
     if (st.phase !== "question") return;
     const i = st.qIndex;
     if (answersOf(PG, i)[pid]) return;
     if (navigator.vibrate) { try { navigator.vibrate(40); } catch (e) {} }
-    set(R(`${pPin}/answers/${i}/${pid}`), {
-      choice, timeLeft: typeof st.timer === "number" ? st.timer : 0, at: serverTimestamp()
-    }).catch(e => showDbError(e));
+    set(R(`${pPin}/answers/${i}/${pid}`), Object.assign({
+      timeLeft: typeof st.timer === "number" ? st.timer : 0, at: serverTimestamp()
+    }, payload)).catch(e => showDbError(e));
+  }
+
+  window.pickAnswer = function(choice) { submitAnswer({ choice }); };
+
+  window.submitText = function() {
+    const el = $("p-text");
+    const text = ((el && el.value) || "").trim().slice(0, 80);
+    if (!text) { if (el && el.focus) el.focus(); return; }
+    submitAnswer({ text });
   };
+
+  // Pussel: lokal ordning (visade positioner) tills spelaren låser
+  let pOrder = [0, 1, 2, 3], pSlider = 0, pLocalKey = "";
+  function renderPuzzleList() {
+    const cur = (PG && PG.state && PG.state.current) || {};
+    const box = $("p-puzzle");
+    if (!box) return;
+    box.innerHTML = pOrder.map((d, k) => `
+      <div class="p-puzzle-row" style="background:${KCOLORS[d]};">
+        <span class="n">${k + 1}</span><span class="t">${esc((cur.items || [])[d])}</span>
+        <span class="mv">
+          <button type="button" onclick="puzzleMove(${k}, -1)" ${k === 0 ? "disabled" : ""} aria-label="Flytta upp">▲</button>
+          <button type="button" onclick="puzzleMove(${k}, 1)" ${k === 3 ? "disabled" : ""} aria-label="Flytta ned">▼</button>
+        </span>
+      </div>`).join("");
+  }
+  window.puzzleMove = function(k, d) {
+    const j = k + d; if (j < 0 || j > 3) return;
+    [pOrder[k], pOrder[j]] = [pOrder[j], pOrder[k]];
+    renderPuzzleList();
+  };
+  window.submitPuzzle = function() { submitAnswer({ order: pOrder.slice() }); };
+
+  function snapSlider(v, cur) {
+    const step = cur.step > 0 ? cur.step : 1;
+    const s = Math.round((v - cur.min) / step) * step + cur.min;
+    return Number(Math.min(cur.max, Math.max(cur.min, s)).toFixed(6));
+  }
+  function showSliderVal() {
+    const cur = (PG && PG.state && PG.state.current) || {};
+    const el = $("p-slider-val"); if (el) el.textContent = fmtNum(pSlider) + (cur.unit ? " " + cur.unit : "");
+    const r = $("p-range"); if (r && Number(r.value) !== pSlider) r.value = pSlider;
+  }
+  window.sliderInput = function(v) {
+    const cur = (PG && PG.state && PG.state.current) || {};
+    pSlider = snapSlider(Number(v), cur); showSliderVal();
+  };
+  window.sliderStep = function(d) {
+    const cur = (PG && PG.state && PG.state.current) || {};
+    pSlider = snapSlider(pSlider + d * (cur.step > 0 ? cur.step : 1), cur); showSliderVal();
+  };
+  window.submitSlider = function() { submitAnswer({ value: pSlider }); };
+
+  function playerQuestionInput(cur) {
+    const type = cur.type || "choice";
+    if (type === "type") return `
+      <input class="p-text-input" id="p-text" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Skriv ditt svar…">
+      <button type="button" class="btn-hype p-submit" onclick="submitText()">SKICKA SVAR ➔</button>`;
+    if (type === "puzzle") return `
+      ${cur.labels && cur.labels.first ? `<div class="p-puzzle-label">⬆ ${esc(cur.labels.first)}</div>` : ""}
+      <div class="p-puzzle" id="p-puzzle"></div>
+      ${cur.labels && cur.labels.last ? `<div class="p-puzzle-label">⬇ ${esc(cur.labels.last)}</div>` : ""}
+      <button type="button" class="btn-hype p-submit" onclick="submitPuzzle()">LÅS ORDNINGEN ➔</button>`;
+    if (type === "slider") return `
+      <div class="p-slider-val" id="p-slider-val"></div>
+      <input type="range" class="p-range" id="p-range" min="${cur.min}" max="${cur.max}" step="${cur.step > 0 ? cur.step : 1}" value="${pSlider}" oninput="sliderInput(this.value)">
+      <div class="p-range-ends"><span>${fmtNum(cur.min)}</span><span>${fmtNum(cur.max)}</span></div>
+      <div class="p-step-btns">
+        <button type="button" class="btn" style="justify-content:center; font-size:20px;" onclick="sliderStep(-1)">−</button>
+        <button type="button" class="btn" style="justify-content:center; font-size:20px;" onclick="sliderStep(1)">+</button>
+      </div>
+      <button type="button" class="btn-hype p-submit" onclick="submitSlider()">LÅS SVARET ➔</button>`;
+    return `
+      <div class="p-ans-grid">
+        ${[0, 1, 2, 3].map(k => `
+          <button type="button" class="p-ans-btn a${k}" onclick="pickAnswer(${k})">
+            <span class="shape">${SHAPES[k]}</span><span>${esc((cur.answers || [])[k])}</span>
+          </button>`).join("")}
+      </div>`;
+  }
 
   window.leaveGame = function() {
     if (!confirm("Lämna spelet?")) return;
@@ -1901,34 +2423,41 @@
         </div>`;
     } else if (st.phase === "question") {
       const cur = st.current || {};
+      const type = cur.type || "choice";
+      const meta = `<div class="p-qmeta"><span>${TYPES[type].icon} FRÅGA ${i + 1} / ${st.total}${cur.double ? " · ⚡ 2X" : ""}</span><span class="p-timer" id="p-timer">${st.paused ? "⏸" : "⏱ " + st.timer}</span></div>`;
       if (!myAns) {
-        v.innerHTML = `
-          <div class="p-qmeta"><span>FRÅGA ${i + 1} / ${st.total}${cur.double ? " · ⚡ 2X" : ""}</span><span class="p-timer" id="p-timer">${st.paused ? "⏸" : "⏱ " + st.timer}</span></div>
-          <div class="p-qtext">${esc(cur.q)}</div>
-          <div class="p-ans-grid">
-            ${[0, 1, 2, 3].map(k => `
-              <button type="button" class="p-ans-btn a${k}" onclick="pickAnswer(${k})">
-                <span class="shape">${SHAPES[k]}</span><span>${esc((cur.answers || [])[k])}</span>
-              </button>`).join("")}
-          </div>`;
+        // Ny fråga → nollställ lokal pussel-/reglageställning
+        const lk = `${i}|${PG.state.timeLimit}|${cur.q}`;
+        if (lk !== pLocalKey) {
+          pLocalKey = lk;
+          pOrder = [0, 1, 2, 3];
+          if (type === "slider") pSlider = snapSlider((cur.min + cur.max) / 2, cur);
+        }
+        v.innerHTML = `${meta}<div class="p-qtext">${esc(cur.q)}</div>${playerQuestionInput(cur)}`;
+        if (type === "puzzle") renderPuzzleList();
+        if (type === "slider") showSliderVal();
+        if (type === "type") {
+          const inp = $("p-text");
+          if (inp) { inp.addEventListener("keydown", e => { if (e.key === "Enter") submitText(); }); if (inp.focus) inp.focus(); }
+        }
       } else {
-        v.innerHTML = `
-          <div class="p-qmeta"><span>FRÅGA ${i + 1} / ${st.total}</span><span class="p-timer" id="p-timer">${st.paused ? "⏸" : "⏱ " + st.timer}</span></div>
-          <div class="p-card">
-            <div class="p-big-shape" style="color:${["var(--k-red)", "var(--k-blue)", "var(--k-yellow)", "var(--k-green)"][myAns.choice]};">${SHAPES[myAns.choice]}</div>
-            <h2>Svar låst! 🔒</h2>
-            <p>Väntar på de andra…</p>
-          </div>`;
+        const big = type === "choice"
+          ? `<div class="p-big-shape" style="color:${KCOLORS[myAns.choice]};">${SHAPES[myAns.choice]}</div>`
+          : `<div style="font-size:30px; font-weight:900;">${esc(answerText(cur, myAns))}</div>`;
+        v.innerHTML = `${meta}
+          <div class="p-card">${big}<h2>Svar låst! 🔒</h2><p>Väntar på de andra…</p></div>`;
       }
     } else if (st.phase === "reveal") {
-      const right = isRight(PG, pid, i, st.correct);
+      const { right, factor } = judge(PG, pid, i, st);
       const cur = st.current || {};
-      const correctTxt = `${SHAPES[st.correct]} ${esc((cur.answers || [])[st.correct])}`;
-      const fast = fastestPid(PG, i, st.correct) === pid;
+      const correctTxt = esc(correctText(st));
+      const mine = myAns ? `<p>Ditt svar: <b>${esc(answerText(cur, myAns))}</b></p>` : "";
+      const fast = fastestPid(PG, i, st) === pid;
       if (right) {
-        v.innerHTML = `<div class="p-result right"><div style="font-size:60px;">✅</div><div class="big">RÄTT!</div>${fast ? `<div class="hype-badge badge-fast" style="background:#fff;">⚡ SNABBAST</div>` : ""}<p>Poängen visas på topplistan 🔥</p></div>`;
+        const close = cur.type === "slider" && factor < 1 ? `<p>Nära! ${Math.round(factor * 100)} % av poängen</p>` : "";
+        v.innerHTML = `<div class="p-result right"><div style="font-size:60px;">✅</div><div class="big">RÄTT!</div>${fast ? `<div class="hype-badge badge-fast" style="background:#fff;">⚡ SNABBAST</div>` : ""}${close}${cur.type === "slider" ? mine : ""}<p>Poängen visas på topplistan 🔥</p></div>`;
       } else if (myAns) {
-        v.innerHTML = `<div class="p-result wrong"><div style="font-size:60px;">❌</div><div class="big">FEL</div><p>Rätt svar: <b>${correctTxt}</b></p></div>`;
+        v.innerHTML = `<div class="p-result wrong"><div style="font-size:60px;">❌</div><div class="big">FEL</div>${mine}<p>Rätt svar: <b>${correctTxt}</b></p></div>`;
       } else {
         v.innerHTML = `<div class="p-result none"><div style="font-size:60px;">⏰</div><div class="big">INGET SVAR</div><p>Rätt svar: <b>${correctTxt}</b></p></div>`;
       }
@@ -1973,7 +2502,7 @@
   }
 
   // ===== START =====
-  if (ROLE === "host") hostInit();
+  if (ROLE === "host") hostGate();
   else playerInit();
 
 </script>
