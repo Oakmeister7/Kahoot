@@ -879,6 +879,25 @@
   .host-login { position: relative; z-index: 6; flex: 1; align-items: center; justify-content: center; padding: 30px 16px; }
   body.role-host.host-locked .host-auth-only,
   body.role-host:not(.host-ready) .host-auth-only { display: none !important; }
+
+  /* ===== KOMPAKT MOBILVY FÖR SPELARE ===== */
+  @media (max-width: 700px) {
+    body.role-player header { padding: 8px 14px; gap: 8px; flex-wrap: nowrap; }
+    body.role-player .brand-logo { font-size: 17px; padding: 4px 10px; }
+    body.role-player .brand-sub, body.role-player #brand-title { display: none; }
+    body.role-player .header-controls { flex-wrap: nowrap; }
+    body.role-player .screen-status { padding: 4px 10px; font-size: 11px; }
+    body.role-player .player-app { padding: 10px 12px; gap: 10px; }
+    body.role-player .p-topbar { padding: 8px 14px; font-size: 15px; }
+    body.role-player .p-qtext { padding: 12px 14px; font-size: 17px; }
+    body.role-player .p-ans-btn { min-height: 112px; }
+    body.role-player .p-puzzle { gap: 8px; }
+    body.role-player .p-puzzle-row { padding: 6px 10px; font-size: 16px; }
+    body.role-player .p-puzzle-row .mv { flex-direction: row; }
+    body.role-player .p-puzzle-row .mv button { width: 46px; height: 42px; }
+    body.role-player .btn-hype { padding: 12px 20px; font-size: 15px; }
+    body.role-player .p-slider-val { font-size: 46px; }
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
