@@ -898,6 +898,50 @@
     body.role-player .btn-hype { padding: 12px 20px; font-size: 15px; }
     body.role-player .p-slider-val { font-size: 46px; }
   }
+
+  /* ===== LÄSFAS ===== */
+  .preview-stage { flex-direction: column; align-items: center; gap: 18px; padding: 30px 24px; background: var(--bg-card); border: 2px solid var(--border-glow); border-radius: 20px; }
+  .preview-label { font-size: 28px; font-weight: 900; text-align: center; }
+  .preview-label b { color: var(--accent-amber); font-family: monospace; font-size: 34px; }
+  .preview-track { width: 100%; max-width: 900px; height: 18px; background: rgba(255,255,255,0.1); border-radius: 99px; overflow: hidden; }
+  .preview-bar { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-pink)); border-radius: 99px; transition: width 1s linear; }
+  .p-pausenote { background: rgba(251,191,36,0.18); border: 1px solid var(--accent-amber); color: #fde68a; font-weight: 800; padding: 8px 12px; border-radius: 10px; text-align: center; }
+
+  /* ===== STOR PIL-KNAPP (spelledare) ===== */
+  .next-fab {
+    position: fixed; right: 28px; bottom: 28px; z-index: 50;
+    display: flex; align-items: center; gap: 12px;
+    background: linear-gradient(135deg, #f59e0b 0%, #ec4899 100%); color: #fff; border: 3px solid #fff;
+    border-radius: 99px; padding: 14px 18px 14px 26px; font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
+    box-shadow: 0 10px 35px rgba(236,72,153,0.6); cursor: pointer; transition: transform 0.15s, filter 0.15s;
+  }
+  .next-fab:hover { transform: translateY(-2px) scale(1.04); filter: brightness(1.1); }
+  .next-fab .arrow { background: #fff; color: #ec4899; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  body.role-host #reveal-btn, body.role-host #to-scoreboard-btn, body.role-host #next-q-btn { display: none !important; }
+  body.role-host .arena-container { padding-bottom: 120px; }
+
+  /* ===== TOPPLISTA MED MÅNGA SPELARE ===== */
+  .leaderboard-rows.compact { gap: 7px; }
+  .leaderboard-rows.compact .lb-row { padding: 8px 18px; border-radius: 12px; }
+  .leaderboard-rows.compact .lb-rank-circle { width: 36px; height: 36px; font-size: 16px; }
+  .leaderboard-rows.compact .lb-name { font-size: 19px; }
+  .leaderboard-rows.compact .lb-score { font-size: 22px; }
+  .lb-more { text-align: center; color: var(--text-muted); font-weight: 800; padding: 6px; }
+
+  /* Topplistan får inte hamna under pil-knappen */
+  body.role-host .hype-board-wrap { max-width: min(980px, calc(100vw - 620px)); min-width: 560px; }
+  body.role-host #screen-leaderboard .hype-title { font-size: 34px; }
+  .leaderboard-rows.compact { gap: 5px; }
+  .leaderboard-rows.compact .lb-row { padding: 5px 16px; }
+  .leaderboard-rows.compact .lb-rank-circle { width: 32px; height: 32px; font-size: 15px; }
+  .leaderboard-rows.compact .lb-name { font-size: 18px; }
+  .leaderboard-rows.compact .lb-score { font-size: 20px; min-width: 90px; }
+  .leaderboard-rows.compact .lb-delta { font-size: 14px; padding: 2px 8px; }
+  @media (max-width: 1250px) {
+    body.role-host .hype-board-wrap { max-width: 980px; min-width: 0; }
+    .next-fab { right: 16px; bottom: 16px; padding: 8px; }
+    .next-fab #next-fab-label { display: none; }
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -987,6 +1031,11 @@
 
     <div class="question-stage" id="question-text">Laddar fråga…</div>
 
+    <div class="preview-stage" id="preview-stage" style="display:none;">
+      <div class="preview-label">📖 Läs frågan – svarsalternativen kommer om <b id="preview-count">5</b></div>
+      <div class="preview-track"><div class="preview-bar" id="preview-bar"></div></div>
+    </div>
+
     <div class="chart-stage" id="chart-stage">
       <div class="chart-col" id="chart-col-0"><div class="chart-bar" id="chart-bar-0" style="background:var(--k-red);">0</div><span style="font-weight:900; color:var(--k-red);">▲</span></div>
       <div class="chart-col" id="chart-col-1"><div class="chart-bar" id="chart-bar-1" style="background:var(--k-blue);">0</div><span style="font-weight:900; color:var(--k-blue);">◆</span></div>
@@ -1024,6 +1073,10 @@
       </div>
     </div>
   </div>
+
+  <button type="button" class="next-fab" id="next-fab" onclick="hostNext()" style="display:none;" title="Nästa steg (→)">
+    <span id="next-fab-label">Nästa</span><span class="arrow">➔</span>
+  </button>
 
   <div id="screen-podium" class="screen">
     <div style="text-align:center;">
@@ -1626,7 +1679,8 @@
 
   // ---------- TIMER (körs bara hos spelledaren) ----------
   function ensureTick() {
-    if (S().phase === "question") { if (!tickInt) tickInt = setInterval(hostTick, 1000); }
+    const ph = S().phase;
+    if (ph === "question" || ph === "preview") { if (!tickInt) tickInt = setInterval(hostTick, 1000); }
     else stopTick();
   }
   function stopTick() {
@@ -1635,21 +1689,38 @@
   }
   function hostTick() {
     const st = S();
-    if (st.phase !== "question" || st.paused) return;
+    if (st.paused) return;
+    if (st.phase === "preview") {
+      const r = Math.max(0, (typeof st.preview === "number" ? st.preview : 0) - 1);
+      if (r > 0) upd({ "state/preview": r }); else openAnswers();
+      return;
+    }
+    if (st.phase !== "question") return;
     const t = Math.max(0, (typeof st.timer === "number" ? st.timer : QT) - 1);
     upd({ "state/timer": t });
     if (t > 0) playTickSound(t <= 5);
     else reveal();
   }
 
+  // Paus: varje paus sparas med servertid så att den inte räknas som svarstid
   window.toggleTimerPause = function() {
-    if (S().phase !== "question") return;
-    upd({ "state/paused": !S().paused });
+    const st = S();
+    if (st.phase !== "question" && st.phase !== "preview") return;
+    const i = st.qIndex;
+    if (!st.paused) {
+      const u = { "state/paused": true };
+      if (st.phase === "question") { const k = "p" + Date.now(); u[`pauses/${i}/${k}`] = { s: serverTimestamp() }; u["state/pauseKey"] = k; }
+      upd(u);
+    } else {
+      const u = { "state/paused": false, "state/pauseKey": null };
+      if (st.pauseKey) u[`pauses/${i}/${st.pauseKey}/e`] = serverTimestamp();
+      upd(u);
+    }
   };
 
   // ---------- SPELFLÖDE ----------
   function resetScoresUpdates() {
-    const u = { answers: null, manual: null, fastest: null, secret: null, preScore: null, "state/scoredQ": -1 };
+    const u = { answers: null, manual: null, fastest: null, secret: null, pauses: null, preScore: null, "state/scoredQ": -1 };
     listPlayers(G).forEach(p => Object.assign(u, {
       [`players/${p.id}/score`]: 0, [`players/${p.id}/prevScore`]: 0, [`players/${p.id}/lastDelta`]: 0,
       [`players/${p.id}/streak`]: 0, [`players/${p.id}/rankClimb`]: 0, [`players/${p.id}/wasFastest`]: false
@@ -1693,17 +1764,31 @@
     return { cur, extra };
   }
 
+  // Lästid (sekunder) innan svarsalternativen visas – ställs in i redigeraren
+  let readTime = (() => { const v = Number(lsGet("abbhoot_read_time")); return Number.isFinite(v) && lsGet("abbhoot_read_time") !== null ? v : 5; })();
+
   function startQuestion(i) {
     const q = questions[i];
     if (!q) return;
     const { cur, extra } = publicQuestion(q, i);
     const tl = timeOf(q);
-    upd(Object.assign({
-      [`answers/${i}`]: null, [`manual/${i}`]: null, [`fastest/${i}`]: null,
-      "state/phase": "question", "state/qIndex": i, "state/timer": tl, "state/timeLimit": tl, "state/paused": false,
+    const u = Object.assign({
+      [`answers/${i}`]: null, [`manual/${i}`]: null, [`fastest/${i}`]: null, [`pauses/${i}`]: null,
+      "state/phase": "preview", "state/preview": readTime, "state/qIndex": i, "state/timer": tl, "state/timeLimit": tl,
+      "state/paused": false, "state/pauseKey": null, "state/startedAt": null,
       "state/correct": null, "state/total": questions.length,
       "state/current": cur
-    }, extra));
+    }, extra);
+    if (!(readTime > 0)) Object.assign(u, { "state/phase": "question", "state/startedAt": serverTimestamp() });
+    upd(u);
+  }
+
+  // Läsfasen är slut → alternativen visas och svarstiden startar (servertid)
+  function openAnswers() {
+    const st = S();
+    if (st.phase !== "preview") return;
+    upd({ "state/phase": "question", "state/startedAt": serverTimestamp(), "state/paused": false, "state/preview": 0 });
+    playPopSound(700);
   }
 
   function correctFor(q, i) {
@@ -1722,8 +1807,25 @@
     if (st.phase !== "question") return;
     stopTick();
     const q = questions[st.qIndex];
-    upd({ "state/phase": "reveal", "state/correct": correctFor(q, st.qIndex), "state/paused": false });
+    const u = { "state/phase": "reveal", "state/correct": correctFor(q, st.qIndex), "state/paused": false, "state/pauseKey": null };
+    if (st.paused && st.pauseKey) u[`pauses/${st.qIndex}/${st.pauseKey}/e`] = serverTimestamp();
+    upd(u);
   };
+
+  // Svarstid i ms: från att alternativen visades till svaret, minus pauser före svaret
+  function responseMs(G, i, st, a, TL) {
+    if (a && typeof a.at === "number" && typeof st.startedAt === "number") {
+      let ms = a.at - st.startedAt;
+      const ps = (G.pauses && G.pauses[i]) || {};
+      Object.values(ps).forEach(pz => { if (pz && typeof pz.s === "number" && typeof pz.e === "number" && pz.e <= a.at) ms -= (pz.e - pz.s); });
+      return Math.max(0, Math.min(ms, TL * 1000));
+    }
+    if (a && typeof a.timeLeft === "number") return Math.max(0, Math.min(TL, TL - a.timeLeft)) * 1000;   // reserv
+    return TL * 500;   // manuellt "rätt" utan svar = halva tiden
+  }
+
+  // Kahoot: poäng = avrunda(1000 × (1 − (svarstid ÷ frågetid) ÷ 2)). Rätt direkt = 1000, i sista sekunden ≈ 500.
+  function kahootPoints(rtMs, TL) { return Math.round(1000 * (1 - ((rtMs / (TL * 1000)) / 2))); }
 
   window.toBoard = function() {
     const st = S();
@@ -1751,11 +1853,9 @@
       let delta = 0, streak = 0;
       if (right) {
         streak = b.streak + 1;
-        const t = Math.min(TL, Math.max(0, a && typeof a.timeLeft === "number" ? a.timeLeft : Math.round(TL * 0.6)));
-        const basePts = Math.round((600 + Math.round((t / TL) * 400)) * factor) * mult;
-        const streakBonus = streak >= 2 ? Math.min(streak * 100, 500) : 0;
-        const fastBonus = fast === p.id ? 250 : 0;
-        delta = basePts + streakBonus + fastBonus;
+        const basePts = Math.round(kahootPoints(responseMs(G, i, st, a, TL), TL) * factor) * mult;
+        const streakBonus = streak >= 2 ? Math.min(streak * 100, 500) : 0;   // svarsserie: +100 per fråga i rad, max +500
+        delta = basePts + streakBonus;
       }
       newScore[p.id] = b.score + delta;
       Object.assign(u, {
@@ -1810,8 +1910,9 @@
   function hostRender() {
     const st = S();
     const phase = st.phase || "lobby";
+    updateNextFab();
     if (phase === "lobby") { showScreen("screen-lobby"); renderHostLobby(); }
-    else if (phase === "question" || phase === "reveal") { showScreen("screen-question"); renderHostQuestion(); }
+    else if (phase === "preview" || phase === "question" || phase === "reveal") { showScreen("screen-question"); renderHostQuestion(); }
     else if (phase === "board") {
       showScreen("screen-leaderboard");
       const key = `${st.scoredQ}-${st.boardAt}`;
@@ -1842,8 +1943,13 @@
     const i = st.qIndex;
     const cur = st.current || {};
     const revealed = st.phase === "reveal";
+    const preview = st.phase === "preview";
     const qKey = `${i}`;
-    if (st.phase === "question" && qKey !== lastQuestionKey) { lastQuestionKey = qKey; playQuestionIntroSound(); }
+    // Introljud när frågan dyker upp (läsfasen), eller direkt om lästiden är 0
+    if ((preview || st.phase === "question") && qKey !== lastQuestionKey && lastQuestionKey !== `open-${i}`) {
+      lastQuestionKey = preview ? qKey : `open-${i}`; playQuestionIntroSound();
+    }
+    if (st.phase === "question" && lastQuestionKey === qKey) lastQuestionKey = `open-${i}`;
 
     $("q-counter").textContent = `FRÅGA ${i + 1} AV ${st.total || questions.length}`;
     $("q-double-badge").style.display = cur.double ? "inline-block" : "none";
@@ -1865,8 +1971,25 @@
     tEl.textContent = st.paused ? "⏸" : (revealed ? "✓" : t);
     tEl.classList.toggle("urgent", !revealed && !st.paused && t <= 5);
 
-    // Svarsräknare
+    // Läsfas: bara frågan + nedräkning, inga alternativ
     const list = listPlayers(G);
+    $("preview-stage").style.display = preview ? "flex" : "none";
+    document.querySelector(".answer-counter").style.visibility = preview ? "hidden" : "visible";
+    if (preview) {
+      const total = readTime > 0 ? readTime : 1, left = typeof st.preview === "number" ? st.preview : total;
+      tEl.textContent = st.paused ? "⏸" : (st.timeLimit || QT);
+      tEl.classList.remove("urgent");
+      $("preview-count").textContent = st.paused ? "⏸" : left;
+      $("preview-bar").style.width = Math.max(0, Math.min(100, ((total - left) / total) * 100 + (100 / total))) + "%";
+      $("answers-grid").style.display = "none";
+      $("alt-stage").style.display = "none";
+      $("chart-stage").style.display = "none";
+      renderPresenterPanel(list, {}, false);
+      updateNextFab();
+      return;
+    }
+
+    // Svarsräknare
     const ans = answersOf(G, i);
     const nAnswered = list.filter(p => ans[p.id]).length;
     $("answer-count").textContent = nAnswered;
@@ -1901,7 +2024,34 @@
 
     renderAltStage(type, cur, st, list, ans, revealed);
     renderPresenterPanel(list, ans, revealed);
+    updateNextFab();
   }
+
+  // ---------- STOR PIL-KNAPP: nästa steg ----------
+  function nextLabel() {
+    const st = S();
+    switch (st.phase) {
+      case "lobby": return "Starta";
+      case "preview": return "Visa alternativ";
+      case "question": return "Avslöja svaret";
+      case "reveal": return "Topplista";
+      case "board": return st.qIndex + 1 >= questions.length ? "Podium" : "Nästa fråga";
+      default: return "";
+    }
+  }
+  function updateNextFab() {
+    const lbl = nextLabel();
+    $("next-fab").style.display = lbl ? "flex" : "none";
+    $("next-fab-label").textContent = lbl;
+  }
+  window.hostNext = function() {
+    const ph = S().phase;
+    if (ph === "lobby") startGame();
+    else if (ph === "preview") openAnswers();
+    else if (ph === "question") reveal();
+    else if (ph === "reveal") toBoard();
+    else if (ph === "board") nextQuestion();
+  };
 
   // Storskärmsvy för Skriv svar / Pussel / Skjutreglage
   function renderAltStage(type, cur, st, list, ans, revealed) {
@@ -1997,12 +2147,15 @@
 
   function renderBoard(animate) {
     const st = S();
-    const sorted = listPlayers(G).sort((a, b) => (b.score || 0) - (a.score || 0));
+    const sorted = listPlayers(G).sort((a, b) => ((b.score || 0) - (a.score || 0)) || String(a.name).localeCompare(String(b.name), "sv"));
     const maxScore = Math.max(1000, (sorted[0] && sorted[0].score) || 0);
     $("lb-subtitle").textContent = `STÄLLNING EFTER FRÅGA ${st.qIndex + 1} AV ${st.total || questions.length}`;
     $("next-q-btn").textContent = st.qIndex + 1 >= questions.length ? "🏆 AVSLÖJA SLUTPODIET! ➔" : `Nästa Fråga (${st.qIndex + 2}/${questions.length}) ➔`;
 
-    $("leaderboard-rows").innerHTML = sorted.map((p, idx) => {
+    // Topp 10 på storskärmen (alla ser sin egen placering i mobilen)
+    const TOP = 10, shown = sorted.slice(0, TOP);
+    $("leaderboard-rows").classList.toggle("compact", shown.length > 6);
+    $("leaderboard-rows").innerHTML = shown.map((p, idx) => {
       const rank = idx + 1;
       const pct = Math.round(((p.score || 0) / maxScore) * 100);
       const icon = rank === 1 ? "👑" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `#${rank}`;
@@ -2019,7 +2172,7 @@
             <span class="lb-score" id="lb-score-${p.id}">${fmt(animate ? p.prevScore : p.score)} p</span>
           </div>
         </div>`;
-    }).join("");
+    }).join("") + (sorted.length > TOP ? `<div class="lb-more">+ ${sorted.length - TOP} spelare till – se din placering i mobilen 📱</div>` : "");
 
     if (animate) {
       playLeaderboardFanfare();
@@ -2079,6 +2232,8 @@
 
   // Läs in fälten i arbetskopian
   function collectEditor() {
+    const rt = Number(ival("ed_readtime"));
+    if (ival("ed_readtime") !== "" && Number.isFinite(rt)) edReadTime = Math.max(0, Math.min(30, Math.round(rt)));
     edQ = edQ.map((q, qi) => {
       const t = qType(q);
       const n = { type: t, q: ival(`ed_q_${qi}`).trim(), double: !!($(`ed_double_${qi}`) || {}).checked, time: num(`ed_time_${qi}`, TYPES[t].time) };
@@ -2131,8 +2286,13 @@
       </div>`;
   }
 
+  let edReadTime = 5;
   function renderEditor() {
-    $("editor-list").innerHTML = edQ.map((q, qi) => `
+    $("editor-list").innerHTML = `
+      <div class="q-edit-card">
+        <label class="ed-label" style="font-size:14px; color:#fff;">📖 Lästid innan svarsalternativen visas (sekunder, 0 = direkt)
+          <input class="edit-input" style="max-width:120px;" id="ed_readtime" inputmode="numeric" value="${esc(edReadTime)}"></label>
+      </div>` + edQ.map((q, qi) => `
       <div class="q-edit-card">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
           <strong style="color:var(--accent-amber);">Fråga #${qi + 1}</strong>
@@ -2158,6 +2318,7 @@
 
   window.openEditor = function() {
     edQ = JSON.parse(JSON.stringify(questions)).map(q => Object.assign({ type: qType(q) }, q));
+    edReadTime = readTime;
     renderEditor();
     $("editor-modal").style.display = "flex";
   };
@@ -2204,6 +2365,8 @@
     if (problems.length) { alert("Rätta först:\n\n• " + problems.join("\n• ")); return; }
     questions = JSON.parse(JSON.stringify(edQ));
     lsSet(LS_QUESTIONS_KEY, questions);
+    readTime = edReadTime;
+    lsSet("abbhoot_read_time", readTime);
     closeEditor();
     if (pin) upd({ "state/total": questions.length });
   };
@@ -2223,11 +2386,7 @@
       if (e.key === "p" || e.key === "P") { togglePanel(); return; }
       if (e.key !== "ArrowRight") return;
       e.preventDefault();
-      const ph = S().phase;
-      if (ph === "lobby") startGame();
-      else if (ph === "question") reveal();
-      else if (ph === "reveal") toBoard();
-      else if (ph === "board") nextQuestion();
+      hostNext();
     });
   }
 
@@ -2301,7 +2460,7 @@
   function submitAnswer(payload) {
     if (!PG || !PG.state) return;
     const st = PG.state;
-    if (st.phase !== "question") return;
+    if (st.phase !== "question" || st.paused) return;
     const i = st.qIndex;
     if (answersOf(PG, i)[pid]) return;
     if (navigator.vibrate) { try { navigator.vibrate(40); } catch (e) {} }
@@ -2427,6 +2586,8 @@
     if (key === pViewKey) {
       const t = $("p-timer");
       if (t) t.textContent = st.paused ? "⏸" : `⏱ ${st.timer}`;
+      const pv = $("p-preview"); if (pv) pv.textContent = st.paused ? "⏸" : st.preview;
+      const pn = $("p-pausenote"); if (pn) pn.style.display = st.paused ? "block" : "none";
       return;
     }
     pViewKey = key;
@@ -2440,10 +2601,19 @@
           <p>Leta efter <b>${esc(me.name)}</b> på storskärmen.<br>Vänta tills spelledaren startar.</p>
           <button type="button" class="btn" onclick="leaveGame()">Lämna / byt namn</button>
         </div>`;
+    } else if (st.phase === "preview") {
+      const cur = st.current || {};
+      const type = cur.type || "choice";
+      v.innerHTML = `
+        <div class="p-qmeta"><span>${TYPES[type].icon} FRÅGA ${i + 1} / ${st.total}${cur.double ? " · ⚡ 2X" : ""}</span><span>${TYPES[type].label}</span></div>
+        <div class="p-qtext">${esc(cur.q)}</div>
+        <div class="p-card"><div style="font-size:44px;">📖</div><h2>Läs frågan…</h2>
+          <p>Svarsalternativen kommer om</p><div class="p-rank" id="p-preview">${st.paused ? "⏸" : st.preview}</div></div>`;
     } else if (st.phase === "question") {
       const cur = st.current || {};
       const type = cur.type || "choice";
-      const meta = `<div class="p-qmeta"><span>${TYPES[type].icon} FRÅGA ${i + 1} / ${st.total}${cur.double ? " · ⚡ 2X" : ""}</span><span class="p-timer" id="p-timer">${st.paused ? "⏸" : "⏱ " + st.timer}</span></div>`;
+      const meta = `<div class="p-qmeta"><span>${TYPES[type].icon} FRÅGA ${i + 1} / ${st.total}${cur.double ? " · ⚡ 2X" : ""}</span><span class="p-timer" id="p-timer">${st.paused ? "⏸" : "⏱ " + st.timer}</span></div>
+        <div class="p-pausenote" id="p-pausenote" style="display:${st.paused ? "block" : "none"};">⏸ Pausat av spelledaren – vänta lite</div>`;
       if (!myAns) {
         // Ny fråga → nollställ lokal pussel-/reglageställning
         const lk = `${i}|${PG.state.timeLimit}|${cur.q}`;
