@@ -942,6 +942,100 @@
     .next-fab { right: 16px; bottom: 16px; padding: 8px; }
     .next-fab #next-fab-label { display: none; }
   }
+
+  /* ===== PUSSEL: DRA OCH SLÄPP ===== */
+  .p-puzzle-hint { text-align: center; font-weight: 800; color: var(--text-muted); font-size: 14px; }
+  .p-puzzle-row { touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; position: relative; transition: transform 0.18s ease, box-shadow 0.18s; min-height: 58px; }
+  .p-puzzle-row .grip { font-size: 26px; opacity: 0.85; padding: 0 6px; }
+  .p-puzzle-row.dragging { transition: none; z-index: 10; cursor: grabbing; box-shadow: 0 14px 30px rgba(0,0,0,0.55), 0 0 0 3px #fff; }
+  .p-puzzle.is-dragging .p-puzzle-row:not(.dragging) { opacity: 0.85; }
+
+  /* ===== PODIUM: HYPE ===== */
+  #screen-podium { position: relative; overflow: hidden; }
+  .pod-head, .podium-stage, .pod-after { position: relative; z-index: 3; transition: filter 0.6s, opacity 0.6s; }
+  #screen-podium.pod-dark .podium-stage { filter: brightness(0.55); }
+  #screen-podium.pod-dark .podium-column.revealed { filter: brightness(1.6); }
+  .pod-after { opacity: 0; pointer-events: none; transform: translateY(30px); transition: opacity 0.8s, transform 0.8s; }
+  #screen-podium.pod-done .pod-after { opacity: 1; pointer-events: auto; transform: none; }
+
+  .pod-hype { position: absolute; inset: 0; z-index: 6; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0; transition: opacity 0.35s; background: radial-gradient(circle, rgba(9,4,24,0.35), rgba(9,4,24,0.85)); }
+  .pod-hype.show { opacity: 1; }
+  .pod-hype-text { font-size: 64px; font-weight: 900; text-align: center; line-height: 1.15; letter-spacing: 2px; text-transform: uppercase;
+    background: linear-gradient(90deg, #fff, #fbbf24, #ec4899, #fff); background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: hypeShimmer 1.6s linear infinite, hypeIn 0.5s cubic-bezier(.2,1.4,.4,1); filter: drop-shadow(0 0 30px rgba(251,191,36,0.6)); }
+  .pod-hype-text.small { font-size: 46px; }
+  .pod-hype-text.suspense { font-size: 80px; animation: hypeShimmer 1s linear infinite, hypePulse 0.45s ease-in-out infinite alternate; }
+  @keyframes hypeShimmer { to { background-position: -300% 0; } }
+  @keyframes hypeIn { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes hypePulse { from { transform: scale(0.96); } to { transform: scale(1.08); } }
+
+  .pod-spot { position: absolute; top: -20%; width: 46%; height: 140%; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 0.6s;
+    background: conic-gradient(from 180deg at 50% 0%, transparent 0deg, rgba(255,240,180,0.22) 12deg, transparent 24deg); }
+  .pod-spot-l { left: 4%; transform-origin: 50% 0%; animation: spotL 2.2s ease-in-out infinite alternate; }
+  .pod-spot-r { right: 4%; transform-origin: 50% 0%; animation: spotR 2s ease-in-out infinite alternate; }
+  #screen-podium.pod-suspense .pod-spot, #screen-podium.pod-winner .pod-spot { opacity: 1; }
+  #screen-podium.pod-suspense .pod-spot-l { animation-duration: 0.7s; }
+  #screen-podium.pod-suspense .pod-spot-r { animation-duration: 0.6s; }
+  @keyframes spotL { from { transform: rotate(-28deg); } to { transform: rotate(22deg); } }
+  @keyframes spotR { from { transform: rotate(26deg); } to { transform: rotate(-24deg); } }
+
+  .pod-flash { position: fixed; inset: 0; background: #fff; z-index: 999; opacity: 0; pointer-events: none; }
+  .pod-flash.go { animation: podFlash 0.9s ease-out; }
+  @keyframes podFlash { 0% { opacity: 0.95; } 100% { opacity: 0; } }
+
+  /* Vinnaren */
+  #podium-col-1 { position: relative; z-index: 4; }
+  .winner-rays { position: absolute; left: 50%; top: 40px; width: 720px; height: 720px; margin-left: -360px; margin-top: -300px; border-radius: 50%; z-index: -1; opacity: 0; pointer-events: none;
+    background: repeating-conic-gradient(rgba(251,191,36,0.38) 0deg 9deg, transparent 9deg 22deg);
+    -webkit-mask: radial-gradient(circle, #000 18%, transparent 68%); mask: radial-gradient(circle, #000 18%, transparent 68%); }
+  #screen-podium.pod-winner .winner-rays { opacity: 1; animation: raysSpin 14s linear infinite; transition: opacity 0.8s; }
+  @keyframes raysSpin { to { transform: rotate(360deg); } }
+  #podium-name-1 { font-size: 30px; color: var(--accent-amber); }
+  #screen-podium.pod-winner #podium-name-1 { font-size: 52px; line-height: 1.05;
+    background: linear-gradient(90deg, #fde68a, #fbbf24, #fff, #fbbf24, #fde68a); background-size: 250% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: winnerZoom 0.9s cubic-bezier(.2,1.6,.4,1), hypeShimmer 2.2s linear infinite; filter: drop-shadow(0 0 22px rgba(251,191,36,0.9)); }
+  @keyframes winnerZoom { 0% { transform: scale(0.2); opacity: 0; } 70% { transform: scale(1.25); opacity: 1; } 100% { transform: scale(1); } }
+  #screen-podium.pod-winner .winner-crown { font-size: 84px; animation: crownDrop 1s cubic-bezier(.3,1.5,.5,1), crownFloat 1.6s ease-in-out 1s infinite alternate; filter: drop-shadow(0 0 25px rgba(251,191,36,0.9)); }
+  @keyframes crownDrop { 0% { transform: translateY(-420px) rotate(-30deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+  @keyframes crownFloat { from { transform: translateY(0) rotate(-4deg); } to { transform: translateY(-14px) rotate(4deg); } }
+  .winner-tag { font-size: 14px; font-weight: 900; letter-spacing: 2px; color: #090418; background: linear-gradient(90deg, #fbbf24, #fde68a, #fbbf24); padding: 5px 14px; border-radius: 99px; margin-bottom: 10px; opacity: 0; transform: scale(0.5); transition: all 0.5s 0.7s; white-space: nowrap; }
+  #screen-podium.pod-winner .winner-tag { opacity: 1; transform: scale(1); }
+  #screen-podium.pod-winner .pillar-1 { animation: pillarGlow 1.2s ease-in-out infinite alternate; }
+  @keyframes pillarGlow { from { box-shadow: 0 0 40px rgba(251,191,36,0.5); } to { box-shadow: 0 0 90px rgba(251,191,36,0.95), 0 0 160px rgba(236,72,153,0.4); } }
+  #screen-podium.pod-winner #podium-pts-1 { font-size: 26px; }
+
+  /* Kommentarsvägg */
+  .comment-wall-wrap { margin-top: 22px; display: flex; flex-direction: column; gap: 10px; }
+  .comment-wall-wrap h3 { text-align: center; font-size: 20px; color: var(--accent-amber); }
+  .comment-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .comment-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18); border-radius: 14px; padding: 12px 16px; animation: popIn 0.4s ease; }
+  .comment-name { font-weight: 900; color: var(--accent-blue); margin-bottom: 4px; }
+  .comment-text { font-size: 17px; line-height: 1.4; word-break: break-word; }
+
+  /* Mobil: podium + kommentar */
+  .p-suspense .drum { font-size: 80px; animation: hypePulse 0.3s ease-in-out infinite alternate; }
+  .p-winner { background: radial-gradient(circle at 50% 20%, rgba(251,191,36,0.45), rgba(30,18,66,0.95) 70%); border-color: var(--accent-amber); box-shadow: 0 0 50px rgba(251,191,36,0.5); }
+  .p-winner .crown { font-size: 96px; animation: crownDrop 0.9s cubic-bezier(.3,1.5,.5,1), crownFloat 1.6s ease-in-out 0.9s infinite alternate; }
+  .p-winner h2 { font-size: 38px; color: var(--accent-amber); }
+  .p-comment { width: 100%; min-height: 110px; background: #fff; color: #0f172a; border: none; border-radius: 14px; padding: 14px; font-size: 18px; font-weight: 600; resize: vertical; font-family: inherit; }
+  .p-comment-count { align-self: flex-end; font-size: 12px; font-weight: 800; color: var(--text-muted); margin-top: -8px; }
+  .p-comment-done { font-size: 18px; font-weight: 700; font-style: italic; background: rgba(255,255,255,0.08); padding: 12px 14px; border-radius: 12px; word-break: break-word; }
+  #screen-podium.pod-winner .pod-head { opacity: 0; }
+
+  /* Kommentarer först under podiet, övriga placeringar kompakt i två kolumner */
+  #screen-podium .hype-board-wrap.pod-after { max-width: 1200px; min-width: 0; }
+  #screen-podium .comment-wall-wrap { margin-top: 0; }
+  #screen-podium .comment-wall-wrap h3 { font-size: 26px; }
+  #screen-podium .comment-wall { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  #screen-podium .comment-card { padding: 14px 18px; border-radius: 16px; background: rgba(255,255,255,0.09); }
+  #screen-podium .comment-text { font-size: 21px; font-weight: 700; }
+  #screen-podium .comment-card.new { border-color: var(--accent-amber); box-shadow: 0 0 30px rgba(251,191,36,0.45); animation: popIn 0.45s cubic-bezier(.2,1.5,.4,1); }
+  .runnerups-title { text-align: center; color: var(--text-muted); font-size: 14px; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 22px; }
+  .leaderboard-rows.runnerups { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
+  .leaderboard-rows.runnerups .lb-row { padding: 6px 14px; border-radius: 12px; animation: none; }
+  .leaderboard-rows.runnerups .lb-rank-circle { width: 32px; height: 32px; font-size: 14px; }
+  .leaderboard-rows.runnerups .lb-name { font-size: 17px; }
+  .leaderboard-rows.runnerups .lb-score { font-size: 18px; min-width: 80px; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -1079,7 +1173,10 @@
   </button>
 
   <div id="screen-podium" class="screen">
-    <div style="text-align:center;">
+    <div class="pod-spot pod-spot-l"></div><div class="pod-spot pod-spot-r"></div>
+    <div class="pod-hype" id="pod-hype"><div class="pod-hype-text" id="pod-hype-text"></div></div>
+    <div class="pod-flash" id="pod-flash"></div>
+    <div style="text-align:center;" class="pod-head">
       <div style="font-size:15px; font-weight:900; color:var(--accent-amber); letter-spacing:3px; text-transform:uppercase;">SLUTRESULTAT // ABBHOOT CHAMPION</div>
       <h2 class="hype-title" style="font-size:48px;">🏆 PALLPLATS & VINNARE 🏆</h2>
     </div>
@@ -1090,8 +1187,10 @@
         <div class="podium-pillar pillar-2"><div class="pillar-place">2</div><div class="pillar-pts" id="podium-pts-2">0 p</div></div>
       </div>
       <div class="podium-column" id="podium-col-1">
-        <div class="podium-avatar">👑</div>
-        <div class="podium-name" id="podium-name-1" style="color:var(--accent-amber); font-size:28px;">–</div>
+        <div class="winner-rays"></div>
+        <div class="podium-avatar winner-crown">👑</div>
+        <div class="podium-name" id="podium-name-1">–</div>
+        <div class="winner-tag">🏆 DAGENS CHAMPION 🏆</div>
         <div class="podium-pillar pillar-1"><div class="pillar-place">1</div><div class="pillar-pts" id="podium-pts-1" style="background:#090418; color:var(--accent-amber);">0 p</div></div>
       </div>
       <div class="podium-column" id="podium-col-3">
@@ -1100,9 +1199,14 @@
         <div class="podium-pillar pillar-3"><div class="pillar-place">3</div><div class="pillar-pts" id="podium-pts-3">0 p</div></div>
       </div>
     </div>
-    <div class="hype-board-wrap" style="margin-top:20px;">
-      <h3 style="text-align:center; color:var(--text-muted); font-size:14px; text-transform:uppercase; letter-spacing:1.5px;">Övriga placeringar</h3>
-      <div class="leaderboard-rows" id="final-runnerups"></div>
+    <div class="hype-board-wrap pod-after" style="margin-top:20px;">
+      <div class="comment-wall-wrap">
+        <h3>💬 Dagens kommentarer <span id="comment-count">(0)</span></h3>
+        <div class="comment-wall" id="comment-wall"><div class="alt-sub">Spelarna kan skriva en kommentar i mobilen nu ✍️</div></div>
+      </div>
+      <h3 class="runnerups-title">Övriga placeringar</h3>
+      <div class="leaderboard-rows runnerups" id="final-runnerups"></div>
+
       <div style="text-align:center; margin-top:16px;">
         <button type="button" class="btn-hype" onclick="playAgain()">🔄 Spela en ny omgång (samma spelare)</button>
       </div>
@@ -1537,7 +1641,7 @@
   function updateConfetti() {
     cctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach(part => {
-      part.x += part.vx; part.y += part.vy; part.vy += 0.35; part.life -= 1.1;
+      part.x += part.vx; part.y += part.vy; part.vy += (part.g ?? 0.35); part.life -= 1.1;
       cctx.fillStyle = part.color;
       cctx.fillRect(part.x, part.y, part.size, part.size);
     });
@@ -1546,6 +1650,67 @@
     else { animating = false; cctx.clearRect(0, 0, canvas.width, canvas.height); }
   }
 
+
+
+  // ===== EXTRA EFFEKTER (podium) =====
+  const POD = { third: 2200, second: 4600, suspense: 6800, winner: 10200, after: 13200 };
+  let noiseBuf = null;
+  function noise(a) {
+    if (!noiseBuf) {
+      noiseBuf = a.createBuffer(1, Math.floor(a.sampleRate * 1.5), a.sampleRate);
+      const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    const src = a.createBufferSource(); src.buffer = noiseBuf; return src;
+  }
+  // Trumvirvel som accelererar och blir starkare
+  function playDrumroll(sec, peak) {
+    if (!soundHere()) return;
+    try {
+      const a = getAudio(); if (!a) return;
+      let t = a.currentTime; const end = t + sec;
+      while (t < end) {
+        const pr = 1 - (end - t) / sec;
+        const src = noise(a), f = a.createBiquadFilter(), g = a.createGain();
+        f.type = "bandpass"; f.frequency.value = 1800; f.Q.value = 0.8;
+        src.connect(f); f.connect(g); g.connect(a.destination);
+        g.gain.setValueAtTime(0.05 + peak * 0.25 * pr, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+        src.start(t, Math.random()); src.stop(t + 0.07);
+        t += 0.11 - 0.07 * pr;   // från 110 ms till 40 ms mellan slagen
+      }
+    } catch (e) {}
+  }
+  // Cymbal/krasch
+  function playCrash(vol) {
+    if (!soundHere()) return;
+    try {
+      const a = getAudio(); if (!a) return;
+      const src = noise(a), f = a.createBiquadFilter(), g = a.createGain(), t = a.currentTime;
+      f.type = "highpass"; f.frequency.value = 3500;
+      src.connect(f); f.connect(g); g.connect(a.destination);
+      g.gain.setValueAtTime(0.4 * vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + 1.4 * vol + 0.3);
+      src.start(t); src.stop(t + 1.8);
+    } catch (e) {}
+  }
+
+  const GOLD = ["#fbbf24", "#fde68a", "#f59e0b", "#ffffff", "#ec4899", "#38bdf8", "#a855f7", "#10b981"];
+  function startConfetti() { if (!animating) { animating = true; requestAnimationFrame(updateConfetti); } }
+  function launchConfettiAt(count, x, y) {
+    for (let i = 0; i < count; i++) particles.push({ x, y, vx: (Math.random() - 0.5) * 16, vy: -(6 + Math.random() * 14), size: Math.random() * 8 + 4, color: GOLD[Math.floor(Math.random() * GOLD.length)], life: 120 });
+    startConfetti();
+  }
+  function confettiCannon(fromLeft, count) {
+    const x = fromLeft ? 0 : window.innerWidth, y = window.innerHeight;
+    for (let i = 0; i < count; i++) particles.push({ x, y, vx: (fromLeft ? 1 : -1) * (6 + Math.random() * 16), vy: -(14 + Math.random() * 16), size: Math.random() * 9 + 5, color: GOLD[Math.floor(Math.random() * GOLD.length)], life: 170, g: 0.32 });
+    startConfetti();
+  }
+  function firework(x, y, count) {
+    const c = GOLD[Math.floor(Math.random() * GOLD.length)];
+    for (let i = 0; i < count; i++) {
+      const ang = (i / count) * Math.PI * 2, sp = 3 + Math.random() * 7;
+      particles.push({ x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, size: 3 + Math.random() * 4, color: Math.random() < 0.7 ? c : "#ffffff", life: 85, g: 0.1 });
+    }
+    startConfetti();
+  }
 
 
   // =====================================================================
@@ -1720,7 +1885,7 @@
 
   // ---------- SPELFLÖDE ----------
   function resetScoresUpdates() {
-    const u = { answers: null, manual: null, fastest: null, secret: null, pauses: null, preScore: null, "state/scoredQ": -1 };
+    const u = { answers: null, manual: null, fastest: null, secret: null, pauses: null, comments: null, preScore: null, "state/scoredQ": -1 };
     listPlayers(G).forEach(p => Object.assign(u, {
       [`players/${p.id}/score`]: 0, [`players/${p.id}/prevScore`]: 0, [`players/${p.id}/lastDelta`]: 0,
       [`players/${p.id}/streak`]: 0, [`players/${p.id}/rankClimb`]: 0, [`players/${p.id}/wasFastest`]: false
@@ -2189,30 +2354,104 @@
     }
   }
 
-  function renderPodium(animate) {
-    const sorted = listPlayers(G).sort((a, b) => (b.score || 0) - (a.score || 0));
+  // ===== PODIUM – prisutdelning med uppbyggnad =====
+  // Tidslinje (ms från start). Mobilerna använder samma POD.winner för att avslöja samtidigt.
+  let podTimers = [];
+
+  function podiumData() {
+    const sorted = listPlayers(G).sort((a, b) => ((b.score || 0) - (a.score || 0)) || String(a.name).localeCompare(String(b.name), "sv"));
     [1, 2, 3].forEach(n => {
-      const p = sorted[n - 1] || { name: "–", score: 0 };
-      $(`podium-name-${n}`).textContent = p.name;
-      $(`podium-pts-${n}`).textContent = fmt(p.score) + " p";
+      const p = sorted[n - 1];
+      $(`podium-col-${n}`).style.visibility = p ? "visible" : "hidden";
+      $(`podium-name-${n}`).textContent = p ? p.name : "–";
+      $(`podium-pts-${n}`).textContent = fmt(p ? p.score : 0) + " p";
     });
     $("final-runnerups").innerHTML = sorted.slice(3).map((p, k) => `
       <div class="lb-row"><div class="lb-left"><div class="lb-rank-circle">#${k + 4}</div><span class="lb-name">${esc(p.name)}</span></div>
       <div class="lb-right"><span class="lb-score">${fmt(p.score)} p</span></div></div>`).join("");
+    return sorted;
+  }
 
-    const cols = [$("podium-col-1"), $("podium-col-2"), $("podium-col-3")];
-    if (!animate) { if (Date.now() >= podiumAnimUntil) cols.forEach(c => c.classList.add("revealed")); return; }
-    podiumAnimUntil = Date.now() + 2300;
-    cols.forEach(c => c.classList.remove("revealed"));
-    setTimeout(() => { cols[2].classList.add("revealed"); playPopSound(440); }, 350);
-    setTimeout(() => { cols[1].classList.add("revealed"); playPopSound(587); }, 1150);
-    setTimeout(() => {
-      cols[0].classList.add("revealed");
-      document.body.classList.add("shake");
-      setTimeout(() => document.body.classList.remove("shake"), 1000);
-      playChampionFanfare();
-      launchConfetti(140);
-    }, 2100);
+  function renderCommentWall() {
+    const list = Object.values((G && G.comments) || {})
+      .filter(c => c && c.text)
+      .sort((a, b) => (b.at || 0) - (a.at || 0));
+    $("comment-count").textContent = `(${list.length})`;
+    // Nya kommentarer får en kort "pling" + markering
+    const seen = renderCommentWall.seen || (renderCommentWall.seen = new Set());
+    let fresh = false;
+    $("comment-wall").innerHTML = list.length
+      ? list.map(c => {
+          const k = c.name + "|" + c.text;
+          const isNew = !seen.has(k); if (isNew) { seen.add(k); fresh = true; }
+          return `<div class="comment-card ${isNew ? "new" : ""}"><div class="comment-name">💬 ${esc(c.name)}</div><div class="comment-text">${esc(c.text)}</div></div>`;
+        }).join("")
+      : `<div class="alt-sub">Spelarna kan skriva en kommentar i mobilen nu ✍️</div>`;
+    if (fresh && list.length && Date.now() >= podiumAnimUntil) playPopSound(820);
+  }
+
+  function podiumFinal() {
+    const scr = $("screen-podium");
+    scr.classList.remove("pod-dark", "pod-suspense");
+    scr.classList.add("pod-winner", "pod-done");
+    ["podium-col-1", "podium-col-2", "podium-col-3"].forEach(id => $(id).classList.add("revealed"));
+    $("pod-hype").classList.remove("show");
+  }
+
+  function renderPodium(animate) {
+    const sorted = podiumData();
+    renderCommentWall();
+    if (!animate) { if (Date.now() >= podiumAnimUntil) podiumFinal(); return; }
+
+    podTimers.forEach(clearTimeout); podTimers = [];
+    podiumAnimUntil = Date.now() + POD.after + 200;
+    const scr = $("screen-podium"), hype = $("pod-hype"), txt = $("pod-hype-text");
+    const cols = { 1: $("podium-col-1"), 2: $("podium-col-2"), 3: $("podium-col-3") };
+    scr.classList.remove("pod-winner", "pod-done", "pod-suspense");
+    scr.classList.add("pod-dark");
+    Object.values(cols).forEach(c => c.classList.remove("revealed"));
+    const at = (ms, fn) => podTimers.push(setTimeout(fn, ms));
+    const say = (html, cls) => { txt.className = "pod-hype-text " + (cls || ""); txt.innerHTML = html; hype.classList.add("show"); };
+
+    say("🥁 DAGS FÖR<br>PRISUTDELNING!", "intro");
+    playDrumroll(1.6, 0.35);
+
+    at(POD.third - 900, () => say("🥉 På tredje plats…", "small"));
+    at(POD.third, () => {
+      hype.classList.remove("show");
+      if (sorted[2]) { cols[3].classList.add("revealed"); playPopSound(440); playCrash(0.25); launchConfettiAt(60, innerWidth * 0.68, innerHeight * 0.55); }
+    });
+    at(POD.second - 900, () => say("🥈 På andra plats…", "small"));
+    at(POD.second, () => {
+      hype.classList.remove("show");
+      if (sorted[1]) { cols[2].classList.add("revealed"); playPopSound(587); playCrash(0.3); launchConfettiAt(80, innerWidth * 0.32, innerHeight * 0.55); }
+    });
+    at(POD.suspense, () => {
+      scr.classList.add("pod-suspense");
+      say("…OCH DAGENS<br>VINNARE ÄR…", "suspense");
+      playDrumroll((POD.winner - POD.suspense) / 1000, 0.9);
+    });
+    at(POD.winner, () => {
+      hype.classList.remove("show");
+      scr.classList.remove("pod-dark", "pod-suspense");
+      scr.classList.add("pod-winner");
+      const fl = $("pod-flash"); fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go");
+      cols[1].classList.add("revealed");
+      playCrash(1); playChampionFanfare();
+      document.body.classList.add("shake"); setTimeout(() => document.body.classList.remove("shake"), 1200);
+      // Räkna upp vinnarens poäng från 0
+      const target = (sorted[0] && sorted[0].score) || 0, t0 = performance.now(), el = $("podium-pts-1");
+      const step = now => { const pr = Math.min(1, (now - t0) / 1800); el.textContent = fmt(Math.round(target * (1 - Math.pow(1 - pr, 3)))) + " p"; if (pr < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+      // Konfettikanoner + fyrverkerier i ca 7 sekunder
+      confettiCannon(true, 160); confettiCannon(false, 160);
+      for (let k = 0; k < 12; k++) at(POD.winner + 400 + k * 550, () => {
+        firework(innerWidth * (0.15 + Math.random() * 0.7), innerHeight * (0.12 + Math.random() * 0.35), 70);
+        if (k % 3 === 0) confettiCannon(k % 2 === 0, 70);
+        playPopSound(300 + Math.random() * 500);
+      });
+    });
+    at(POD.after, () => scr.classList.add("pod-done"));
   }
 
   // ---------- REDIGERARE ----------
@@ -2485,13 +2724,55 @@
     const box = $("p-puzzle");
     if (!box) return;
     box.innerHTML = pOrder.map((d, k) => `
-      <div class="p-puzzle-row" style="background:${KCOLORS[d]};">
+      <div class="p-puzzle-row" data-k="${k}" style="background:${KCOLORS[d]};">
         <span class="n">${k + 1}</span><span class="t">${esc((cur.items || [])[d])}</span>
-        <span class="mv">
-          <button type="button" onclick="puzzleMove(${k}, -1)" ${k === 0 ? "disabled" : ""} aria-label="Flytta upp">▲</button>
-          <button type="button" onclick="puzzleMove(${k}, 1)" ${k === 3 ? "disabled" : ""} aria-label="Flytta ned">▼</button>
-        </span>
+        <span class="grip" aria-hidden="true">⠿</span>
       </div>`).join("");
+    box.querySelectorAll(".p-puzzle-row").forEach(r => r.addEventListener("pointerdown", puzzleDragStart));
+  }
+
+  // Dra en rad med fingret/musen och släpp där den ska ligga
+  let pDrag = null;
+  function buzz(ms) { if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} } }
+  function puzzleDragStart(e) {
+    if (pDrag || (e.button !== undefined && e.button > 0)) return;
+    const row = e.currentTarget;
+    const rows = [...document.querySelectorAll("#p-puzzle .p-puzzle-row")];
+    const r0 = rows[0].getBoundingClientRect(), r1 = rows[1] ? rows[1].getBoundingClientRect() : null;
+    const k = Number(row.dataset.k);
+    pDrag = { row, rows, k, target: k, startY: e.clientY, id: e.pointerId, step: r1 ? r1.top - r0.top : r0.height + 8 };
+    try { row.setPointerCapture(e.pointerId); } catch (err) {}
+    row.classList.add("dragging");
+    document.getElementById("p-puzzle").classList.add("is-dragging");
+    row.addEventListener("pointermove", puzzleDragMove);
+    row.addEventListener("pointerup", puzzleDragEnd);
+    row.addEventListener("pointercancel", puzzleDragEnd);
+    buzz(15);
+    e.preventDefault();
+  }
+  function puzzleDragMove(e) {
+    const d = pDrag; if (!d || e.pointerId !== d.id) return;
+    const n = d.rows.length;
+    const dy = Math.max(-d.k * d.step, Math.min((n - 1 - d.k) * d.step, e.clientY - d.startY));
+    d.row.style.transform = `translateY(${dy}px) scale(1.05)`;
+    const t = Math.max(0, Math.min(n - 1, d.k + Math.round(dy / d.step)));
+    if (t !== d.target) { d.target = t; buzz(8); }
+    d.rows.forEach((r, j) => {
+      if (j === d.k) return;
+      let off = 0;
+      if (d.k < t && j > d.k && j <= t) off = -d.step;
+      if (d.k > t && j < d.k && j >= t) off = d.step;
+      r.style.transform = off ? `translateY(${off}px)` : "";
+    });
+  }
+  function puzzleDragEnd(e) {
+    const d = pDrag; if (!d || e.pointerId !== d.id) return;
+    d.row.removeEventListener("pointermove", puzzleDragMove);
+    d.row.removeEventListener("pointerup", puzzleDragEnd);
+    d.row.removeEventListener("pointercancel", puzzleDragEnd);
+    pDrag = null;
+    if (d.target !== d.k) { const item = pOrder.splice(d.k, 1)[0]; pOrder.splice(d.target, 0, item); buzz(12); }
+    renderPuzzleList();
   }
   window.puzzleMove = function(k, d) {
     const j = k + d; if (j < 0 || j > 3) return;
@@ -2527,6 +2808,7 @@
       <button type="button" class="btn-hype p-submit" onclick="submitText()">SKICKA SVAR ➔</button>`;
     if (type === "puzzle") return `
       ${cur.labels && cur.labels.first ? `<div class="p-puzzle-label">⬆ ${esc(cur.labels.first)}</div>` : ""}
+      <div class="p-puzzle-hint">☝️ Håll och dra raderna till rätt ordning</div>
       <div class="p-puzzle" id="p-puzzle"></div>
       ${cur.labels && cur.labels.last ? `<div class="p-puzzle-label">⬇ ${esc(cur.labels.last)}</div>` : ""}
       <button type="button" class="btn-hype p-submit" onclick="submitPuzzle()">LÅS ORDNINGEN ➔</button>`;
@@ -2580,7 +2862,17 @@
 
     const i = st.qIndex;
     const myAns = answersOf(PG, i)[pid];
-    const key = `${st.phase}|${i}|${myAns ? "a" : "-"}|${st.phase === "board" ? st.boardAt : ""}|${st.phase === "reveal" ? JSON.stringify(manualOf(PG, i)[pid] || {}) + (PG.fastest && PG.fastest[i]) : ""}`;
+    // Podium: samma tidslinje som storskärmen (avslöjas samtidigt), sedan kommentarsrutan
+    let podStage = "";
+    if (st.phase === "podium") {
+      const pk = String(st.podiumAt);
+      if (pk !== pPodKey) { pPodKey = pk; pPodStart = pFirstRender ? -Infinity : Date.now(); pEditComment = false; schedulePodiumStages(); }
+      const el = Date.now() - pPodStart;
+      podStage = el >= POD.winner + 2500 ? "comment" : el >= POD.winner ? "result" : "wait";
+      podStage += (PG.comments && PG.comments[pid] ? ":sent" : ":new") + (pEditComment ? ":edit" : "");
+    }
+    pFirstRender = false;
+    const key = `${st.phase}|${podStage}|${i}|${myAns ? "a" : "-"}|${st.phase === "board" ? st.boardAt : ""}|${st.phase === "reveal" ? JSON.stringify(manualOf(PG, i)[pid] || {}) + (PG.fastest && PG.fastest[i]) : ""}`;
 
     // Bara timern uppdateras om vyn är oförändrad (så knapptryck inte tappas)
     if (key === pViewKey) {
@@ -2660,17 +2952,64 @@
         </div>
         <div class="p-card"><p>Du ligger på plats</p><div class="p-rank">${rank} <span style="font-size:24px; color:var(--text-muted);">av ${total}</span></div><p>${fmt(me.score)} poäng totalt</p></div>`;
     } else if (st.phase === "podium") {
-      const { rank, total } = myRank();
-      const medal = rank === 1 ? "👑" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : "🎉";
-      v.innerHTML = `
-        <div class="p-card">
-          <div style="font-size:80px;">${medal}</div>
-          <h2>${rank === 1 ? "DU VANN!" : "Slutplacering"}</h2>
-          <div class="p-rank">${rank} <span style="font-size:24px; color:var(--text-muted);">av ${total}</span></div>
-          <p>${fmt(me.score)} poäng · Titta på storskärmen! 🏆</p>
-        </div>`;
+      renderPlayerPodium(me, podStage);
     }
   }
+
+  // ---------- Podium + kommentar (spelare) ----------
+  let pPodKey = "", pPodStart = 0, pFirstRender = true, pEditComment = false, pPodTimers = [];
+  function schedulePodiumStages() {
+    pPodTimers.forEach(clearTimeout); pPodTimers = [];
+    pPodiumCelebrated = false;
+    const el = Date.now() - pPodStart;
+    [POD.winner, POD.winner + 2500].forEach(ms => { if (ms > el) pPodTimers.push(setTimeout(() => { pViewKey = ""; playerRender(); }, ms - el + 30)); });
+  }
+
+  function renderPlayerPodium(me, stage) {
+    const v = $("p-view");
+    if (stage.startsWith("wait")) {
+      v.innerHTML = `<div class="p-card p-suspense"><div class="drum">🥁</div><h2>Prisutdelning!</h2><p>Titta på storskärmen…<br>vem vinner?! 👀</p></div>`;
+      return;
+    }
+    const { rank, total } = myRank();
+    const medal = rank === 1 ? "👑" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : "🎉";
+    const first = stage.startsWith("result") && !pPodiumCelebrated;
+    let html = rank === 1
+      ? `<div class="p-card p-winner"><div class="crown">👑</div><h2>DU VANN!</h2><div class="p-rank">1 <span style="font-size:24px; color:#fde68a;">av ${total}</span></div><p>${fmt(me.score)} poäng – dagens champion! 🏆</p></div>`
+      : `<div class="p-card"><div style="font-size:72px;">${medal}</div><h2>Slutplacering</h2><div class="p-rank">${rank} <span style="font-size:24px; color:var(--text-muted);">av ${total}</span></div><p>${fmt(me.score)} poäng · Titta på storskärmen! 🏆</p></div>`;
+
+    if (stage.startsWith("comment")) {
+      const mine = PG.comments && PG.comments[pid];
+      if (mine && !stage.includes(":edit")) {
+        html += `<div class="p-card"><h2>💬 Tack!</h2><p>Din kommentar visas på storskärmen:</p><div class="p-comment-done">"${esc(mine.text)}"</div>
+          <button type="button" class="btn" onclick="editComment()">✏️ Ändra kommentar</button></div>`;
+      } else {
+        html += `<div class="p-card"><h2>💬 Din kommentar på dagens spel</h2>
+          <textarea class="p-comment" id="p-comment" maxlength="200" placeholder="Vad tyckte du? Bästa frågan? Revansch?">${esc(mine ? mine.text : "")}</textarea>
+          <div class="p-comment-count"><span id="p-comment-n">${mine ? mine.text.length : 0}</span>/200</div>
+          <button type="button" class="btn-hype p-submit" onclick="sendComment()">SKICKA KOMMENTAR ➔</button></div>`;
+      }
+    }
+    v.innerHTML = html;
+    const ta = $("p-comment");
+    if (ta && ta.addEventListener) ta.addEventListener("input", () => { const n = $("p-comment-n"); if (n) n.textContent = ta.value.length; });
+    if (first) {
+      pPodiumCelebrated = true;
+      if (rank === 1) { buzz([80, 60, 80, 60, 200]); confettiCannon(true, 90); confettiCannon(false, 90); setTimeout(() => firework(innerWidth / 2, innerHeight * 0.3, 60), 500); }
+      else if (rank <= 3) { launchConfettiAt(60, innerWidth / 2, innerHeight * 0.4); buzz(60); }
+    }
+  }
+  let pPodiumCelebrated = false;
+
+  window.sendComment = function() {
+    const ta = $("p-comment");
+    const text = ((ta && ta.value) || "").trim().slice(0, 200);
+    if (!text) { if (ta && ta.focus) ta.focus(); return; }
+    const me = PG && PG.players && PG.players[pid];
+    pEditComment = false;
+    set(R(`${pPin}/comments/${pid}`), { name: (me && me.name) || pName || "Spelare", text, at: serverTimestamp() }).catch(showDbError);
+  };
+  window.editComment = function() { pEditComment = true; pViewKey = ""; playerRender(); };
 
   async function playerInit() {
     $("brand-title").textContent = "SPELARE";
