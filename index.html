@@ -1083,6 +1083,26 @@
   .pv-det { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 4px; color: var(--text-muted); }
   .pv-right { color: #6ee7b7; font-weight: 800; }
   button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* ===== EXEMPELMALL / BESTÄLLNING TILL AI ===== */
+  .tpl-panel { flex-direction: column; gap: 10px; background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.35); border-radius: 12px; padding: 14px; }
+  .tpl-step { font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 8px; color: #fff; }
+  .tpl-n { background: var(--accent-blue); color: #090418; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
+  .tpl-hint { color: var(--text-muted); font-weight: 700; }
+  .tpl-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .tpl-grid .tpl-wide { grid-column: 1 / -1; }
+  .tpl-text { min-height: 180px; font-size: 12px; }
+  .tpl-total { font-weight: 900; color: var(--accent-amber); font-size: 14px; }
+  @media (max-width: 700px) { .tpl-grid { grid-template-columns: 1fr 1fr; } }
+
+  /* Långa namn i mobilens topprad */
+  .p-topbar #p-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .p-topbar .p-score { flex-shrink: 0; }
+  .lb-delta, .lb-score { white-space: nowrap; }
+
+  /* Låtval */
+  .bgm-wrap { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 4px 6px 4px 10px; font-size: 13px; font-weight: 800; }
+  .bgm-wrap select { background: #090418; color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; padding: 5px 6px; font-weight: 800; font-size: 13px; cursor: pointer; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -1104,6 +1124,16 @@
     <span class="screen-status" id="conn-status">⏳ Ansluter…</span>
     <button type="button" class="btn host-only host-auth-only" id="btn-toggle-panel" onclick="togglePanel()">🎛 Visa kontroller (P)</button>
     <button type="button" class="btn host-only host-auth-only" onclick="openEditor()">⚙️ Redigera frågor</button>
+    <label class="bgm-wrap host-only host-auth-only" title="Bakgrundsmusik – spelas bara här på storskärmen">
+      <span>🎵 Låtval</span>
+      <select id="bgm-select" onchange="bgmChoose(this.value)">
+        <option value="">— Ingen musik —</option>
+        <option value="quiz-time">Quiz Time</option>
+        <option value="christmas-eve-in-town">Christmas Eve in Town</option>
+        <option value="final-round-pressure">Final Round Pressure</option>
+        <option value="kahoot-kungar">Kahoot-Kungar</option>
+      </select>
+    </label>
     <button type="button" class="btn host-only host-auth-only" id="sound-btn" onclick="toggleSound()">🔊 Ljud & Musik: PÅ</button>
     <button type="button" class="btn host-only host-auth-only" onclick="confirmNewGame()">🆕 Nytt spel (ny PIN)</button>
     <span class="screen-status on host-only host-auth-only" id="host-user">👤</span>
@@ -1287,11 +1317,37 @@
     <div class="editor-scroll" id="editor-list"></div>
     <div class="editor-scroll" id="paste-panel" style="display:none;">
       <div class="q-edit-card">
-        <div class="paste-help">Klistra in en färdig mall (t.ex. från Claude). Alla fyra frågetyper stöds: <b>Flerval</b>, <b>Skriv svar</b>, <b>Pussel</b> och <b>Skjutreglage</b>.</div>
+        <div class="paste-help">Klistra in svaret från valfri AI (ChatGPT, Gemini, Claude …) – öppna <b>Visa exempelmall</b> för att få en färdig beställning. Alla fyra frågetyper stöds: <b>Flerval</b>, <b>Skriv svar</b>, <b>Pussel</b> och <b>Skjutreglage</b>.</div>
         <div class="ed-tools">
-          <button type="button" class="btn ed-mini" onclick="pasteInsertExample()">📄 Visa exempelmall</button>
-          <button type="button" class="btn ed-mini" onclick="copyPromptForClaude()">🤖 Kopiera beställning till Claude</button>
+          <button type="button" class="btn ed-mini" id="tpl-toggle" onclick="toggleTemplatePanel()">📄 Visa exempelmall</button>
           <button type="button" class="btn ed-mini" onclick="exportCurrentAsTemplate()">⬇️ Nuvarande frågor som mall</button>
+        </div>
+
+        <div class="tpl-panel" id="tpl-panel" style="display:none;">
+          <div class="tpl-step"><span class="tpl-n">1</span> Välj tema och upplägg</div>
+          <div class="tpl-grid">
+            <label class="ed-label tpl-wide">🎯 Tema
+              <input class="edit-input" id="tpl-theme" value="Allmänbildning med en twist" oninput="buildPromptText()"></label>
+            <label class="ed-label">🔘 Flerval<input class="edit-input" id="tpl-n-choice" inputmode="numeric" value="6" oninput="buildPromptText()"></label>
+            <label class="ed-label">✍️ Skriv svar<input class="edit-input" id="tpl-n-type" inputmode="numeric" value="2" oninput="buildPromptText()"></label>
+            <label class="ed-label">🧩 Pussel<input class="edit-input" id="tpl-n-puzzle" inputmode="numeric" value="1" oninput="buildPromptText()"></label>
+            <label class="ed-label">🎚️ Reglage<input class="edit-input" id="tpl-n-slider" inputmode="numeric" value="1" oninput="buildPromptText()"></label>
+            <label class="ed-label">📈 Svårighet
+              <select class="edit-input" id="tpl-level" onchange="buildPromptText()">
+                <option>Lätt</option><option selected>Medel</option><option>Svår</option><option>Blandad – lätt i början, svårare mot slutet</option>
+              </select></label>
+            <label class="ed-label tpl-wide">💡 Egna önskemål (valfritt)
+              <input class="edit-input" id="tpl-extra" placeholder="t.ex. roliga fakta, koppling till el och energi, inga frågor om sport" oninput="buildPromptText()"></label>
+          </div>
+          <div class="tpl-step"><span class="tpl-n">2</span> Kopiera texten och skicka till valfri AI <span class="tpl-hint">(ChatGPT, Gemini, Claude …)</span></div>
+          <textarea class="paste-area tpl-text" id="tpl-text" spellcheck="false"></textarea>
+          <div class="ed-tools">
+            <button type="button" class="btn-hype" style="padding:9px 18px; font-size:13px;" onclick="copyPromptText()">📋 Kopiera beställningen</button>
+            <span class="tpl-total" id="tpl-total"></span>
+            <button type="button" class="btn ed-mini" style="margin-left:auto;" onclick="pasteInsertExample()">🧪 Testa exemplet i rutan nedan</button>
+          </div>
+          <div class="paste-status" id="tpl-status"></div>
+          <div class="tpl-step"><span class="tpl-n">3</span> Klistra in AI:ns svar i rutan nedan</div>
         </div>
         <textarea class="paste-area" id="paste-text" spellcheck="false" placeholder="Klistra in mallen här…" oninput="pastePreview()"></textarea>
         <div class="paste-status" id="paste-status"></div>
@@ -1592,6 +1648,8 @@
   window.toggleSound = function() {
     soundEnabled = !soundEnabled;
     document.getElementById("sound-btn").textContent = soundEnabled ? "🔊 Ljud & Musik: PÅ" : "🔇 Ljud & Musik: AV";
+    if (typeof bgmChoose === "function") { if (!soundEnabled) { if (bgmAudio) { bgmAudio.pause(); } } else if (bgmTrack && S().phase !== "podium") bgmChoose(bgmTrack); }
+    if (!soundEnabled && typeof podAudio !== "undefined" && podAudio) podAudio.pause();
   };
 
   function playPopSound(freq = 600) {
@@ -1988,9 +2046,37 @@
     return u;
   }
 
+  // ---------- Hemligt namnbyte när spelet startar 😄 ----------
+  const PRANK_NAMES = ["Cristiano Ronaldos största fan", "CR7 lover", "CR7 THE GOAT", "Cristiano Ronaldo är min GOAT"];
+  const PRANK_LIST = new Set(["theo", "theodor", "lucas", "lucce", "abbe", "alberto", "carlos", "carlito"]);
+  const prankKey = (n) => String(n || "").trim().toLowerCase();
+  // Körs när spelet är igång: varje matchande spelare får ett EGET namn ur listan (slumpat, aldrig samma som någon annan)
+  // och namnet låses – byter man tillbaka sätts samma Ronaldo-namn igen.
+  function prankUpdates() {
+    const u = {}, list = listPlayers(G);
+    const used = new Set(list.filter(p => p.pranked && p.prankName).map(p => p.prankName));
+    const free = PRANK_NAMES.filter(n => !used.has(n)).sort(() => Math.random() - 0.5);
+    let extra = 2;
+    list.forEach(p => {
+      if (p.pranked && p.prankName) { if (p.name !== p.prankName) u[`players/${p.id}/name`] = p.prankName; return; }
+      if (!PRANK_LIST.has(prankKey(p.name))) return;
+      let nm = free.shift();
+      if (!nm) { do { nm = `${PRANK_NAMES[(extra - 2) % PRANK_NAMES.length]} ${extra}`; extra++; } while (used.has(nm)); }   // fler än 4: "CR7 lover 2" osv.
+      used.add(nm);
+      Object.assign(u, { [`players/${p.id}/name`]: nm, [`players/${p.id}/prankName`]: nm, [`players/${p.id}/pranked`]: true, [`players/${p.id}/origName`]: p.name });
+    });
+    return u;
+  }
+  let prankBusy = false;
+  function enforcePranks() {
+    if (prankBusy || !G || !G.state || G.state.phase === "lobby") return;
+    const u = prankUpdates();
+    if (Object.keys(u).length) { prankBusy = true; upd(u).finally(() => { prankBusy = false; }); }
+  }
+
   window.startGame = async function() {
     if (!listPlayers(G).length && !confirm("Inga spelare har anslutit än. Starta ändå?")) return;
-    await upd(resetScoresUpdates());
+    await upd(Object.assign(resetScoresUpdates(), prankUpdates()));
     startQuestion(0);
   };
 
@@ -2171,6 +2257,8 @@
     const st = S();
     const phase = st.phase || "lobby";
     updateNextFab();
+    enforcePranks();
+    bgmSync(phase);
     if (phase !== "podium") podStop();
     if (phase === "lobby") { showScreen("screen-lobby"); renderHostLobby(); }
     else if (phase === "preview" || phase === "question" || phase === "reveal") { showScreen("screen-question"); renderHostQuestion(); }
@@ -2450,6 +2538,63 @@
     }
   }
 
+  // ===== BAKGRUNDSMUSIK (låtval) – bara storskärmen =====
+  // Loopar under hela spelet, sänks på topplistan, och stängs av HELT innan prisutdelningslåten börjar.
+  const BGM_VOL = 0.85, BGM_DUCK = 0.3;         // full volym / sänkt under topplistan
+  let bgmAudio = null, bgmTrack = "", bgmFade = 0, bgmTarget = BGM_VOL;
+  function bgmSetVolume(target, ms) {
+    bgmTarget = target;
+    if (!bgmAudio) return;
+    cancelAnimationFrame(bgmFade);
+    const from = bgmAudio.volume, t0 = performance.now(), dur = Math.max(1, ms || 0);
+    const step = now => {
+      if (!bgmAudio) return;
+      const k = Math.min(1, (now - t0) / dur);
+      bgmAudio.volume = Math.max(0, Math.min(1, from + (target - from) * k));
+      if (k < 1) bgmFade = requestAnimationFrame(step);
+    };
+    bgmFade = requestAnimationFrame(step);
+  }
+  function bgmPhaseVolume() { return (G && G.state && G.state.phase === "board") ? BGM_DUCK : BGM_VOL; }
+  function bgmStop(reset) {
+    cancelAnimationFrame(bgmFade);
+    if (bgmAudio) { try { bgmAudio.pause(); bgmAudio.currentTime = 0; } catch (e) {} bgmAudio.src = ""; bgmAudio = null; }
+    if (reset) { bgmTrack = ""; const sel = $("bgm-select"); if (sel) sel.value = ""; }
+  }
+  window.bgmChoose = function(track) {
+    bgmStop(false);
+    bgmTrack = track || "";
+    if (!bgmTrack) return;
+    if (S().phase === "podium") { $("bgm-select").value = ""; bgmTrack = ""; return; }   // prisutdelningen har sin egen låt
+    if (!soundEnabled) return;
+    // Låten får ligga i mappen musik/ ELLER direkt bredvid index.html
+    const tk = bgmTrack, sources = [`musik/${tk}.mp3`, `${tk}.mp3`];
+    const tryPlay = (k) => {
+      if (bgmTrack !== tk) return;
+      if (k >= sources.length) {
+        const b = $("db-error");
+        b.textContent = `⚠️ Hittar inte ${tk}.mp3 – ladda upp filen till GitHub, bredvid index.html.`;
+        b.style.display = "block";
+        bgmAudio = null; return;
+      }
+      const a = new Audio(sources[k]);
+      a.loop = true; a.volume = 0;
+      a.addEventListener("error", () => { try { a.pause(); a.removeAttribute("src"); a.load(); } catch (e) {} if (bgmAudio === a) tryPlay(k + 1); }, { once: true });
+      bgmAudio = a;
+      const pr = a.play();
+      if (pr && pr.catch) pr.catch(() => {});
+      bgmSetVolume(bgmPhaseVolume(), 800);
+    };
+    tryPlay(0);
+  };
+  // Anropas vid varje ändring i spelet
+  function bgmSync(phase) {
+    if (phase === "podium") { if (bgmAudio || bgmTrack) bgmStop(true); return; }   // MÅSTE vara tyst före "Sollefteå på topp"
+    if (!bgmAudio) return;
+    const want = phase === "board" ? BGM_DUCK : BGM_VOL;
+    if (want !== bgmTarget) bgmSetVolume(want, phase === "board" ? 700 : 900);
+  }
+
   // ===== PODIUM – prisutdelning till låten (45 s) =====
   // Allt styrs av låtens klocka (audio.currentTime) så att bild och musik aldrig glider isär.
   let podAudio = null, podRaf = 0, podT0 = 0, podUseAudio = false, podWinnerShown = true;
@@ -2504,6 +2649,7 @@
   function renderPodium(animate) {
     if (!animate) { const s = podiumData(); renderCommentWall(); if (Date.now() >= podiumAnimUntil) { podiumFinal(); podiumData(); } return s; }
 
+    bgmStop(true);   // bakgrundsmusiken bort innan prisutdelningslåten
     podStop();
     podWinnerShown = false;
     const sorted = podiumData();
@@ -2764,22 +2910,21 @@
   //    Reglage:  MIN: MAX: STEG: RÄTT: MARGINAL: ENHET:
   //    Valfritt: TID: sekunder   DUBBEL: ja
   //    Överst i mallen (valfritt): LÄSTID: sekunder
-  const TEMPLATE_EXAMPLE = `LÄSTID: 5
 
-# FLERVAL
+  // ---------- Beställning till valfri AI (tema + upplägg justeras i panelen) ----------
+  const EX = {
+    choice: `# FLERVAL
 F: Vilket djur bajsar fyrkantiga kuber?
 A: Sengångare
 A*: Vombat
 A: Näbbdjur
 A: Koala
-TID: 20
----
-# SKRIV SVAR
+TID: 20`,
+    type: `# SKRIV SVAR
 F: Vilket grundämne har kemiska tecknet Fe?
 SVAR: Järn; Jarn; Iron
-TID: 30
----
-# PUSSEL
+TID: 30`,
+    puzzle: `# PUSSEL
 F: Sortera djuren från minst till störst!
 1: Myra
 2: Katt
@@ -2787,36 +2932,117 @@ F: Sortera djuren från minst till störst!
 4: Blåval
 ÖVERST: Minst
 NEDERST: Störst
-TID: 30
----
-# REGLAGE
+TID: 30`,
+    slider: `# REGLAGE
 F: Vilket år invigdes Öresundsbron?
 MIN: 1980
 MAX: 2020
 STEG: 1
 RÄTT: 2000
 MARGINAL: 3
-ENHET:
-TID: 20
-DUBBEL: ja`;
+ENHET: år
+TID: 20`
+  };
 
-  const PROMPT_FOR_CLAUDE = `Skapa [ANTAL] quizfrågor om [ÄMNE] till mitt quiz ABBHOOT.
-Blanda de fyra frågetyperna (flerval, skriv svar, pussel, reglage). Frågorna ska vara faktamässigt korrekta och ha ett entydigt rätt svar.
-Svara ENDAST med mallen nedan i ett kodblock – inga förklaringar – så att jag kan klistra in den direkt.
+  const TEMPLATE_EXAMPLE = "LÄSTID: 5\n\n" + [EX.choice, EX.type, EX.puzzle, EX.slider].join("\n---\n") + "\nDUBBEL: ja";
 
-Regler för mallen:
-- En fråga per block, block separeras med en rad: ---
-- Börja varje block med typen: # FLERVAL, # SKRIV SVAR, # PUSSEL eller # REGLAGE
+  function buildPrompt(o) {
+    const n = o.n, total = n.choice + n.type + n.puzzle + n.slider;
+    const parts = [[n.choice, "flerval"], [n.type, "skriv svar"], [n.puzzle, "pussel"], [n.slider, "reglage"]].filter(x => x[0] > 0).map(x => `${x[0]} ${x[1]}`).join(", ");
+    return `Du ska skapa quizfrågor till mitt quizspel ABBHOOT. Spelet läser in ditt svar automatiskt, så formatet måste vara EXAKT som beskrivet nedan.
+
+TEMA: ${o.theme || "Allmänbildning"}
+ANTAL: ${total} frågor totalt – ${parts || "valfri fördelning"}
+SVÅRIGHET: ${o.level}${o.extra ? `\nÖNSKEMÅL: ${o.extra}` : ""}
+
+=== VIKTIGT OM DITT SVAR ===
+- Svara ENDAST med mallen, i ETT enda kodblock. Ingen inledning, inga förklaringar, ingen fetstil eller punktlistor.
+- Varje rad börjar med ett nyckelord följt av kolon, exakt som i exemplen (F:, A:, A*:, SVAR:, 1:, MIN: …).
+- Alla fakta ska vara korrekta och varje fråga ska ha ETT entydigt rätt svar. Hitta aldrig på fakta.
+- Skriv på svenska. Håll frågorna korta (helst under 120 tecken) så att de hinner läsas.
+
+=== SÅ ÄR MALLEN UPPBYGGD ===
+- Allra överst, en gång: LÄSTID: 5   (sekunder att läsa frågan innan svaren visas)
+- Varje fråga är ett eget block. Mellan blocken står en rad med bara tre bindestreck: ---
+- Varje block börjar med frågetypen på en egen rad: # FLERVAL, # SKRIV SVAR, # PUSSEL eller # REGLAGE
 - F: frågetexten
-- FLERVAL: exakt 4 rader "A: …", rätt svar markeras "A*: …"
-- SKRIV SVAR: "SVAR: rätt; stavningsvariant; variant" (skilj med semikolon, ta med varianter utan å/ä/ö)
-- PUSSEL: "1: … 2: … 3: … 4: …" i RÄTT ordning, valfritt "ÖVERST: …" och "NEDERST: …"
-- REGLAGE: MIN, MAX, STEG, RÄTT, MARGINAL (godkänd felmarginal), ENHET (t.ex. %, år, kr eller tomt)
-- Valfritt per fråga: TID: sekunder (5–240), DUBBEL: ja
-- Valfritt överst: LÄSTID: sekunder
+- TID: sekunder att svara (valfritt, 5–240). Flerval/reglage ca 20, skriv svar/pussel ca 30.
+- DUBBEL: ja   (valfritt, ger dubbla poäng – använd på högst 1–2 frågor, gärna den sista)
 
+=== TYP 1: # FLERVAL – fyra alternativ, ett är rätt ===
+- Exakt 4 rader som börjar med A:
+- Det rätta svaret skrivs A*: (stjärna direkt före kolon). Exakt EN A* per fråga.
+- Variera var det rätta svaret står – inte alltid på samma plats.
+- Fel alternativ ska vara rimliga men tydligt fel. Inga "alla ovanstående".
 Exempel:
-${TEMPLATE_EXAMPLE}`;
+${EX.choice}
+
+=== TYP 2: # SKRIV SVAR – spelaren skriver svaret själv ===
+- SVAR: följt av alla godkända svar, åtskilda med semikolon ;
+- Rätt svar ska vara kort: ett ord, ett namn eller en siffra – aldrig en mening.
+- Ta med vanliga stavningsvarianter och samma ord utan å/ä/ö (t.ex. Järn; Jarn).
+- Är svaret ett tal: skriv siffran först och ordet som variant (t.ex. SVAR: 8; åtta; atta).
+Exempel:
+${EX.type}
+
+=== TYP 3: # PUSSEL – sortera fyra saker i rätt ordning ===
+- Exakt 4 rader numrerade 1: 2: 3: 4: skrivna i RÄTT ordning. Spelet blandar dem själv.
+- Frågan ska säga vad som sorteras och åt vilket håll (t.ex. "från äldst till nyast").
+- ÖVERST: och NEDERST: (valfritt) beskriver ändarna, t.ex. Minst / Störst.
+- Ordningen måste vara helt entydig – inga lika värden.
+Exempel:
+${EX.puzzle}
+
+=== TYP 4: # REGLAGE – dra ett reglage till rätt tal ===
+- MIN: och MAX: är skalans ändar. RÄTT: måste ligga mellan dem.
+- STEG: hur mycket reglaget hoppar (1 för år och antal, 0.5 eller 0.1 för decimaler).
+- MARGINAL: hur långt från rätt svar som fortfarande räknas som rätt (0 = exakt). Närmare ger fler poäng.
+- ENHET: visas efter talet, t.ex. %, år, kr, km – eller lämna tomt efter kolon.
+- Använd punkt som decimaltecken (2.5). Lägg inte rätt svar exakt i mitten eller i en ände av skalan.
+Exempel:
+${EX.slider}
+
+=== KONTROLLERA INNAN DU SVARAR ===
+✓ Exakt ${total} frågor: ${parts}
+✓ --- mellan varje fråga, och varje block börjar med # TYP
+✓ Varje FLERVAL har exakt 4 A-rader och exakt en A*
+✓ Varje SKRIV SVAR har en SVAR:-rad med korta svar och varianter
+✓ Varje PUSSEL har raderna 1: till 4: i rätt ordning
+✓ Varje REGLAGE har MIN < RÄTT < MAX
+✓ Svaret består ENDAST av kodblocket – börja med LÄSTID: 5`;
+  }
+
+  const ival2 = (id, fb) => { const el = $(id); return el ? el.value : fb; };
+  const nVal = (id) => Math.max(0, Math.min(50, Math.round(Number(ival2(id, 0)) || 0)));
+  window.buildPromptText = function() {
+    const n = { choice: nVal("tpl-n-choice"), type: nVal("tpl-n-type"), puzzle: nVal("tpl-n-puzzle"), slider: nVal("tpl-n-slider") };
+    const total = n.choice + n.type + n.puzzle + n.slider;
+    $("tpl-text").value = buildPrompt({ theme: ival2("tpl-theme", "").trim(), level: ival2("tpl-level", "Medel"), extra: ival2("tpl-extra", "").trim(), n });
+    $("tpl-total").textContent = total ? `= ${total} frågor` : "⚠️ ange minst 1 fråga";
+    lsSet("abbhoot_tpl", { theme: ival2("tpl-theme", ""), level: ival2("tpl-level", ""), extra: ival2("tpl-extra", ""), n });
+  };
+  window.toggleTemplatePanel = function() {
+    const p = $("tpl-panel"), show = p.style.display === "none";
+    p.style.display = show ? "flex" : "none";
+    $("tpl-toggle").textContent = show ? "✕ Dölj exempelmall" : "📄 Visa exempelmall";
+    if (show) {
+      const saved = lsGet("abbhoot_tpl");
+      if (saved) {
+        if (saved.theme) $("tpl-theme").value = saved.theme;
+        if (saved.level) $("tpl-level").value = saved.level;
+        if (saved.extra !== undefined) $("tpl-extra").value = saved.extra;
+        if (saved.n) ["choice", "type", "puzzle", "slider"].forEach(k => { if (Number.isFinite(saved.n[k])) $(`tpl-n-${k}`).value = saved.n[k]; });
+      }
+      buildPromptText();
+    }
+  };
+  window.copyPromptText = async function() {
+    const t = $("tpl-text").value;
+    const ok = await copyText(t);
+    $("tpl-status").innerHTML = ok
+      ? `<div class="paste-ok">📋 Kopierad! Klistra in hos valfri AI, kopiera sedan hela svaret (kodblocket) och klistra in det i rutan nedan.</div>`
+      : `<div class="paste-err">Kunde inte kopiera automatiskt – klicka i texten, markera allt (Ctrl+A) och kopiera (Ctrl+C).</div>`;
+  };
 
   function parseTemplate(text) {
     const res = { questions: [], errors: [], readTime: null };
@@ -3000,12 +3226,6 @@ ${TEMPLATE_EXAMPLE}`;
       let ok = false; try { ok = document.execCommand("copy"); } catch (e2) {} ta.remove(); return ok;
     }
   }
-  window.copyPromptForClaude = async function() {
-    const ok = await copyText(PROMPT_FOR_CLAUDE);
-    $("paste-status").innerHTML = ok
-      ? `<div class="paste-ok">🤖 Beställningen är kopierad! Klistra in den hos Claude, byt ut [ANTAL] och [ÄMNE], och klistra sedan in svaret här.</div>`
-      : `<div class="paste-err">Kunde inte kopiera automatiskt – markera texten nedan och kopiera själv.</div><textarea class="paste-area" readonly>${esc(PROMPT_FOR_CLAUDE)}</textarea>`;
-  };
   window.exportCurrentAsTemplate = function() {
     collectEditor();
     const ta = $("paste-text");
