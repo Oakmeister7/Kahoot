@@ -1217,6 +1217,31 @@
   .bot-hint { width: 100%; text-align: center; font-size: 12px; color: var(--text-muted); }
   .lobby-player-chip.is-bot, .team-chip.is-bot { border-style: dashed; }
   .lobby-player-chip.is-bot::after, .team-chip.is-bot::after { content: "TEST"; font-size: 9px; font-weight: 900; background: #1e3a8a; color: #bfdbfe; border-radius: 6px; padding: 1px 5px; letter-spacing: 1px; }
+
+  /* ===== Bilddatabas (Pixabay) ===== */
+  .pxb-modal { position: fixed; inset: 0; z-index: 2500; background: rgba(5,2,15,0.85); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 16px; }
+  .pxb-box { width: min(1100px, 100%); max-height: calc(100vh - 32px); display: flex; flex-direction: column; gap: 10px; background: var(--bg-arena); border: 2px solid var(--border-glow); border-radius: 18px; padding: 16px; }
+  .pxb-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 18px; }
+  .pxb-head .btn { margin-left: auto; }
+  .pxb-src { font-size: 12px; color: var(--text-muted); }
+  .pxb-src a, .pxb-keyrow a, .pxb-status a { color: var(--accent-blue); }
+  .pxb-keyrow { display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+  .pxb-row, .pxb-searchrow { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pxb-row .edit-input, .pxb-searchrow .edit-input { flex: 1; min-width: 200px; }
+  .pxb-searchrow select { background: #090418; color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 10px; padding: 8px; font-weight: 800; }
+  .pxb-btn { padding: 10px 20px; font-size: 15px; }
+  .pxb-status { font-size: 13px; color: var(--text-muted); min-height: 18px; font-weight: 700; }
+  .pxb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; overflow-y: auto; min-height: 0; flex: 1; }
+  .pxb-hit { position: relative; border: 2px solid transparent; border-radius: 10px; padding: 0; background: #000; cursor: pointer; overflow: hidden; aspect-ratio: 4 / 3; }
+  .pxb-hit img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pxb-hit span { position: absolute; left: 0; right: 0; bottom: 0; font-size: 11px; font-weight: 800; color: #fff; background: linear-gradient(transparent, rgba(0,0,0,0.75)); padding: 10px 6px 4px; text-align: left; }
+  .pxb-hit:hover { border-color: var(--accent-amber); }
+  .pxb-hit.loading { opacity: .5; pointer-events: none; }
+  .pxb-hit.loading::after { content: "⏳"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+  .pxb-foot { display: flex; justify-content: space-between; align-items: center; }
+  .pxb-open { padding: 3px 10px !important; font-size: 12px !important; }
+  .pxb-grid { align-content: start; grid-auto-rows: max-content; }
+  .pxb-hit { width: 100%; height: auto; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -2233,7 +2258,7 @@
   function attachGame(p) {
     pin = p;
     gameQs = lsGet(gqKey());   // pågående spels låsta frågor (överlever omladdning)
-    lastBoardKey = lastPodiumKey = lastQuestionKey = "";
+    lastBoardKey = null; lastPodiumKey = lastQuestionKey = "";
     renderJoinInfo();
     let first = true;
     unsub = onValue(R(p), snap => {
@@ -2720,6 +2745,7 @@
   function hostRender() {
     const st = S();
     const phase = st.phase || "lobby";
+    if (lastBoardKey === null && phase !== "board") lastBoardKey = "";   // omladdad mitt i spelet, inte på topplistan → nästa topplista animeras som vanligt
     updateNextFab();
     renderTeamWarn();
     enforcePranks();
@@ -2731,7 +2757,7 @@
     else if (phase === "board") {
       showScreen("screen-leaderboard");
       const key = `${st.scoredQ}-${st.boardAt}`;
-      const fresh = key !== lastBoardKey;
+      const fresh = key !== lastBoardKey && lastBoardKey !== null;   // null = sidan laddades nyss om → ingen omspelning av animationen
       lastBoardKey = key;
       renderBoard(fresh);
     }
@@ -3507,12 +3533,13 @@
           <div class="ed-img-ok">🖼️ Bild visas på storskärmen</div>
           <div class="ed-img-src">${q.img.startsWith("idb:") ? "Sparad i den här datorn" : esc(q.img.slice(0, 60))}</div>
           <button type="button" class="btn ed-mini" onclick="edImgPick(${qi})">🔁 Byt bild</button>
+          <button type="button" class="btn ed-mini" onclick="pxbOpen(${qi})">🔎 Sök i bilddatabasen</button>
           <button type="button" class="btn ed-mini" onclick="edImgRemove(${qi})">🗑 Ta bort bild</button>
         </div>
       </div>`;
     return `
       <div class="ed-img" data-qi="${qi}">
-        <div class="ed-img-hint">🖼️ <b>Dra in en bild här</b> · <button type="button" class="linkbtn" onclick="edImgPick(${qi})">välj fil</button> · klistra in (Ctrl+V) · <button type="button" class="linkbtn" onclick="edImgUrl(${qi})">bildlänk</button></div>
+        <div class="ed-img-hint">🖼️ <b>Dra in en bild här</b> · <button type="button" class="linkbtn" onclick="edImgPick(${qi})">välj fil</button> · klistra in (Ctrl+V) · <button type="button" class="linkbtn" onclick="edImgUrl(${qi})">bildlänk</button> · <button type="button" class="btn ed-mini pxb-open" onclick="pxbOpen(${qi})">🔎 Bilddatabas</button></div>
       </div>`;
   }
   // Fyll i förhandsbilder (de laddas asynkront ur bilddatabasen)
@@ -3589,6 +3616,158 @@
   // Säkerhet: en fil som släpps utanför en fråga får ALDRIG öppnas i fliken (då skulle spelet försvinna)
   window.addEventListener("dragover", e => { if (e.dataTransfer && [...(e.dataTransfer.types || [])].includes("Files")) e.preventDefault(); });
   window.addEventListener("drop", e => { if (e.dataTransfer && [...(e.dataTransfer.types || [])].includes("Files")) e.preventDefault(); });
+
+
+  // =====================================================================
+  // ===== BILDDATABAS (Pixabay) – sök gratis bilder och hämta dem ========
+  // =====================================================================
+  // Villkor (pixabay.com/api/docs): API-nyckel, max 100 sökningar/min, sökningar cachas 24 h,
+  // bilder får INTE länkas permanent → vi laddar ner och sparar dem i datorn som en egen bild,
+  // och visar "Bilder från Pixabay" i sökrutan. Nyckeln sparas bara i den här webbläsaren (aldrig i filen).
+  const PXB_KEY_LS = "abbhoot_pixabay_key", PXB_CACHE_LS = "abbhoot_pixabay_cache";
+  let pxbQi = null, pxbState = { q: "", page: 1, type: "photo", lang: "sv", hits: [], total: 0, busy: false };
+  const pxbKey = () => { const k = lsGet(PXB_KEY_LS); return typeof k === "string" ? k : ""; };
+  function pxbCacheGet(url) {
+    const c = lsGet(PXB_CACHE_LS) || {}, e = c[url];
+    return e && Date.now() - e.t < 24 * 3600 * 1000 ? e.d : null;
+  }
+  function pxbCachePut(url, d) {
+    const c = lsGet(PXB_CACHE_LS) || {}, now = Date.now();
+    Object.keys(c).forEach(k => { if (!c[k] || now - c[k].t > 24 * 3600 * 1000) delete c[k]; });
+    const keys = Object.keys(c).sort((a, b) => c[a].t - c[b].t); while (keys.length > 25) delete c[keys.shift()];
+    c[url] = { t: now, d }; lsSet(PXB_CACHE_LS, c);
+  }
+  function pxbModal() {
+    let m = $("pxb-modal");
+    if (m) return m;
+    m = document.createElement("div"); m.id = "pxb-modal"; m.className = "pxb-modal host-only";
+    m.innerHTML = `
+      <div class="pxb-box" role="dialog" aria-label="Bilddatabas">
+        <div class="pxb-head"><b>🔎 Bilddatabas</b><span class="pxb-src">Bilder från <a href="https://pixabay.com/" target="_blank" rel="noopener">Pixabay</a> – gratis att använda</span>
+          <button type="button" class="btn ed-mini" onclick="pxbClose()">✕ Stäng</button></div>
+        <div class="pxb-keyrow" id="pxb-keyrow">
+          <div>Klistra in din <b>Pixabay API-nyckel</b> en gång (finns på <a href="https://pixabay.com/api/docs/" target="_blank" rel="noopener">pixabay.com/api/docs</a> när du är inloggad). Den sparas bara i den här webbläsaren.</div>
+          <div class="pxb-row"><input class="edit-input" id="pxb-key" placeholder="t.ex. 12345678-abcdef…" autocomplete="off"><button type="button" class="btn-hype pxb-btn" onclick="pxbSaveKey()">Spara nyckel</button></div>
+        </div>
+        <div class="pxb-searchrow" id="pxb-searchrow">
+          <input class="edit-input" id="pxb-q" maxlength="100" placeholder="Sök, t.ex. katt, pizza, Stockholm, fotboll…" autocomplete="off">
+          <select id="pxb-type"><option value="photo">📷 Foton</option><option value="illustration">🎨 Illustrationer</option><option value="vector">✏️ Vektorer</option><option value="all">Alla</option></select>
+          <button type="button" class="btn-hype pxb-btn" onclick="pxbSearch(1)">Sök</button>
+        </div>
+        <div class="pxb-status" id="pxb-status"></div>
+        <div class="pxb-grid" id="pxb-grid"></div>
+        <div class="pxb-foot"><button type="button" class="btn ed-mini" id="pxb-more" onclick="pxbMore()" style="display:none;">Visa fler ⬇</button>
+          <button type="button" class="linkbtn" onclick="pxbChangeKey()">Byt API-nyckel</button></div>
+      </div>`;
+    document.body.appendChild(m);
+    $("pxb-q").addEventListener("keydown", e => { if (e.key === "Enter") pxbSearch(1); e.stopPropagation(); });
+    $("pxb-key").addEventListener("keydown", e => { if (e.key === "Enter") pxbSaveKey(); e.stopPropagation(); });
+    $("pxb-grid").addEventListener("click", e => { const c = e.target.closest(".pxb-hit"); if (c) pxbPick(Number(c.dataset.i)); });
+    m.addEventListener("click", e => { if (e.target === m) pxbClose(); });
+    return m;
+  }
+  function pxbShowKeyUi() { const has = !!pxbKey(); $("pxb-keyrow").style.display = has ? "none" : ""; $("pxb-searchrow").style.display = has ? "" : "none"; }
+  window.pxbOpen = function(qi) {
+    collectEditor(); pxbQi = qi;
+    const m = pxbModal(); m.style.display = "flex"; pxbShowKeyUi();
+    const qtext = (edQ[qi] && edQ[qi].q) || "";
+    if (!$("pxb-q").value && qtext) $("pxb-q").value = "";
+    $("pxb-status").textContent = pxbKey() ? `Bild till fråga ${qi + 1}: "${qtext.slice(0, 60)}"` : "";
+    setTimeout(() => { const f = pxbKey() ? $("pxb-q") : $("pxb-key"); if (f) f.focus(); }, 30);
+  };
+  window.pxbMore = function() { pxbSearch(pxbState.page + 1); };
+  window.pxbClose = function() { const m = $("pxb-modal"); if (m) m.style.display = "none"; };
+  window.pxbSaveKey = function() {
+    const k = ($("pxb-key").value || "").trim();
+    if (!/^[A-Za-z0-9-]{10,80}$/.test(k)) { $("pxb-status").textContent = "⚠️ Det ser inte ut som en API-nyckel (bara bokstäver, siffror och bindestreck)."; return; }
+    lsSet(PXB_KEY_LS, k); $("pxb-key").value = ""; pxbShowKeyUi(); $("pxb-status").textContent = "✅ Nyckeln sparad. Sök efter en bild!"; $("pxb-q").focus();
+  };
+  window.pxbChangeKey = function() { try { localStorage.removeItem(PXB_KEY_LS); } catch (e) {} pxbShowKeyUi(); $("pxb-status").textContent = ""; $("pxb-key").focus(); };
+  // JSONP-reserv om webbläsaren skulle stoppa vanlig hämtning (CORS)
+  function pxbJsonp(url) {
+    return new Promise((res, rej) => {
+      const cb = "__pxb" + Math.random().toString(36).slice(2, 9), sc = document.createElement("script");
+      const done = () => { delete window[cb]; sc.remove(); clearTimeout(t); };
+      const t = setTimeout(() => { done(); rej(new Error("timeout")); }, 12000);
+      window[cb] = (d) => { done(); res(d); };
+      sc.onerror = () => { done(); rej(new Error("jsonp")); };
+      sc.src = url + "&callback=" + cb; document.head.appendChild(sc);
+    });
+  }
+  async function pxbFetch(url) {
+    let r;
+    try { r = await fetch(url); }
+    catch (e) { return await pxbJsonp(url); }           // nätverk/CORS → prova JSONP
+    if (r.status === 400) throw new Error("Pixabay svarade: fel API-nyckel eller ogiltig sökning. Kontrollera nyckeln (Byt API-nyckel).");
+    if (r.status === 429) throw new Error("För många sökningar på kort tid – vänta en minut.");
+    if (!r.ok) throw new Error("Pixabay svarade med fel " + r.status + ".");
+    return await r.json();
+  }
+  window.pxbSearch = async function(page) {
+    const q = ($("pxb-q").value || "").trim().slice(0, 100), key = pxbKey();
+    if (!key) { pxbShowKeyUi(); return; }
+    if (!q) { $("pxb-status").textContent = "Skriv ett sökord först."; return; }
+    if (pxbState.busy) return;
+    const type = $("pxb-type").value || "photo";
+    if (page === 1) { pxbState = { q, page: 1, type, lang: "sv", hits: [], total: 0, busy: false }; $("pxb-grid").innerHTML = ""; }
+    pxbState.busy = true; $("pxb-status").textContent = "⏳ Söker…"; $("pxb-more").style.display = "none";
+    const build = (lang) => `https://pixabay.com/api/?key=${encodeURIComponent(key)}&q=${encodeURIComponent(q)}&lang=${lang}&image_type=${type}&safesearch=true&per_page=30&page=${page}`;
+    try {
+      let lang = page === 1 ? "sv" : pxbState.lang, url = build(lang);
+      let d = pxbCacheGet(url.replace(key, "K"));
+      if (!d) { d = await pxbFetch(url); pxbCachePut(url.replace(key, "K"), d); }
+      if (page === 1 && (!d.hits || !d.hits.length)) {            // inget på svenska → prova engelska
+        lang = "en"; url = build(lang);
+        d = pxbCacheGet(url.replace(key, "K")) || await pxbFetch(url); pxbCachePut(url.replace(key, "K"), d);
+      }
+      pxbState.lang = lang; pxbState.page = page;
+      const hits = (d.hits || []).filter(h => h && h.previewURL && (h.largeImageURL || h.webformatURL));
+      pxbState.hits = pxbState.hits.concat(hits); pxbState.total = Number(d.totalHits) || 0;
+      if (!pxbState.hits.length) { $("pxb-status").textContent = `Inga bilder hittades för "${q}". Prova ett annat ord (gärna på engelska).`; return; }
+      $("pxb-grid").innerHTML = pxbState.hits.map((h, i) => `<button type="button" class="pxb-hit" data-i="${i}" title="${esc(h.tags || "")}"><img src="${esc(h.webformatURL || h.previewURL)}" alt="${esc(h.tags || "")}" loading="lazy" referrerpolicy="no-referrer"><span>${esc((h.tags || "").split(",")[0])}</span></button>`).join("");
+      $("pxb-status").textContent = `${pxbState.hits.length} av ${Math.min(pxbState.total, 500)} bilder${lang === "en" && page === 1 ? " (inga svenska träffar – visar engelska)" : ""} · klicka på en bild för att använda den`;
+      $("pxb-more").style.display = pxbState.hits.length < Math.min(pxbState.total, 500) ? "" : "none";
+    } catch (e) {
+      $("pxb-status").textContent = "⚠️ " + (e && e.message === "jsonp" || e.message === "timeout" ? "Kunde inte nå Pixabay. Kontrollera internet och API-nyckeln." : e.message);
+    } finally { pxbState.busy = false; }
+  };
+  // Hämta bilden (största tillåtna) → komprimera → spara i datorn som en egen bild
+  async function pxbDownload(h) {
+    const urls = [h.largeImageURL, h.webformatURL].filter(Boolean);
+    for (const u of urls) {
+      try {
+        const r = await fetch(u, { mode: "cors", referrerPolicy: "no-referrer" });
+        if (!r.ok) continue;
+        const b = await r.blob();
+        if (/^image\//.test(b.type) && b.size > 100) return new File([b], "pixabay-" + h.id + ".jpg", { type: b.type });
+      } catch (e) {}
+      try {   // reserv: via <img crossorigin> + canvas
+        const im = new Image(); im.crossOrigin = "anonymous"; im.referrerPolicy = "no-referrer";
+        await new Promise((res, rej) => { im.onload = res; im.onerror = rej; im.src = u; });
+        const cv = document.createElement("canvas"); cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+        cv.getContext("2d").drawImage(im, 0, 0);
+        const b = await new Promise(r2 => cv.toBlob(r2, "image/jpeg", 0.9));
+        if (b) return new File([b], "pixabay-" + h.id + ".jpg", { type: "image/jpeg" });
+      } catch (e) {}
+    }
+    throw new Error("Bilden kunde inte hämtas från Pixabay härifrån. Öppna den på Pixabay, ladda ner den och dra in filen i stället.");
+  }
+  async function pxbPick(i) {
+    const h = pxbState.hits[i]; if (!h || pxbQi === null || pxbState.busy) return;
+    pxbState.busy = true;
+    const card = document.querySelector(`.pxb-hit[data-i="${i}"]`); if (card) card.classList.add("loading");
+    $("pxb-status").textContent = "⏳ Hämtar och sparar bilden…";
+    try {
+      const file = await pxbDownload(h);
+      const blob = await processImageFile(file);
+      const ref = await storeImage(blob);
+      collectEditor(); edQ[pxbQi].img = ref; renderEditor();
+      pxbClose();
+    } catch (e) {
+      $("pxb-status").innerHTML = "⚠️ " + esc(e.message || e) + (h.pageURL ? ` <a href="${esc(h.pageURL)}" target="_blank" rel="noopener">Öppna på Pixabay</a>` : "");
+      if (card) card.classList.remove("loading");
+    } finally { pxbState.busy = false; }
+  }
 
   let edReadTime = 5;
   function renderEditor() {
