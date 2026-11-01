@@ -1103,6 +1103,120 @@
   /* Låtval */
   .bgm-wrap { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 4px 6px 4px 10px; font-size: 13px; font-weight: 800; }
   .bgm-wrap select { background: #090418; color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; padding: 5px 6px; font-weight: 800; font-size: 13px; cursor: pointer; }
+
+  /* Passiv spelledarflik */
+  .host-passive { position: fixed; inset: 0; z-index: 3000; background: rgba(7,3,18,0.92); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 20px; }
+
+  /* ===== Lagläge ===== */
+  .mode-bar { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 14px 0 4px; }
+  .mode-label { font-size: 13px; font-weight: 900; color: var(--accent-amber); text-transform: uppercase; letter-spacing: 1.5px; }
+  .mode-btn { background: rgba(255,255,255,0.08); color: #fff; border: 2px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 9px 20px; font-size: 17px; font-weight: 900; cursor: pointer; }
+  .mode-btn.active { background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); border-color: #fff; box-shadow: 0 0 18px rgba(236,72,153,0.5); }
+  .mode-hint { font-size: 13px; color: var(--text-muted); font-weight: 700; }
+  .team-setup { margin-top: 10px; width: 100%; }
+  .team-toolbar { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .team-count-btns { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+  .tcount { width: 36px; height: 36px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); color: #fff; font-weight: 900; font-size: 15px; cursor: pointer; }
+  .tcount.active { background: var(--accent-amber); color: #1a0f00; border-color: #fff; }
+  .team-status { text-align: center; margin: 10px 0; font-weight: 800; font-size: 15px; }
+  .ts-ok { color: #34d399; } .ts-bad { color: #fca5a5; } .ts-warn { color: #fde68a; margin-left: 8px; } .ts-wait { color: var(--text-muted); }
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+  .team-col { --tc: #64748b; background: rgba(9,4,24,0.6); border: 2px solid var(--tc); border-radius: 14px; min-height: 120px; display: flex; flex-direction: column; transition: transform .12s, box-shadow .12s; }
+  .team-col.free { --tc: rgba(255,255,255,0.35); border-style: dashed; }
+  .team-col.free.is-empty { opacity: 0.6; }
+  .team-col.over { transform: scale(1.03); box-shadow: 0 0 22px var(--tc); }
+  .team-head { display: flex; align-items: center; gap: 6px; padding: 7px 8px; background: color-mix(in srgb, var(--tc) 30%, transparent); border-radius: 12px 12px 0 0; }
+  .team-title { font-weight: 900; flex: 1; }
+  .team-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; flex-shrink: 0; padding: 0; }
+  .team-name-in { flex: 1; min-width: 0; background: rgba(0,0,0,0.35); color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; padding: 5px 7px; font-weight: 900; font-size: 14px; }
+  .team-n { background: rgba(0,0,0,0.4); border-radius: 999px; padding: 2px 9px; font-weight: 900; font-size: 13px; }
+  .team-members { display: flex; flex-direction: column; gap: 5px; padding: 8px; flex: 1; }
+  .team-empty { color: var(--text-muted); font-size: 13px; font-style: italic; text-align: center; padding: 10px 0; }
+  .team-chip { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; padding: 6px 8px; font-weight: 800; font-size: 14px; cursor: grab; user-select: none; }
+  .team-chip.sel { outline: 3px solid var(--accent-amber); background: rgba(251,191,36,0.2); }
+  .team-chip.dragging { opacity: 0.35; }
+  .team-chip.offline { opacity: 0.45; }
+  .tc-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tc-x { background: rgba(239,68,68,0.25); border: none; color: #fca5a5; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; font-weight: 900; font-size: 10px; flex-shrink: 0; }
+  .team-help { text-align: center; color: var(--text-muted); font-size: 12px; margin-top: 8px; }
+  .team-warn { position: fixed; left: 14px; bottom: 14px; z-index: 900; background: rgba(60,10,10,0.92); border: 2px solid #f87171; border-radius: 14px; padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; max-width: min(720px, calc(100vw - 260px)); font-size: 14px; }
+  .team-warn .tw-row { display: inline-flex; gap: 6px; align-items: center; font-weight: 800; }
+  .team-warn select { background: #090418; color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 4px; font-weight: 800; }
+  .lb-team-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; flex-shrink: 0; }
+  .lb-members { font-size: 12px; color: var(--text-muted); font-weight: 800; }
+  .leaderboard-rows.teams .lb-row { border-left: 6px solid var(--tc); }
+  .badge-mvp { background: rgba(251,191,36,0.18); color: #fde68a; border: 1px solid #fbbf24; }
+  .podium-sub { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: -4px 0 8px; text-align: center; max-width: 240px; }
+  .podium-sub:empty { display: none; }
+  .ps-mvp { font-size: 14px; font-weight: 900; color: #fde68a; }
+  .ps-members { font-size: 12px; color: var(--text-muted); font-weight: 700; }
+  .podium-column[style*="--tc"] .podium-pillar { box-shadow: 0 0 26px var(--tc); }
+  .p-team { flex-shrink: 0; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.6); max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .p-team-card { border-color: var(--tc) !important; box-shadow: 0 0 24px color-mix(in srgb, var(--tc) 45%, transparent); }
+  .p-teammates { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .p-teammates span { background: rgba(255,255,255,0.1); border-radius: 999px; padding: 4px 10px; font-weight: 800; font-size: 14px; }
+  .p-teammates span.me { background: var(--tc); }
+  .p-mvp { color: #fde68a; font-weight: 900; }
+  .team-col.full .team-n { background: #b91c1c; }
+  .team-col.full.over { box-shadow: 0 0 22px #ef4444; transform: none; }
+  .ts-flash { color: #fca5a5; font-weight: 900; margin-top: 4px; animation: popIn .2s ease; }
+
+  /* ===== Avatarer ===== */
+  .av { font-size: 1.1em; }
+  .lb-av { font-size: 28px; line-height: 1; flex-shrink: 0; }
+  .leaderboard-rows.compact .lb-av { font-size: 22px; }
+  .p-big-av { font-size: 64px; line-height: 1; animation: popIn .3s ease; }
+  .p-av-label { font-size: 13px; font-weight: 900; color: var(--accent-amber); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+  .p-av-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; width: 100%; }
+  .p-av { font-size: 24px; line-height: 1; padding: 6px 0; border-radius: 10px; border: 2px solid transparent; background: rgba(255,255,255,0.06); cursor: pointer; }
+  .p-av.sel { border-color: var(--accent-amber); background: rgba(251,191,36,0.25); transform: scale(1.08); }
+  @media (max-width: 360px) { .p-av-grid { grid-template-columns: repeat(6, 1fr); } }
+
+  /* ===== Bild på frågan ===== */
+  .q-image-wrap { display: flex; justify-content: center; align-items: center; min-height: 0; }
+  .q-image-wrap img { max-width: 100%; max-height: 46vh; object-fit: contain; border-radius: 16px; border: 3px solid rgba(255,255,255,0.25); box-shadow: 0 12px 40px rgba(0,0,0,0.5); background: rgba(0,0,0,0.25); animation: popIn .35s ease; }
+  .q-image-wrap[data-phase="question"] img { max-height: 30vh; }
+  .q-image-wrap[data-phase="reveal"] img { max-height: 22vh; }
+  body.has-qimg #screen-question { gap: 12px; }
+  body.has-qimg #screen-question .question-stage { padding: 18px 28px; font-size: clamp(22px, 2.6vw, 38px); }
+  .ed-img { border: 2px dashed rgba(255,255,255,0.3); border-radius: 12px; padding: 10px 12px; font-size: 13px; color: var(--text-muted); transition: background .12s, border-color .12s; }
+  .ed-img.over { border-color: var(--accent-amber); background: rgba(251,191,36,0.15); }
+  .ed-img.busy { opacity: .5; pointer-events: none; }
+  .ed-img.busy::after { content: " ⏳ Komprimerar bilden…"; font-weight: 800; color: #fff; }
+  .ed-img.has { display: flex; gap: 12px; align-items: center; border-style: solid; border-color: rgba(52,211,153,0.6); }
+  .ed-img-prev { width: 150px; height: 95px; object-fit: cover; border-radius: 8px; background: #000; flex-shrink: 0; }
+  .ed-img-side { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; min-width: 0; }
+  .ed-img-ok { color: #34d399; font-weight: 900; }
+  .ed-img-src { font-size: 11px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 320px; }
+  .ed-img-bad { width: 150px; color: #fca5a5; font-weight: 800; }
+  .linkbtn { background: none; border: none; color: var(--accent-blue); text-decoration: underline; cursor: pointer; font: inherit; font-weight: 800; padding: 0; }
+  .p-imghint { text-align: center; font-weight: 900; color: #fde68a; background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.5); border-radius: 12px; padding: 8px; }
+  /* Bild + svar ska rymmas på en 1366×768-projektor utan scroll */
+  .q-image-wrap[data-phase="preview"] img { max-height: max(160px, min(46vh, calc(100vh - 470px))); }
+  .q-image-wrap[data-phase="question"] img { max-height: max(110px, min(34vh, calc(100vh - 545px))); }
+  .q-image-wrap[data-phase="reveal"] img { max-height: max(90px, min(22vh, calc(100vh - 700px))); }
+  body.has-qimg #screen-question .k-card { min-height: 64px; padding: 12px 20px; font-size: 20px; }
+  body.has-qimg #screen-question .answers-grid { gap: 12px; }
+  /* Låga skärmar (t.ex. 1280×720-projektor): kompaktare kort så att avslöjandet ryms */
+  @media (max-height: 760px) {
+    #screen-question .k-card { min-height: 60px; padding: 10px 18px; font-size: 19px; }
+    #screen-question .answers-grid { gap: 10px; }
+    #screen-question { gap: 12px; }
+    #screen-question .question-stage { padding: 16px 26px; }
+  }
+  @media (max-height: 760px) {
+    .alt-order { gap: 6px; }
+    .alt-order-row { padding: 7px 16px; font-size: 20px; }
+    .alt-order-row .n { width: 32px; height: 32px; }
+    #screen-question .alt-stage { padding-top: 14px; padding-bottom: 14px; }
+  }
+
+  /* ===== Testspelare ===== */
+  .bot-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 8px; margin: 10px 0 2px; padding: 8px 12px; border: 1px dashed rgba(255,255,255,0.25); border-radius: 12px; }
+  .bot-count { font-weight: 900; color: #93c5fd; font-size: 13px; }
+  .bot-hint { width: 100%; text-align: center; font-size: 12px; color: var(--text-muted); }
+  .lobby-player-chip.is-bot, .team-chip.is-bot { border-style: dashed; }
+  .lobby-player-chip.is-bot::after, .team-chip.is-bot::after { content: "TEST"; font-size: 9px; font-weight: 900; background: #1e3a8a; color: #bfdbfe; border-radius: 6px; padding: 1px 5px; letter-spacing: 1px; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -1157,6 +1271,15 @@
   </div>
 </div>
 
+<div class="host-passive host-only" id="host-passive" style="display:none;">
+  <div class="p-card" style="max-width:520px;">
+    <div style="font-size:54px;">🖥️</div>
+    <h2>Spelet styrs från ett annat fönster</h2>
+    <p>ABBHOOT är öppet som spelledare i en annan flik eller på en annan dator. Bara ett fönster i taget kan styra, annars går timern dubbelt så fort.</p>
+    <button type="button" class="btn-hype" onclick="claimHost()">🎮 Styr härifrån i stället</button>
+  </div>
+</div>
+
 <!-- ===================== SPELLEDARE / STORSKÄRM ===================== -->
 <div class="arena-container host-only host-auth-only">
 
@@ -1172,13 +1295,40 @@
         <div class="qr-box" id="qr-box">QR laddas…</div>
       </div>
 
+      <div class="mode-bar" id="mode-bar">
+        <span class="mode-label">Spelläge:</span>
+        <button type="button" class="mode-btn" id="mode-solo" onclick="setGameMode('solo')">👤 Solo</button>
+        <button type="button" class="mode-btn" id="mode-team" onclick="setGameMode('team')">👥 Lag</button>
+        <span class="mode-hint" id="mode-hint"></span>
+      </div>
+
       <div class="lobby-players-wrap">
         <div style="font-size:13px; font-weight:800; color:var(--accent-amber); text-transform:uppercase; letter-spacing:1.5px;">
           Anslutna spelare (<span id="lobby-count">0</span>)
         </div>
         <div class="lobby-players-grid" id="lobby-players-grid"></div>
+        <div class="team-setup" id="team-setup" style="display:none;">
+          <div class="team-toolbar">
+            <span class="mode-label">Antal lag:</span>
+            <span class="team-count-btns" id="team-count-btns"></span>
+            <button type="button" class="btn ed-mini" onclick="shuffleTeams()">🎲 Slumpa jämna lag</button>
+            <button type="button" class="btn ed-mini" onclick="clearTeams()">↺ Töm lagen</button>
+          </div>
+          <div class="team-status" id="team-status"></div>
+          <div class="team-grid" id="team-grid"></div>
+          <div class="team-help">Dra en spelare till ett lag – eller klicka på spelaren och sedan på laget. Klicka på färgpricken för att byta färg.</div>
+        </div>
       </div>
 
+      <div class="bot-bar" id="bot-bar">
+        <span class="mode-label">🤖 Testspelare:</span>
+        <button type="button" class="btn ed-mini" onclick="addBots(1)">+1</button>
+        <button type="button" class="btn ed-mini" onclick="addBots(5)">+5</button>
+        <button type="button" class="btn ed-mini" onclick="addBots(10)">+10</button>
+        <button type="button" class="btn ed-mini" id="bot-remove" onclick="removeBots()" style="display:none;">🗑 Ta bort alla testspelare</button>
+        <span class="bot-count" id="bot-count"></span>
+        <span class="bot-hint">Låtsasspelare som svarar själva (ibland rätt, ibland fel) – öva utan mobiler. Ta bort dem innan riktigt spel.</span>
+      </div>
       <button type="button" class="btn-hype" id="btn-start-game" onclick="startGame()">🚀 STARTA ABBHOOT!</button>
     </div>
   </div>
@@ -1201,6 +1351,8 @@
     </div>
 
     <div class="question-stage" id="question-text">Laddar fråga…</div>
+
+    <div class="q-image-wrap" id="q-image-wrap" style="display:none;"><img id="q-image" alt=""></div>
 
     <div class="preview-stage" id="preview-stage" style="display:none;">
       <div class="preview-label">📖 Läs frågan – svarsalternativen kommer om <b id="preview-count">5</b></div>
@@ -1245,6 +1397,8 @@
     </div>
   </div>
 
+  <div class="team-warn host-only" id="team-warn" style="display:none;"></div>
+
   <button type="button" class="next-fab" id="next-fab" onclick="hostNext()" style="display:none;" title="Nästa steg (→)">
     <span id="next-fab-label">Nästa</span><span class="arrow">➔</span>
   </button>
@@ -1261,18 +1415,21 @@
       <div class="podium-column" id="podium-col-2">
         <div class="podium-avatar">🥈</div>
         <div class="podium-name" id="podium-name-2">–</div>
+        <div class="podium-sub" id="podium-sub-2"></div>
         <div class="podium-pillar pillar-2"><div class="pillar-place">2</div><div class="pillar-pts" id="podium-pts-2">0 p</div></div>
       </div>
       <div class="podium-column" id="podium-col-1">
         <div class="winner-rays"></div>
         <div class="podium-avatar winner-crown">👑</div>
         <div class="podium-name" id="podium-name-1">–</div>
-        <div class="winner-tag">🏆 DAGENS CHAMPION 🏆</div>
+        <div class="podium-sub" id="podium-sub-1"></div>
+        <div class="winner-tag" id="winner-tag">🏆 DAGENS CHAMPION 🏆</div>
         <div class="podium-pillar pillar-1"><div class="pillar-place">1</div><div class="pillar-pts" id="podium-pts-1" style="background:#090418; color:var(--accent-amber);">0 p</div></div>
       </div>
       <div class="podium-column" id="podium-col-3">
         <div class="podium-avatar">🥉</div>
         <div class="podium-name" id="podium-name-3">–</div>
+        <div class="podium-sub" id="podium-sub-3"></div>
         <div class="podium-pillar pillar-3"><div class="pillar-place">3</div><div class="pillar-pts" id="podium-pts-3">0 p</div></div>
       </div>
     </div>
@@ -1295,6 +1452,7 @@
 <div class="player-app player-only">
   <div class="p-topbar" id="p-topbar" style="display:none;">
     <span id="p-name">–</span>
+    <span class="p-team" id="p-team" style="display:none;"></span>
     <span class="p-score" id="p-score">0 p</span>
   </div>
   <div id="p-view"></div>
@@ -1563,8 +1721,53 @@
       .filter(([, p]) => p && typeof p.name === "string" && p.name)
       .map(([id, p]) => ({ id, ...p }));
   }
+  // Avatarer – bara emojis ur listan godkänns (skyddar mot att någon skriver in egen text/kod)
+  const AVATARS = ["🦊","🐼","🐸","🐯","🦁","🐨","🐵","🦄","🐙","🦖","🐳","🦉","🐧","🐝","🦋","🐢","🐶","🐱","🐻","🐰","🐷","🦈","🦀","🍕","🌮","🍩","🚀","⚡","🔥","👻","🤖","👽","🎸","⚽","🏒","🎮","😎","🤠","🥷","👑"];
+  const avatarOf = (p) => (p && AVATARS.includes(p.avatar)) ? p.avatar : "🙂";
+  const randomAvatar = () => AVATARS[Math.floor(Math.random() * AVATARS.length)];
   const answersOf = (G, i) => (G && G.answers && G.answers[i]) || {};
   const manualOf = (G, i) => (G && G.manual && G.manual[i]) || {};
+
+  // ===== LAGLÄGE (gemensamt för storskärm och mobil) =====
+  // Varje spelare har eget poängkonto; lagets poäng = SUMMAN av medlemmarnas poäng.
+  const TEAM_COLORS = [
+    { c: "#ef4444", e: "🔴", n: "Röd" },    { c: "#3b82f6", e: "🔵", n: "Blå" },    { c: "#22c55e", e: "🟢", n: "Grön" },
+    { c: "#eab308", e: "🟡", n: "Gul" },    { c: "#a855f7", e: "🟣", n: "Lila" },   { c: "#f97316", e: "🟠", n: "Orange" },
+    { c: "#ec4899", e: "💗", n: "Rosa" },   { c: "#06b6d4", e: "🩵", n: "Turkos" }, { c: "#e5e7eb", e: "⚪", n: "Vit" },
+    { c: "#a16207", e: "🟤", n: "Brun" }
+  ];
+  const MAX_TEAMS = 10, MAX_PER_TEAM = 5;
+  const isTeamMode = (G) => !!(G && G.state && G.state.mode === "team");
+  const teamCountOf = (G) => Math.max(2, Math.min(MAX_TEAMS, Math.round(Number(G && G.state && G.state.teamCount) || 2)));
+  function teamColorIdx(G, t) {
+    const d = (G && G.teams && G.teams[t]) || {};
+    return typeof d.color === "number" && d.color >= 0 && d.color < TEAM_COLORS.length ? d.color : t % TEAM_COLORS.length;
+  }
+  function teamInfo(G, t) {
+    const d = (G && G.teams && G.teams[t]) || {}, col = TEAM_COLORS[teamColorIdx(G, t)];
+    return { idx: t, id: "t" + t, name: (typeof d.name === "string" && d.name.trim()) ? d.name.trim().slice(0, 24) : `Lag ${col.n}`, color: col.c, emoji: col.e };
+  }
+  // Spelarens lag (index) – null om spelaren inte är indelad (eller laget inte finns längre)
+  function teamOfPlayer(G, p) { const t = p && p.team; return (typeof t === "number" && t >= 0 && t < teamCountOf(G)) ? t : null; }
+  const byScore = (a, b) => ((b.score || 0) - (a.score || 0)) || String(a.name).localeCompare(String(b.name), "sv");
+  function teamList(G) {
+    const players = listPlayers(G);
+    return [...Array(teamCountOf(G)).keys()].map(t => {
+      const members = players.filter(p => teamOfPlayer(G, p) === t).sort(byScore);
+      const sum = k => members.reduce((s, p) => s + (Number(p[k]) || 0), 0);
+      return Object.assign(teamInfo(G, t), { members, score: sum("score"), prevScore: sum("prevScore"), lastDelta: sum("lastDelta"), mvp: members[0] || null });
+    });
+  }
+  // Lag med minst en spelare, bäst först (lika poäng → lagnummer)
+  function rankedTeams(G) {
+    const list = teamList(G).filter(t => t.members.length);
+    const prevOrder = [...list].sort((a, b) => (b.prevScore - a.prevScore) || (a.idx - b.idx)).map(t => t.idx);
+    return list.sort((a, b) => (b.score - a.score) || (a.idx - b.idx))
+      .map((t, k) => Object.assign(t, { rankClimb: prevOrder.indexOf(t.idx) - k }));
+  }
+  const unassignedPlayers = (G) => listPlayers(G).filter(p => teamOfPlayer(G, p) === null);
+  // Antal "platser" på prispallen: lag i lagläge, annars spelare
+  const podCount = (G) => isTeamMode(G) ? rankedTeams(G).length : listPlayers(G).length;
 
   // Bedömning av ett svar. st = state (med current.type och correct, som sätts först vid avslöjande).
   // Returnerar { right, factor } där factor 0–1 skalar poängen (skjutreglage ger lägre poäng ju längre ifrån).
@@ -1590,11 +1793,24 @@
     return { right: false, factor: 0 };
   }
 
+  // Ett svar som kommer in EFTER avslöjandet (t.ex. mobil med lagg) räknas inte
+  function answerOf(G, i, pid, st) {
+    const a = answersOf(G, i)[pid];
+    if (!a) return null;
+    if (st && typeof st.revealedAt === "number" && typeof a.at === "number" && a.at > st.revealedAt) return null;
+    return a;
+  }
+  function validAnswers(G, i, st) {
+    const out = {};
+    Object.keys(answersOf(G, i)).forEach(pid => { const a = answerOf(G, i, pid, st); if (a) out[pid] = a; });
+    return out;
+  }
+
   function judge(G, pid, i, st) {
     const m = manualOf(G, i)[pid];
     if (m && typeof m.correct === "boolean") return { right: m.correct, factor: m.correct ? 1 : 0 };
     const type = (st && st.current && st.current.type) || "choice";
-    return judgeAnswer(type, answersOf(G, i)[pid], st && st.correct);
+    return judgeAnswer(type, answerOf(G, i, pid, st), st && st.correct);
   }
   const isRight = (G, pid, i, st) => judge(G, pid, i, st).right;
 
@@ -1603,7 +1819,7 @@
     if (ov === "none") return null;
     if (ov) return ov;
     let best = null, bestAt = Infinity;
-    Object.entries(answersOf(G, i)).forEach(([pid, a]) => {
+    Object.entries(validAnswers(G, i, st)).forEach(([pid, a]) => {
       if (a && typeof a.at === "number" && a.at < bestAt && isRight(G, pid, i, st)) { bestAt = a.at; best = pid; }
     });
     return best;
@@ -1870,6 +2086,10 @@
   // ============================ SPELLEDARE =============================
   // =====================================================================
   let questions = isValidQuestions(lsGet(LS_QUESTIONS_KEY)) ? lsGet(LS_QUESTIONS_KEY) : JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+  // Frågorna för PÅGÅENDE spel låses vid start – ändringar i redigeraren gäller från nästa omgång
+  let gameQs = null;
+  const gq = () => gameQs || questions;
+  const gqKey = () => `abbhoot_gameqs_${pin}`;
   let pin = null, G = null, unsub = null, tickInt = null, autoRevealT = null;
   let lastBoardKey = "", lastPodiumKey = "", lastQuestionKey = "";
   let podiumAnimUntil = 0;
@@ -1937,6 +2157,7 @@
   };
 
   async function hostInit() {
+    setupTeamUi();
     $("brand-title").textContent = "SPELLEDARE // STORSKÄRM";
     $("brand-sub").textContent = "👑 Dela den här skärmen – spelarna svarar i mobilen";
     const saved = lsGet("abbhoot_host_pin");
@@ -1952,12 +2173,14 @@
   async function newGame() {
     stopTick();
     if (unsub) { unsub(); unsub = null; }
-    if (pin) remove(R(pin)).catch(() => {});
+    if (pin) { remove(R(pin)).catch(() => {}); remove(ref(db, `abbhoot/lease/${pin}`)).catch(() => {}); }
     const p = genPin();
     try {
       await set(R(p), {
         createdAt: serverTimestamp(),
-        state: { phase: "lobby", qIndex: -1, timer: QT, paused: false, scoredQ: -1, total: questions.length }
+        state: { phase: "lobby", qIndex: -1, timer: QT, paused: false, scoredQ: -1, total: questions.length,
+                 mode: lsGet("abbhoot_mode") === "team" ? "team" : "solo", teamCount: Number(lsGet("abbhoot_team_count")) || 2 },
+        teams: lsGet("abbhoot_teams") || null
       });
       hideDbError();
     } catch (e) { showDbError(e); }
@@ -1969,16 +2192,57 @@
     if (confirm("Starta ett helt nytt spel med ny PIN? Alla spelare måste gå med igen.")) newGame();
   };
 
+  // ---------- Bara EN spelledarflik styr (timer, auto-avslöjande, låtar) ----------
+  // Senast öppnade flik tar över. Stängs den tar den gamla automatiskt över igen efter ca 4 s.
+  // Signalen ligger på en EGEN plats (abbhoot/lease/PIN) så att spelet och mobilerna inte ritas om av den.
+  const TAB_ID = Math.random().toString(36).slice(2, 10);
+  let isOwner = false, beatSeen = null, beatChangedAt = 0, beatInt = null, lease = null, leaseUnsub = null;
+  const LR = () => ref(db, `abbhoot/lease/${pin}`);
+  function claimHost() {
+    if (!pin) return;
+    const was = isOwner;
+    isOwner = true; beatChangedAt = performance.now();
+    set(LR(), { tab: TAB_ID, beat: Date.now() }).catch(() => {});
+    updateOwnerUi();
+    // Tog över från en annan flik → starta timern/låten direkt (annars står timern still tills något annat ändras)
+    if (!was && G) { hostRender(); ensureTick(); }
+  }
+  window.claimHost = claimHost;
+  function updateOwnerUi() {
+    const el = $("host-passive"); if (el) el.style.display = isOwner ? "none" : "flex";
+    if (!isOwner) { stopTick(); bgmStop(true); podStop(); botClearAll(); }
+  }
+  function ownerCheck() {
+    const was = isOwner;
+    isOwner = !lease || !lease.tab || lease.tab === TAB_ID;
+    if (lease && lease.beat !== beatSeen) { beatSeen = lease.beat; beatChangedAt = performance.now(); }
+    if (was !== isOwner) { updateOwnerUi(); if (isOwner && G) { hostRender(); ensureTick(); } }
+  }
+  function startBeat() {
+    if (beatInt) clearInterval(beatInt);
+    if (leaseUnsub) leaseUnsub();
+    leaseUnsub = onValue(LR(), snap => { lease = snap.val(); ownerCheck(); });
+    beatInt = setInterval(() => {
+      if (!pin || !G) return;
+      // Bara "beat" skrivs – aldrig "tab". Annars kan en sen hjärtslagning från den gamla fliken ta tillbaka styrningen.
+      if (isOwner) update(LR(), { beat: Date.now() }).catch(() => {});
+      else if (performance.now() - beatChangedAt > 4000) claimHost();   // den andra fliken är stängd
+    }, 1500);
+  }
+
   function attachGame(p) {
     pin = p;
+    gameQs = lsGet(gqKey());   // pågående spels låsta frågor (överlever omladdning)
     lastBoardKey = lastPodiumKey = lastQuestionKey = "";
     renderJoinInfo();
+    let first = true;
     unsub = onValue(R(p), snap => {
       G = snap.val();
       if (!G) return;
       hideDbError();
+      if (first) { first = false; claimHost(); startBeat(); }
       hostRender();
-      ensureTick();
+      if (isOwner) ensureTick(); else stopTick();
     }, showDbError);
   }
 
@@ -2069,15 +2333,27 @@
   }
   let prankBusy = false;
   function enforcePranks() {
-    if (prankBusy || !G || !G.state || G.state.phase === "lobby") return;
+    if (!isOwner || prankBusy || !G || !G.state || G.state.phase === "lobby") return;
     const u = prankUpdates();
     if (Object.keys(u).length) { prankBusy = true; upd(u).finally(() => { prankBusy = false; }); }
   }
 
+  let starting = false;
   window.startGame = async function() {
-    if (!listPlayers(G).length && !confirm("Inga spelare har anslutit än. Starta ändå?")) return;
-    await upd(Object.assign(resetScoresUpdates(), prankUpdates()));
-    startQuestion(0);
+    if (starting || S().phase !== "lobby") return;
+    if (isTeamMode(G)) {
+      const free = unassignedPlayers(G), empty = teamList(G).filter(t => !t.members.length);
+      if (!listPlayers(G).length) { alert("Lagläge: inga spelare har anslutit än."); return; }
+      if (free.length) { alert(`Kan inte starta – ${free.length} spelare saknar lag:\n\n${free.map(p => "• " + p.name).join("\n")}\n\nDra in dem i ett lag först.`); return; }
+      const over = teamList(G).filter(t => t.members.length > MAX_PER_TEAM);
+      if (over.length) { alert(`Kan inte starta – ${over.map(t => t.name).join(", ")} har fler än ${MAX_PER_TEAM} spelare.`); return; }
+      if (empty.length) { alert(`Kan inte starta – ${empty.map(t => t.name).join(", ")} har inga spelare.\n\nMinska antalet lag eller flytta in spelare.`); return; }
+    }
+    else if (!listPlayers(G).length && !confirm("Inga spelare har anslutit än. Starta ändå?")) return;
+    starting = true; setTimeout(() => { starting = false; }, 1500);
+    gameQs = JSON.parse(JSON.stringify(questions));
+    lsSet(gqKey(), gameQs);
+    startQuestion(0, Object.assign(resetScoresUpdates(), prankUpdates()));
   };
 
   const timeOf = (q) => Math.max(5, Math.min(240, Math.round(Number(q.time) || TYPES[qType(q)].time)));
@@ -2095,6 +2371,7 @@
   function publicQuestion(q, i) {
     const type = qType(q);
     const cur = { type, q: q.q, double: !!q.double };
+    if (isImgRef(q.img)) cur.img = true;   // bara en flagga – mobilen säger "titta på storskärmen"
     const extra = {};
     if (type === "choice") cur.answers = q.answers;
     if (type === "puzzle") {
@@ -2110,23 +2387,108 @@
     return { cur, extra };
   }
 
+  // ===== BILDER PÅ FRÅGOR =====
+  // Bilder du drar in komprimeras och sparas i den här webbläsarens bilddatabas (IndexedDB), INTE i Firebase.
+  // Frågan sparar bara en referens: "idb:<id>" (egen bild) eller en https-länk. Mobilerna laddar aldrig ner bilden.
+  const IMGDB = (() => {
+    let dbp = null;
+    const open = () => dbp || (dbp = new Promise((res, rej) => {
+      try {
+        const r = indexedDB.open("abbhoot_images", 1);
+        r.onupgradeneeded = () => r.result.createObjectStore("img");
+        r.onsuccess = () => res(r.result); r.onerror = () => { dbp = null; rej(r.error); };
+      } catch (e) { dbp = null; rej(e); }
+    }));
+    const run = async (mode, fn) => {
+      const d = await open();
+      return new Promise((res, rej) => {
+        const t = d.transaction("img", mode), rq = fn(t.objectStore("img"));
+        t.oncomplete = () => res(rq ? rq.result : undefined); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error || new Error("avbruten"));
+      });
+    };
+    return { put: (id, b) => run("readwrite", st => st.put(b, id)), get: id => run("readonly", st => st.get(id)),
+             del: id => run("readwrite", st => st.delete(id)), keys: () => run("readonly", st => st.getAllKeys()) };
+  })();
+  const imgUrlCache = new Map();
+  const isImgRef = (r) => typeof r === "string" && (/^idb:[a-z0-9]{6,40}$/.test(r) || /^https?:\/\/\S+$/i.test(r));
+  async function imgSrc(ref) {
+    if (!isImgRef(ref)) return null;
+    if (!ref.startsWith("idb:")) return ref;
+    if (imgUrlCache.has(ref)) return imgUrlCache.get(ref);
+    try {
+      const blob = await IMGDB.get(ref.slice(4));
+      if (!blob) return null;
+      const u = URL.createObjectURL(blob); imgUrlCache.set(ref, u); return u;
+    } catch (e) { return null; }
+  }
+  // Läs in, skala ner (max 1600×1000) och komprimera – så att även 10 MB mobilfoton blir ~100–300 kB
+  async function processImageFile(file) {
+    if (!file || !/^image\//.test(file.type || "")) throw new Error("Det där är ingen bild (JPG, PNG, GIF eller WEBP).");
+    if (file.size > 30e6) throw new Error("Bilden är för stor (max 30 MB).");
+    if (file.type === "image/gif" && file.size <= 4e6) return file;   // behåll animerade GIF:ar
+    const url = URL.createObjectURL(file);
+    try {
+      const im = new Image();
+      await new Promise((res, rej) => { im.onload = res; im.onerror = () => rej(new Error("Bilden kunde inte läsas. Är det t.ex. en iPhone-bild (HEIC)? Spara den som JPG eller PNG först.")); im.src = url; });
+      const W = im.naturalWidth || 1200, Hh = im.naturalHeight || 800;
+      const k = Math.min(1, 1600 / W, 1000 / Hh);
+      const cv = document.createElement("canvas"); cv.width = Math.max(1, Math.round(W * k)); cv.height = Math.max(1, Math.round(Hh * k));
+      cv.getContext("2d").drawImage(im, 0, 0, cv.width, cv.height);
+      let blob = await new Promise(r => cv.toBlob(r, "image/webp", 0.85));
+      if (!blob || blob.type !== "image/webp") blob = await new Promise(r => cv.toBlob(r, "image/jpeg", 0.86));
+      if (!blob) throw new Error("Bilden kunde inte komprimeras.");
+      return blob;
+    } finally { URL.revokeObjectURL(url); }
+  }
+  async function storeImage(blob) {
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    await IMGDB.put(id, blob);
+    return "idb:" + id;
+  }
+  // Städa bort bilder som ingen fråga (sparad eller pågående spel) längre använder
+  async function cleanupImages() {
+    try {
+      let all = "";
+      for (let k = 0; k < localStorage.length; k++) { const key = localStorage.key(k); if (key && key.startsWith("abbhoot_")) all += localStorage.getItem(key) || ""; }
+      all += JSON.stringify(edQ || []);
+      const keys = await IMGDB.keys();
+      for (const id of keys) if (!all.includes("idb:" + id)) { await IMGDB.del(id); imgUrlCache.delete("idb:" + id); }
+    } catch (e) {}
+  }
+
   // Lästid (sekunder) innan svarsalternativen visas – ställs in i redigeraren
   let readTime = (() => { const v = Number(lsGet("abbhoot_read_time")); return Number.isFinite(v) && lsGet("abbhoot_read_time") !== null ? v : 5; })();
 
-  function startQuestion(i) {
-    const q = questions[i];
+  // Firebase tillåter inte både "answers" och "answers/0" i samma skrivning → ta bort underliggande sökvägar
+  function mergeUpdates(a, b) {
+    const u = Object.assign({}, a, b);
+    Object.keys(u).sort((x, y) => x.length - y.length).forEach(k => {
+      const anc = Object.keys(u).find(o => o !== k && k.startsWith(o + "/"));
+      if (!anc) return;
+      const v = u[k]; delete u[k];
+      if (v === null || v === undefined) return;                 // föräldern rensas redan
+      if (u[anc] === null || typeof u[anc] !== "object") u[anc] = {};
+      let node = u[anc]; const parts = k.slice(anc.length + 1).split("/");
+      parts.slice(0, -1).forEach(pp => { node = node[pp] = (node[pp] && typeof node[pp] === "object") ? node[pp] : {}; });
+      node[parts[parts.length - 1]] = v;                         // t.ex. "secret": { 0: [...] }
+    });
+    return u;
+  }
+
+  function startQuestion(i, extra0) {
+    const q = gq()[i];
     if (!q) return;
     const { cur, extra } = publicQuestion(q, i);
     const tl = timeOf(q);
     const u = Object.assign({
       [`answers/${i}`]: null, [`manual/${i}`]: null, [`fastest/${i}`]: null, [`pauses/${i}`]: null,
       "state/phase": "preview", "state/preview": readTime, "state/qIndex": i, "state/timer": tl, "state/timeLimit": tl,
-      "state/paused": false, "state/pauseKey": null, "state/startedAt": null,
-      "state/correct": null, "state/total": questions.length,
+      "state/paused": false, "state/pauseKey": null, "state/startedAt": null, "state/revealedAt": null,
+      "state/correct": null, "state/total": gq().length,
       "state/current": cur
     }, extra);
     if (!(readTime > 0)) Object.assign(u, { "state/phase": "question", "state/startedAt": serverTimestamp() });
-    upd(u);
+    upd(extra0 ? mergeUpdates(extra0, u) : u);
   }
 
   // Läsfasen är slut → alternativen visas och svarstiden startar (servertid)
@@ -2152,8 +2514,8 @@
     const st = S();
     if (st.phase !== "question") return;
     stopTick();
-    const q = questions[st.qIndex];
-    const u = { "state/phase": "reveal", "state/correct": correctFor(q, st.qIndex), "state/paused": false, "state/pauseKey": null };
+    const q = gq()[st.qIndex];
+    const u = { "state/phase": "reveal", "state/correct": correctFor(q, st.qIndex), "state/revealedAt": serverTimestamp(), "state/paused": false, "state/pauseKey": null };
     if (st.paused && st.pauseKey) u[`pauses/${st.qIndex}/${st.pauseKey}/e`] = serverTimestamp();
     upd(u);
   };
@@ -2171,7 +2533,7 @@
   }
 
   // Kahoot: poäng = avrunda(1000 × (1 − (svarstid ÷ frågetid) ÷ 2)). Rätt direkt = 1000, i sista sekunden ≈ 500.
-  function kahootPoints(rtMs, TL) { return Math.round(1000 * (1 - ((rtMs / (TL * 1000)) / 2))); }
+  function kahootPoints(rtMs, TL, f = 1) { return Math.round(1000 * (1 - ((rtMs / (TL * 1000)) / 2)) * f); }   // en avrundning
 
   window.toBoard = function() {
     const st = S();
@@ -2195,11 +2557,11 @@
     list.forEach(p => {
       const b = baseOf(p.id);
       const { right, factor } = judge(G, p.id, i, st);
-      const a = answersOf(G, i)[p.id];
+      const a = answerOf(G, i, p.id, st);
       let delta = 0, streak = 0;
       if (right) {
         streak = b.streak + 1;
-        const basePts = Math.round(kahootPoints(responseMs(G, i, st, a, TL), TL) * factor) * mult;
+        const basePts = kahootPoints(responseMs(G, i, st, a, TL), TL, factor) * mult;
         const streakBonus = streak >= 2 ? Math.min(streak * 100, 500) : 0;   // svarsserie: +100 per fråga i rad, max +500
         delta = basePts + streakBonus;
       }
@@ -2223,7 +2585,7 @@
   window.nextQuestion = function() {
     const st = S();
     if (st.phase !== "board" || st.scoredQ !== st.qIndex) return;
-    if (st.qIndex + 1 < questions.length) startQuestion(st.qIndex + 1);
+    if (st.qIndex + 1 < gq().length) startQuestion(st.qIndex + 1);
     else upd({ "state/phase": "podium", "state/podiumAt": Date.now() });
   };
 
@@ -2252,12 +2614,116 @@
     $("btn-toggle-panel").textContent = document.body.classList.contains("hide-controls") ? "🎛 Visa kontroller (P)" : "🙈 Dölj kontroller (P)";
   };
 
+
+  // =====================================================================
+  // ===== TESTSPELARE (🤖) – för att öva/testa utan mobiler ===============
+  // =====================================================================
+  // Körs bara i den styrande spelledarfliken. Varje testspelare har egen "skicklighet" och svarstid,
+  // svarar på alla fyra frågetyper (ibland rätt, ibland fel) och skriver en kommentar efter podiet.
+  const BOT_NAMES = ["Test-Tina", "Test-Tore", "Robo-Rut", "Bot-Bosse", "Test-Tilda", "Robo-Rolf", "Bot-Berit", "Test-Ture", "Robo-Ronja", "Bot-Bengt",
+    "Test-Tyra", "Robo-Rune", "Bot-Britt", "Test-Tage", "Robo-Rakel", "Bot-Birger", "Test-Tekla", "Robo-Roger", "Bot-Bodil", "Test-Tobbe",
+    "Robo-Rebecka", "Bot-Bror", "Test-Thea", "Robo-Ragnar", "Bot-Barbro"];
+  const BOT_WRONG_TEXT = ["vet inte", "ingen aning", "kanske", "hmm", "pass", "42", "banan", "ja"];
+  const BOT_COMMENTS = ["Grymt kul! 🔥", "Revansch nästa vecka!", "Pusslet var svårt 😅", "Bästa quizet hittills", "Jag var nära!", "Mer bildfrågor!", "Kör igen! 🚀", "GG 👑"];
+  const isBot = (p) => !!(p && p.bot);
+  const botsIn = (G) => listPlayers(G).filter(isBot);
+  window.addBots = function(n) {
+    if (!pin || S().phase !== "lobby") return;
+    const have = new Set(listPlayers(G).map(p => p.name));
+    const u = {}; let added = 0;
+    for (let k = 0; k < BOT_NAMES.length * 4 && added < n; k++) {
+      const base = BOT_NAMES[k % BOT_NAMES.length], name = k < BOT_NAMES.length ? base : `${base} ${Math.floor(k / BOT_NAMES.length) + 1}`;
+      if (have.has(name)) continue;
+      have.add(name); added++;
+      const id = "bot" + Math.random().toString(36).slice(2, 10);
+      u[`players/${id}`] = { name, bot: true, skill: Math.round((0.35 + Math.random() * 0.5) * 100) / 100, speed: Math.round((0.15 + Math.random() * 0.55) * 100) / 100,
+        avatar: randomAvatar(), joinedAt: Date.now() + added, online: true, score: 0, prevScore: 0, lastDelta: 0, streak: 0, rankClimb: 0, wasFastest: false };
+    }
+    if (added) upd(u);
+  };
+  window.removeBots = function() {
+    const u = {}; botsIn(G).forEach(p => { u[`players/${p.id}`] = null; u[`comments/${p.id}`] = null; });
+    if (Object.keys(u).length) upd(u);
+  };
+  const botTimers = new Map();   // botId|frågenyckel → timer
+  function botClearAll() { botTimers.forEach(t => clearTimeout(t)); botTimers.clear(); }
+  function botAnswerFor(bot, st, i) {
+    const cur = st.current || {}, type = cur.type || "choice";
+    const q = gq()[i];
+    const known = q && q.q === cur.q;           // vet spelledaren rätt svar? (samma frågor)
+    const right = known && Math.random() < (bot.skill || 0.6);
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    if (type === "choice") {
+      const c = known ? q.correct : -1;
+      return { choice: right ? c : pick([0, 1, 2, 3].filter(k => k !== c)) };
+    }
+    if (type === "type") {
+      if (right) { const a = pick(q.accepted || ["?"]); return { text: pick([a, a.toUpperCase(), a + "!", " " + a.toLowerCase() + " "]).slice(0, 80) }; }
+      return { text: pick(BOT_WRONG_TEXT) };
+    }
+    if (type === "puzzle") {
+      const corr = known ? correctFor(q, i) : [0, 1, 2, 3];
+      if (right) return { order: corr.slice() };
+      let o; do { o = [0, 1, 2, 3].sort(() => Math.random() - 0.5); } while (o.join() === corr.join());
+      return { order: o };
+    }
+    if (type === "slider") {
+      const min = Number(cur.min), max = Number(cur.max);
+      let v;
+      if (right) { const m = Math.max(0, Number(q.slider.margin) || 0); v = Number(q.slider.correct) + (Math.random() * 2 - 1) * m; }
+      else v = min + Math.random() * (max - min);
+      return { value: snapSlider(v, cur) };
+    }
+    return { choice: 0 };
+  }
+  function botSchedule() {
+    if (!isOwner || !G || !G.state) return;
+    const st = S(), i = st.qIndex;
+    const qk = `${i}|${st.startedAt}`;
+    const bots = botsIn(G);
+    if (!bots.length) return;
+    if (st.phase === "question" && typeof st.startedAt === "number") {
+      const TL = (st.timeLimit || QT) * 1000;
+      bots.forEach(bot => {
+        const key = `${bot.id}|${qk}`;
+        if (botTimers.has(key) || answersOf(G, i)[bot.id]) return;
+        // Svarstid: snabba bottar svarar tidigt, långsamma sent – aldrig efter 90 % av tiden
+        const delay = Math.min(TL * 0.9, 1200 + (bot.speed || 0.4) * TL * (0.4 + Math.random() * 0.6));
+        const fire = () => {
+          const s2 = S();
+          if (!isOwner || !G || s2.phase !== "question" || s2.qIndex !== i || `${s2.qIndex}|${s2.startedAt}` !== qk) return;
+          if (!G.players || !G.players[bot.id] || answersOf(G, i)[bot.id]) return;
+          if (s2.paused) { botTimers.set(key, setTimeout(fire, 700)); return; }   // vänta ut pausen
+          set(R(`${pin}/answers/${i}/${bot.id}`), Object.assign({ timeLeft: typeof s2.timer === "number" ? s2.timer : 0, at: serverTimestamp() }, botAnswerFor(bot, s2, i))).catch(() => {});
+        };
+        botTimers.set(key, setTimeout(fire, delay));
+      });
+    }
+    if (st.phase === "podium" && typeof st.podiumAt === "number") {
+      const POD = podTimeline(podCount(G));
+      bots.forEach(bot => {
+        const key = `${bot.id}|pod|${st.podiumAt}`;
+        if (botTimers.has(key) || (G.comments && G.comments[bot.id])) return;
+        if (Math.random() < 0.35) { botTimers.set(key, 0); return; }   // alla kommenterar inte
+        const delay = Math.max(0, st.podiumAt + POD.after - Date.now()) + 1500 + Math.random() * 9000;
+        botTimers.set(key, setTimeout(() => {
+          const s2 = S();
+          if (!isOwner || s2.phase !== "podium" || s2.podiumAt !== st.podiumAt || !G.players || !G.players[bot.id]) return;
+          set(R(`${pin}/comments/${bot.id}`), { name: bot.name, text: BOT_COMMENTS[Math.floor(Math.random() * BOT_COMMENTS.length)], at: serverTimestamp() }).catch(() => {});
+        }, delay));
+      });
+    }
+    if (st.phase === "lobby") botClearAll();
+  }
+
   // ---------- RENDERING (spelledare) ----------
   function hostRender() {
     const st = S();
     const phase = st.phase || "lobby";
     updateNextFab();
+    renderTeamWarn();
     enforcePranks();
+    botSchedule();
     bgmSync(phase);
     if (phase !== "podium") podStop();
     if (phase === "lobby") { showScreen("screen-lobby"); renderHostLobby(); }
@@ -2280,12 +2746,203 @@
   function renderHostLobby() {
     const list = listPlayers(G).sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0));
     $("lobby-count").textContent = list.length;
-    $("lobby-players-grid").innerHTML = list.length ? list.map(p => `
-      <div class="lobby-player-chip ${p.online === false ? "offline" : ""}">
-        <span>🎮 ${esc(p.name)}</span>
+    const nb = list.filter(isBot).length;
+    $("bot-count").textContent = nb ? `${nb} testspelare med` : "";
+    $("bot-remove").style.display = nb ? "" : "none";
+    const team = isTeamMode(G);
+    $("mode-solo").classList.toggle("active", !team);
+    $("mode-team").classList.toggle("active", team);
+    $("mode-hint").textContent = team ? "Alla spelar i sin egen mobil – poängen läggs ihop per lag" : "Alla tävlar mot alla";
+    $("lobby-players-grid").style.display = team ? "none" : "";
+    $("team-setup").style.display = team ? "" : "none";
+    if (team) { renderTeamSetup(list); return; }
+    setHtml("lobby-players-grid", list.length ? list.map(p => `
+      <div class="lobby-player-chip ${p.online === false ? "offline" : ""} ${isBot(p) ? "is-bot" : ""}">
+        <span><span class="av">${avatarOf(p)}</span> ${esc(p.name)}</span>
         <button type="button" onclick="kickPlayer('${p.id}')" title="Ta bort">✕</button>
-      </div>`).join("") : `<div class="waiting-dots">Väntar på spelare… skanna QR-koden eller gå till adressen ovan 📱</div>`;
+      </div>`).join("") : `<div class="waiting-dots">Väntar på spelare… skanna QR-koden eller gå till adressen ovan 📱</div>`);
   }
+  // ----- Lagindelning i lobbyn -----
+  let teamSel = null, teamDragging = false;
+  function teamChip(p) {
+    return `<div class="team-chip ${p.online === false ? "offline" : ""} ${teamSel === p.id ? "sel" : ""} ${isBot(p) ? "is-bot" : ""}" draggable="true" data-pid="${p.id}">
+      <span class="av">${avatarOf(p)}</span><span class="tc-name">${esc(p.name)}</span><button type="button" class="tc-x" data-kick="${p.id}" title="Ta bort">✕</button></div>`;
+  }
+  function renderTeamSetup(list) {
+    if (teamDragging) return;   // rita inte om mitt i ett drag
+    const n = teamCountOf(G), teams = teamList(G), free = unassignedPlayers(G);
+    setHtml("team-count-btns", [...Array(MAX_TEAMS - 1).keys()].map(k => k + 2)
+      .map(k => `<button type="button" class="tcount ${k === n ? "active" : ""}" onclick="setTeamCount(${k})">${k}</button>`).join(""));
+    const sizes = teams.map(t => t.members.length);
+    const empty = teams.filter(t => !t.members.length);
+    const uneven = list.length && Math.max(...sizes) - Math.min(...sizes) > 0;
+    const needTeams = Math.ceil(list.length / MAX_PER_TEAM);
+    const msg = !list.length ? `<span class="ts-wait">Väntar på spelare… alla måste gå med först, sedan delar du in lagen.</span>`
+      : list.length > MAX_TEAMS * MAX_PER_TEAM ? `<span class="ts-bad">⛔ ${list.length} spelare – lagläget rymmer max ${MAX_TEAMS * MAX_PER_TEAM} (${MAX_TEAMS} lag × ${MAX_PER_TEAM}). Kör solo eller ta bort spelare.</span>`
+      : needTeams > n ? `<span class="ts-bad">⛔ ${list.length} spelare får inte plats i ${n} lag (max ${MAX_PER_TEAM} per lag) – välj minst ${needTeams} lag</span>`
+      : free.length ? `<span class="ts-bad">⛔ ${free.length} spelare saknar lag – dra in dem innan du startar</span>`
+      : empty.length ? `<span class="ts-bad">⛔ ${empty.map(t => esc(t.name)).join(", ")} har inga spelare</span>`
+      : `<span class="ts-ok">✅ Alla är indelade – redo att starta!</span>`;
+    const flash = Date.now() < teamFlash.until ? `<div class="ts-flash">⛔ ${esc(teamFlash.text)}</div>` : "";
+    setHtml("team-status", flash + msg + (uneven ? ` <span class="ts-warn">⚠️ Lagen är olika stora (${sizes.join(" / ")}) – poängen räknas som summa</span>` : ""));
+    // Behåll fokus/markör om spelledaren skriver ett lagnamn när någon ansluter
+    const ae = document.activeElement, focusT = ae && ae.dataset && ae.dataset.tname, selS = ae && ae.selectionStart, selE = ae && ae.selectionEnd, typed = ae && ae.value;
+    setHtml("team-grid", `
+      <div class="team-col free ${free.length ? "" : "is-empty"}" data-team="-1">
+        <div class="team-head"><span class="team-title">🙋 Utan lag</span><span class="team-n">${free.length}</span></div>
+        <div class="team-members">${free.map(teamChip).join("") || `<div class="team-empty">Alla har ett lag 👍</div>`}</div>
+      </div>` + teams.map(t => `
+      <div class="team-col ${t.members.length >= MAX_PER_TEAM ? "full" : ""}" data-team="${t.idx}" style="--tc:${t.color};">
+        <div class="team-head">
+          <button type="button" class="team-dot" data-color="${t.idx}" title="Byt färg" style="background:${t.color};"></button>
+          <input class="team-name-in" data-tname="${t.idx}" maxlength="24" value="${esc(t.name)}" aria-label="Lagnamn">
+          <span class="team-n">${t.members.length}/${MAX_PER_TEAM}</span>
+        </div>
+        <div class="team-members">${t.members.slice().sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0)).map(teamChip).join("") || `<div class="team-empty">Dra spelare hit</div>`}</div>
+      </div>`).join(""));
+    if (focusT !== undefined && focusT !== null) {
+      const el = document.querySelector(`.team-name-in[data-tname="${focusT}"]`);
+      if (el && document.activeElement !== el) { el.value = typed; el.focus(); try { el.setSelectionRange(selS, selE); } catch (e) {} }
+    }
+  }
+  function assignTeam(pidX, t) {
+    if (!G || !G.players || !G.players[pidX]) return;
+    const cur = teamOfPlayer(G, G.players[pidX]);
+    const nt = (typeof t === "number" && t >= 0 && t < teamCountOf(G)) ? t : null;
+    if (cur === nt) return;
+    if (nt !== null && teamList(G)[nt].members.length >= MAX_PER_TEAM) { flashTeamMsg(`${teamInfo(G, nt).name} är fullt – max ${MAX_PER_TEAM} per lag`); return; }
+    upd({ [`players/${pidX}/team`]: nt });
+  }
+  window.assignTeam = assignTeam;
+  // Kort felmeddelande (t.ex. "laget är fullt") – ritas in i statusraden så att det överlever omritning
+  let teamFlash = { text: "", until: 0 };
+  function flashTeamMsg(t) {
+    teamFlash = { text: t, until: Date.now() + 2800 };
+    if (S().phase === "lobby") renderHostLobby(); else alert(t);
+    setTimeout(() => { if (S().phase === "lobby") renderHostLobby(); }, 2900);
+  }
+  window.setGameMode = function(m) {
+    if (S().phase !== "lobby") return;
+    lsSet("abbhoot_mode", m);
+    upd({ "state/mode": m === "team" ? "team" : "solo", "state/teamCount": teamCountOf(G) });
+  };
+  window.setTeamCount = function(n) {
+    if (S().phase !== "lobby") return;
+    n = Math.max(2, Math.min(MAX_TEAMS, n));
+    lsSet("abbhoot_team_count", n);
+    const u = { "state/teamCount": n };
+    listPlayers(G).forEach(p => { if (typeof p.team === "number" && p.team >= n) u[`players/${p.id}/team`] = null; });   // lag som försvann → utan lag
+    upd(u);
+  };
+  window.shuffleTeams = function() {
+    if (S().phase !== "lobby") return;
+    const n = teamCountOf(G), list = listPlayers(G).sort(() => Math.random() - 0.5), u = {};
+    if (list.length > n * MAX_PER_TEAM) {
+      alert(`${list.length} spelare får inte plats i ${n} lag (max ${MAX_PER_TEAM} per lag).\n\nVälj minst ${Math.min(MAX_TEAMS, Math.ceil(list.length / MAX_PER_TEAM))} lag${list.length > MAX_TEAMS * MAX_PER_TEAM ? ` – eller kör solo (lagläget rymmer max ${MAX_TEAMS * MAX_PER_TEAM})` : ""}.`);
+      return;
+    }
+    list.forEach((p, k) => { u[`players/${p.id}/team`] = k % n; });
+    if (list.length) upd(u);
+  };
+  window.clearTeams = function() {
+    if (S().phase !== "lobby") return;
+    const u = {}; listPlayers(G).forEach(p => { u[`players/${p.id}/team`] = null; });
+    if (Object.keys(u).length) upd(u);
+  };
+  function saveTeamsLocal() {
+    const t = {}; for (let k = 0; k < MAX_TEAMS; k++) { const d = G && G.teams && G.teams[k]; if (d) t[k] = { name: d.name || "", color: d.color }; }
+    lsSet("abbhoot_teams", t);
+  }
+  function renameTeam(t, name) {
+    name = String(name || "").trim().slice(0, 24);
+    upd({ [`teams/${t}/name`]: name || null }).then(saveTeamsLocal);
+  }
+  function cycleTeamColor(t) {
+    const n = teamCountOf(G), used = new Set([...Array(n).keys()].filter(k => k !== t).map(k => teamColorIdx(G, k)));
+    let c = teamColorIdx(G, t);
+    for (let k = 0; k < TEAM_COLORS.length; k++) { c = (c + 1) % TEAM_COLORS.length; if (!used.has(c)) break; }
+    upd({ [`teams/${t}/color`]: c }).then(saveTeamsLocal);
+  }
+  // Händelser för lagindelningen (delegerade – överlever omritning)
+  function setupTeamUi() {
+    const grid = $("team-grid"); if (!grid || grid.__wired) return; grid.__wired = true;
+    const colOf = el => el && el.closest(".team-col");
+    grid.addEventListener("dragstart", e => {
+      const c = e.target.closest && e.target.closest(".team-chip"); if (!c) return;
+      teamDragging = true; teamSel = null;
+      e.dataTransfer.setData("text/plain", c.dataset.pid); e.dataTransfer.effectAllowed = "move";
+      setTimeout(() => c.classList.add("dragging"), 0);
+    });
+    grid.addEventListener("dragend", () => { teamDragging = false; document.querySelectorAll(".team-col.over").forEach(x => x.classList.remove("over")); renderHostLobby(); });
+    grid.addEventListener("dragover", e => { const col = colOf(e.target); if (col) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; col.classList.add("over"); } });
+    grid.addEventListener("dragleave", e => { const col = colOf(e.target); if (col && !col.contains(e.relatedTarget)) col.classList.remove("over"); });
+    grid.addEventListener("drop", e => {
+      const col = colOf(e.target); if (!col) return;
+      e.preventDefault(); col.classList.remove("over");
+      const pidX = e.dataTransfer.getData("text/plain"); teamDragging = false;
+      if (pidX) assignTeam(pidX, Number(col.dataset.team));
+    });
+    grid.addEventListener("click", e => {
+      const kick = e.target.closest(".tc-x"); if (kick) { kickPlayer(kick.dataset.kick); return; }
+      const dot = e.target.closest(".team-dot"); if (dot) { cycleTeamColor(Number(dot.dataset.color)); return; }
+      if (e.target.closest(".team-name-in")) return;
+      const chip = e.target.closest(".team-chip");
+      if (chip) { teamSel = teamSel === chip.dataset.pid ? null : chip.dataset.pid; grid.__html = null; renderHostLobby(); return; }
+      const col = colOf(e.target);
+      if (col && teamSel) { const s2 = teamSel; teamSel = null; grid.__html = null; assignTeam(s2, Number(col.dataset.team)); renderHostLobby(); }
+    });
+    grid.addEventListener("change", e => { const el = e.target.closest(".team-name-in"); if (el) renameTeam(Number(el.dataset.tname), el.value); });
+    grid.addEventListener("keydown", e => { const el = e.target.closest(".team-name-in"); if (el) { if (e.key === "Enter") el.blur(); e.stopPropagation(); } });
+  }
+
+  // Spelare utan lag mitt i spelet (t.ex. anslöt sent) – snabbval på storskärmen
+  function renderTeamWarn() {
+    const el = $("team-warn"); if (!el) return;
+    const ph = S().phase;
+    const free = isTeamMode(G) && ph !== "lobby" && ph !== "podium" ? unassignedPlayers(G) : [];
+    if (!free.length) { if (el.style.display !== "none") { el.style.display = "none"; el.__html = null; } return; }
+    el.style.display = "";
+    const opts = teamList(G).map(t => `<option value="${t.idx}" ${t.members.length >= MAX_PER_TEAM ? "disabled" : ""}>${t.emoji} ${esc(t.name)} (${t.members.length}/${MAX_PER_TEAM})</option>`).join("");
+    setHtml("team-warn", `<b>⚠️ Saknar lag:</b>` + free.map(p => `<span class="tw-row">${avatarOf(p)} ${esc(p.name)}
+      <select onchange="assignTeam('${p.id}', Number(this.value))"><option value="">Välj lag…</option>${opts}</select></span>`).join(""));
+  }
+
+  // Skriv bara om HTML när innehållet faktiskt ändrats (annars startar CSS-animationer om = flimmer)
+  function setHtml(id, html) { const el = $(id); if (el && el.__html !== html) { el.__html = html; el.innerHTML = html; } }
+
+  // Frågans bild på storskärmen (stor under läsfasen, mindre när svaren syns)
+  let qImgShown = "";
+  async function renderQImage(st, cur) {
+    const wrap = $("q-image-wrap"), img = $("q-image");
+    const q = gq()[st.qIndex];
+    const ref = q && cur.img && q.q === cur.q && isImgRef(q.img) ? q.img : "";   // samma fråga som visas? (skydd om frågorna ändrats)
+    document.body.classList.toggle("has-qimg", !!ref);
+    wrap.dataset.phase = st.phase;
+    if (!ref) { wrap.style.display = "none"; if (qImgShown) { img.removeAttribute("src"); qImgShown = ""; } return; }
+    if (qImgShown === ref) { if (img.dataset.ok === "1") wrap.style.display = ""; return; }
+    qImgShown = ref; img.dataset.ok = "0"; wrap.style.display = "none";
+    const src = await imgSrc(ref);
+    if (qImgShown !== ref) return;   // hann byta fråga
+    if (!src) { document.body.classList.remove("has-qimg"); return; }
+    img.onload = () => { if (qImgShown === ref) { img.dataset.ok = "1"; wrap.style.display = ""; fitQImage(); } };
+    img.onerror = () => { img.dataset.ok = "0"; wrap.style.display = "none"; document.body.classList.remove("has-qimg"); };
+    img.src = src;
+  }
+
+  // Krymp bilden så att frågan + svaren alltid ryms på skärmen (t.ex. 1366×768-projektor). Blir den för liten → döljs den.
+  function fitQImage() {
+    const wrap = $("q-image-wrap"), img = $("q-image"), scr = $("screen-question");
+    if (!wrap || !scr.classList.contains("active") || img.dataset.ok !== "1" || !qImgShown) return;
+    wrap.classList.remove("squeezed"); wrap.style.display = ""; img.style.maxHeight = "";
+    const els = [...scr.children].filter(e => e.offsetParent !== null && e !== wrap);
+    const bottom = Math.max(wrap.getBoundingClientRect().bottom, ...els.map(e => e.getBoundingClientRect().bottom));
+    const over = bottom - (window.innerHeight - 10);
+    if (over <= 0) return;
+    const h = img.getBoundingClientRect().height, want = h - over;
+    if (want < 100) { wrap.classList.add("squeezed"); wrap.style.display = "none"; }
+    else img.style.maxHeight = Math.floor(want) + "px";
+  }
+  window.addEventListener("resize", () => { if (typeof fitQImage === "function") fitQImage(); });
 
   function renderHostQuestion() {
     const st = S();
@@ -2300,9 +2957,10 @@
     }
     if (st.phase === "question" && lastQuestionKey === qKey) lastQuestionKey = `open-${i}`;
 
-    $("q-counter").textContent = `FRÅGA ${i + 1} AV ${st.total || questions.length}`;
+    $("q-counter").textContent = `FRÅGA ${i + 1} AV ${st.total || gq().length}`;
     $("q-double-badge").style.display = cur.double ? "inline-block" : "none";
     $("question-text").textContent = cur.q || "";
+    renderQImage(st, cur);
     const type = cur.type || "choice";
     $("q-type-badge").textContent = `${TYPES[type].icon} ${TYPES[type].label.toUpperCase()}`;
     const cardTexts = type === "puzzle" ? (cur.items || []) : (cur.answers || []);
@@ -2335,11 +2993,12 @@
       $("chart-stage").style.display = "none";
       renderPresenterPanel(list, {}, false);
       updateNextFab();
+      fitQImage();
       return;
     }
 
-    // Svarsräknare
-    const ans = answersOf(G, i);
+    // Svarsräknare (efter avslöjandet: bara svar som kom in i tid)
+    const ans = revealed ? validAnswers(G, i, st) : answersOf(G, i);
     const nAnswered = list.filter(p => ans[p.id]).length;
     $("answer-count").textContent = nAnswered;
     $("answer-count-label").textContent = `av ${list.length} svar`;
@@ -2350,7 +3009,7 @@
 
     // Alla (online) har svarat → avslöja automatiskt
     const online = list.filter(p => p.online !== false);
-    if (st.phase === "question" && online.length > 0 && online.every(p => ans[p.id])) {
+    if (isOwner && st.phase === "question" && online.length > 0 && online.every(p => ans[p.id])) {
       if (!autoRevealT) autoRevealT = setTimeout(() => { autoRevealT = null; reveal(); }, 1200);
     }
 
@@ -2374,6 +3033,9 @@
     renderAltStage(type, cur, st, list, ans, revealed);
     renderPresenterPanel(list, ans, revealed);
     updateNextFab();
+    fitQImage();
+    clearTimeout(fitQImage.t1); clearTimeout(fitQImage.t2);   // igen när staplar/animationer landat
+    fitQImage.t1 = setTimeout(fitQImage, 450); fitQImage.t2 = setTimeout(fitQImage, 1100);
   }
 
   // ---------- STOR PIL-KNAPP: nästa steg ----------
@@ -2384,7 +3046,7 @@
       case "preview": return "Visa alternativ";
       case "question": return "Avslöja svaret";
       case "reveal": return "Topplista";
-      case "board": return st.qIndex + 1 >= questions.length ? "Podium" : "Nästa fråga";
+      case "board": return st.qIndex + 1 >= gq().length ? "Podium" : "Nästa fråga";
       default: return "";
     }
   }
@@ -2393,7 +3055,11 @@
     $("next-fab").style.display = lbl ? "flex" : "none";
     $("next-fab-label").textContent = lbl;
   }
+  let lastNextAt = -1e9;   // (0 skulle spärra första klicket om sidan precis laddats)
   window.hostNext = function() {
+    const now = performance.now();
+    if (now - lastNextAt < 700) return;   // skydd mot dubbelklick / snabba tryck
+    lastNextAt = now;
     const ph = S().phase;
     if (ph === "lobby") startGame();
     else if (ph === "preview") openAnswers();
@@ -2481,7 +3147,7 @@
       return `
         <div class="p-ctrl-card ${has && !revealed ? "locked-in" : ""} ${right ? "got-correct" : ""}">
           <div class="p-ctrl-top">
-            <span>${esc(p.name)}${p.online === false ? " 💤" : ""}</span>
+            <span>${avatarOf(p)} ${esc(p.name)}${p.online === false ? " 💤" : ""}</span>
             ${revealed ? `<span class="p-streak-tag">${fmt(p.score)} p</span>`
                        : `<span class="p-answered-tag ${has ? "yes" : "no"}">${has ? "✓ Svarat" : "…"}</span>`}
           </div>
@@ -2494,34 +3160,50 @@
     }).join("");
   }
 
+  let lastBoardSig = "";
   function renderBoard(animate) {
     const st = S();
-    const sorted = listPlayers(G).sort((a, b) => ((b.score || 0) - (a.score || 0)) || String(a.name).localeCompare(String(b.name), "sv"));
+    const team = isTeamMode(G);
+    const sorted = team ? rankedTeams(G) : listPlayers(G).sort(byScore);
     const maxScore = Math.max(1000, (sorted[0] && sorted[0].score) || 0);
-    $("lb-subtitle").textContent = `STÄLLNING EFTER FRÅGA ${st.qIndex + 1} AV ${st.total || questions.length}`;
-    $("next-q-btn").textContent = st.qIndex + 1 >= questions.length ? "🏆 AVSLÖJA SLUTPODIET! ➔" : `Nästa Fråga (${st.qIndex + 2}/${questions.length}) ➔`;
+    $("lb-subtitle").textContent = `${team ? "LAGSTÄLLNING" : "STÄLLNING"} EFTER FRÅGA ${st.qIndex + 1} AV ${st.total || gq().length}`;
+    $("next-q-btn").textContent = st.qIndex + 1 >= gq().length ? "🏆 AVSLÖJA SLUTPODIET! ➔" : `Nästa Fråga (${st.qIndex + 2}/${gq().length}) ➔`;
 
     // Topp 10 på storskärmen (alla ser sin egen placering i mobilen)
     const TOP = 10, shown = sorted.slice(0, TOP);
+    // Rita inte om topplistan om inget som syns har ändrats (t.ex. en mobil som somnar) – annars flimrar raderna
+    const sig = JSON.stringify([team, st.qIndex, sorted.length, shown.map(p => [p.id, p.name, p.avatar, p.score, p.prevScore, p.lastDelta, p.rankClimb, p.streak, p.wasFastest, p.color, p.mvp && [p.mvp.name, p.mvp.score], p.members && p.members.length])]);
+    if (!animate && sig === lastBoardSig) return;
+    lastBoardSig = sig;
+    const anyPrev = team && sorted.some(t => t.prevScore > 0);
     $("leaderboard-rows").classList.toggle("compact", shown.length > 6);
-    $("leaderboard-rows").innerHTML = shown.map((p, idx) => {
+    $("leaderboard-rows").classList.toggle("teams", team);
+    $("leaderboard-rows").innerHTML = (shown.map((p, idx) => {
       const rank = idx + 1;
       const pct = Math.round(((p.score || 0) / maxScore) * 100);
       const icon = rank === 1 ? "👑" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `#${rank}`;
       let badges = "";
-      if (p.rankClimb > 0) badges += `<span class="hype-badge badge-climb">🚀 KLÄTTRADE +${p.rankClimb}</span>`;
-      if (p.streak >= 2) badges += `<span class="hype-badge badge-streak">🔥 STREAK x${p.streak}</span>`;
-      if (p.wasFastest) badges += `<span class="hype-badge badge-fast">⚡ SNABBAST</span>`;
+      if (team) {
+        if (anyPrev && p.rankClimb > 0) badges += `<span class="hype-badge badge-climb">🚀 KLÄTTRADE +${p.rankClimb}</span>`;
+        if (p.mvp) badges += `<span class="hype-badge badge-mvp">⭐ MVP ${avatarOf(p.mvp)} ${esc(p.mvp.name)} · ${fmt(p.mvp.score)} p</span>`;
+      } else {
+        if (p.rankClimb > 0) badges += `<span class="hype-badge badge-climb">🚀 KLÄTTRADE +${p.rankClimb}</span>`;
+        if (p.streak >= 2) badges += `<span class="hype-badge badge-streak">🔥 STREAK x${p.streak}</span>`;
+        if (p.wasFastest) badges += `<span class="hype-badge badge-fast">⚡ SNABBAST</span>`;
+      }
+      const nameHtml = team
+        ? `<span class="lb-team-dot" style="background:${p.color};"></span><span class="lb-name">${esc(p.name)}</span><span class="lb-members">${p.members.length} st</span>`
+        : `<span class="lb-av">${avatarOf(p)}</span><span class="lb-name">${esc(p.name)}</span>`;
       return `
-        <div class="lb-row rank-${rank}" style="animation-delay:${animate ? idx * 0.06 : 0}s;">
-          <div class="lb-row-fill" style="width:${pct}%;"></div>
-          <div class="lb-left"><div class="lb-rank-circle">${icon}</div><span class="lb-name">${esc(p.name)}</span>${badges}</div>
+        <div class="lb-row rank-${rank}" style="animation-delay:${animate ? idx * 0.06 : 0}s;${team ? `--tc:${p.color};` : ""}">
+          <div class="lb-row-fill" style="width:${pct}%;${team ? `background:linear-gradient(90deg, ${p.color}55, ${p.color}22);` : ""}"></div>
+          <div class="lb-left"><div class="lb-rank-circle">${icon}</div>${nameHtml}${badges}</div>
           <div class="lb-right">
             ${p.lastDelta > 0 ? `<span class="lb-delta">+${fmt(p.lastDelta)} p</span>` : ""}
             <span class="lb-score" id="lb-score-${p.id}">${fmt(animate ? p.prevScore : p.score)} p</span>
           </div>
         </div>`;
-    }).join("") + (sorted.length > TOP ? `<div class="lb-more">+ ${sorted.length - TOP} spelare till – se din placering i mobilen 📱</div>` : "");
+    }).join("") + (sorted.length > TOP ? `<div class="lb-more">+ ${sorted.length - TOP} spelare till – se din placering i mobilen 📱</div>` : ""));
 
     if (animate) {
       playLeaderboardFanfare();
@@ -2563,6 +3245,7 @@
   }
   window.bgmChoose = function(track) {
     bgmStop(false);
+    if (!isOwner) { const sel = $("bgm-select"); if (sel) sel.value = ""; bgmTrack = ""; return; }
     bgmTrack = track || "";
     if (!bgmTrack) return;
     if (S().phase === "podium") { $("bgm-select").value = ""; bgmTrack = ""; return; }   // prisutdelningen har sin egen låt
@@ -2600,23 +3283,30 @@
   let podAudio = null, podRaf = 0, podT0 = 0, podUseAudio = false, podWinnerShown = true;
 
   function podiumData() {
-    const sorted = listPlayers(G).sort((a, b) => ((b.score || 0) - (a.score || 0)) || String(a.name).localeCompare(String(b.name), "sv"));
+    const team = isTeamMode(G);
+    const sorted = team ? rankedTeams(G) : listPlayers(G).sort(byScore);
+    const subOf = t => `<span class="ps-mvp">⭐ MVP: ${t.mvp ? avatarOf(t.mvp) + " " + esc(t.mvp.name) : "–"}</span><span class="ps-members">${t.members.map(m => avatarOf(m) + " " + esc(m.name)).join(" · ")}</span>`;
     [1, 2, 3].forEach(n => {
       const p = sorted[n - 1];
       $(`podium-col-${n}`).classList.toggle("empty", !p);
-      $(`podium-name-${n}`).textContent = p ? p.name : (n === 1 ? "–" : "Ledig plats");
+      $(`podium-col-${n}`).style.setProperty("--tc", team && p ? p.color : "");
+      $(`podium-name-${n}`).textContent = p ? (team ? `${p.emoji} ${p.name}` : `${avatarOf(p)} ${p.name}`) : (n === 1 ? "–" : "Ledig plats");
       $(`podium-pts-${n}`).textContent = p ? fmt(p.score) + " p" : "–";
+      $(`podium-sub-${n}`).innerHTML = team && p ? subOf(p) : "";
     });
-    if (!podWinnerShown) { $("podium-name-1").textContent = "? ? ?"; $("podium-pts-1").textContent = "? p"; }
+    $("winner-tag").textContent = team ? "🏆 DAGENS VINNARLAG 🏆" : "🏆 DAGENS CHAMPION 🏆";
+    if (!podWinnerShown) { $("podium-name-1").textContent = "? ? ?"; $("podium-pts-1").textContent = "? p"; $("podium-sub-1").innerHTML = ""; }
+    document.querySelector(".runnerups-title").textContent = team ? "Övriga lag" : "Övriga placeringar";
     $("final-runnerups").innerHTML = sorted.slice(3).map((p, k) => `
-      <div class="lb-row"><div class="lb-left"><div class="lb-rank-circle">#${k + 4}</div><span class="lb-name">${esc(p.name)}</span></div>
+      <div class="lb-row"${team ? ` style="--tc:${p.color};"` : ""}><div class="lb-left"><div class="lb-rank-circle">#${k + 4}</div>${team ? `<span class="lb-team-dot" style="background:${p.color};"></span>` : `<span class="lb-av">${avatarOf(p)}</span>`}<span class="lb-name">${esc(p.name)}</span>${team && p.mvp ? `<span class="hype-badge badge-mvp">⭐ ${avatarOf(p.mvp)} ${esc(p.mvp.name)}</span>` : ""}</div>
       <div class="lb-right"><span class="lb-score">${fmt(p.score)} p</span></div></div>`).join("");
     document.querySelector(".runnerups-title").style.display = sorted.length > 3 ? "" : "none";
     return sorted;
   }
 
   function renderCommentWall() {
-    const list = Object.values((G && G.comments) || {})
+    const list = Object.entries((G && G.comments) || {})
+      .map(([cid, c]) => c && Object.assign({}, c, { av: avatarOf(G.players && G.players[cid]) }))
       .filter(c => c && c.text)
       .sort((a, b) => (b.at || 0) - (a.at || 0));
     $("comment-count").textContent = `(${list.length})`;
@@ -2626,7 +3316,7 @@
       ? list.map(c => {
           const k = c.name + "|" + c.text;
           const isNew = !seen.has(k); if (isNew) { seen.add(k); fresh = true; }
-          return `<div class="comment-card ${isNew ? "new" : ""}"><div class="comment-name">💬 ${esc(c.name)}</div><div class="comment-text">${esc(c.text)}</div></div>`;
+          return `<div class="comment-card ${isNew ? "new" : ""}"><div class="comment-name">${c.av} ${esc(c.name)}</div><div class="comment-text">${esc(c.text)}</div></div>`;
         }).join("")
       : `<div class="alt-sub">Spelarna kan skriva en kommentar i mobilen nu ✍️</div>`;
     if (fresh && list.length && Date.now() >= podiumAnimUntil) playPopSound(820);
@@ -2712,7 +3402,7 @@
     // ---- Klocka: låten om ljudet är på, annars vanlig tid ----
     podUseAudio = false;
     podT0 = performance.now();
-    if (soundEnabled && typeof PODIUM_SONG === "string" && PODIUM_SONG) {
+    if (isOwner && soundEnabled && typeof PODIUM_SONG === "string" && PODIUM_SONG) {
       try {
         if (!podAudio) { podAudio = new Audio(PODIUM_SONG); podAudio.preload = "auto"; }
         podAudio.currentTime = 0; podAudio.volume = 1;
@@ -2745,6 +3435,7 @@
   function defaultsFor(type, q) {
     const answers = Array.isArray(q.answers) && q.answers.length === 4 ? q.answers.slice() : ["", "", "", ""];
     const base = { type, q: q.q || "", double: !!q.double, time: TYPES[type].time };
+    if (isImgRef(q.img)) base.img = q.img;
     if (type === "choice") return Object.assign(base, { answers, correct: Number.isInteger(q.correct) ? q.correct : 0 });
     if (type === "puzzle") return Object.assign(base, { answers, labels: q.labels || { first: "", last: "" } });
     if (type === "type") return Object.assign(base, { accepted: Array.isArray(q.accepted) ? q.accepted : [""] });
@@ -2758,6 +3449,7 @@
     edQ = edQ.map((q, qi) => {
       const t = qType(q);
       const n = { type: t, q: ival(`ed_q_${qi}`).trim(), double: !!($(`ed_double_${qi}`) || {}).checked, time: num(`ed_time_${qi}`, TYPES[t].time) };
+      if (isImgRef(q.img)) n.img = q.img;
       if (t === "choice" || t === "puzzle") n.answers = [0, 1, 2, 3].map(ai => ival(`ed_a_${qi}_${ai}`).trim());
       if (t === "choice") { n.correct = 0; document.getElementsByName(`ed_corr_${qi}`).forEach((r, idx) => { if (r.checked) n.correct = idx; }); }
       if (t === "puzzle") n.labels = { first: ival(`ed_lf_${qi}`).trim(), last: ival(`ed_ll_${qi}`).trim() };
@@ -2807,9 +3499,101 @@
       </div>`;
   }
 
+  function editorImageZone(q, qi) {
+    if (isImgRef(q.img)) return `
+      <div class="ed-img has" data-qi="${qi}">
+        <img class="ed-img-prev" data-imgref="${esc(q.img)}" alt="Bild till fråga ${qi + 1}">
+        <div class="ed-img-side">
+          <div class="ed-img-ok">🖼️ Bild visas på storskärmen</div>
+          <div class="ed-img-src">${q.img.startsWith("idb:") ? "Sparad i den här datorn" : esc(q.img.slice(0, 60))}</div>
+          <button type="button" class="btn ed-mini" onclick="edImgPick(${qi})">🔁 Byt bild</button>
+          <button type="button" class="btn ed-mini" onclick="edImgRemove(${qi})">🗑 Ta bort bild</button>
+        </div>
+      </div>`;
+    return `
+      <div class="ed-img" data-qi="${qi}">
+        <div class="ed-img-hint">🖼️ <b>Dra in en bild här</b> · <button type="button" class="linkbtn" onclick="edImgPick(${qi})">välj fil</button> · klistra in (Ctrl+V) · <button type="button" class="linkbtn" onclick="edImgUrl(${qi})">bildlänk</button></div>
+      </div>`;
+  }
+  // Fyll i förhandsbilder (de laddas asynkront ur bilddatabasen)
+  function hydrateImgs(root) {
+    (root || document).querySelectorAll("img[data-imgref]").forEach(async el => {
+      const src = await imgSrc(el.dataset.imgref);
+      if (src) { el.onerror = () => { el.replaceWith(Object.assign(document.createElement("div"), { className: "ed-img-bad", textContent: "⚠️ Bilden kunde inte laddas" })); }; el.src = src; }
+      else el.replaceWith(Object.assign(document.createElement("div"), { className: "ed-img-bad", textContent: "⚠️ Bilden finns inte i den här datorn" }));
+    });
+  }
+  let edImgBusy = false;
+  async function edSetImageFromBlob(qi, file) {
+    if (edImgBusy) return;
+    edImgBusy = true;
+    const zone = document.querySelector(`.ed-img[data-qi="${qi}"]`);
+    if (zone) zone.classList.add("busy");
+    try {
+      const blob = await processImageFile(file);
+      const ref = await storeImage(blob);
+      collectEditor(); edQ[qi].img = ref; renderEditor();
+    } catch (e) {
+      alert("Kunde inte lägga till bilden:\n\n" + (e && e.message ? e.message : e));
+      if (zone) zone.classList.remove("busy");
+    } finally { edImgBusy = false; }
+  }
+  window.edImgPick = function(qi) {
+    const inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*";
+    inp.onchange = () => { if (inp.files && inp.files[0]) edSetImageFromBlob(qi, inp.files[0]); };
+    inp.click();
+  };
+  window.edImgUrl = function(qi) {
+    const u = (prompt("Klistra in en bildlänk (måste börja med https://):", "") || "").trim();
+    if (!u) return;
+    if (!/^https?:\/\/\S+$/i.test(u)) { alert("Länken måste börja med https://"); return; }
+    collectEditor(); edQ[qi].img = u; renderEditor();
+  };
+  window.edImgRemove = function(qi) { collectEditor(); delete edQ[qi].img; renderEditor(); };
+  // Dra-och-släpp + klistra in (delegerat, kopplas en gång)
+  let edImgTarget = null;
+  function setupEditorImages() {
+    const list = $("editor-list"); if (!list || list.__imgWired) return; list.__imgWired = true;
+    const cardOf = el => el && el.closest && el.closest(".q-edit-card");
+    const qiOf = card => { const z = card && card.querySelector(".ed-img"); return z ? Number(z.dataset.qi) : null; };
+    const hasFiles = e => e.dataTransfer && [...(e.dataTransfer.types || [])].some(t => t === "Files" || t === "text/uri-list");
+    list.addEventListener("dragover", e => {
+      const card = cardOf(e.target); if (!card || qiOf(card) === null || !hasFiles(e)) return;
+      e.preventDefault(); e.dataTransfer.dropEffect = "copy";
+      list.querySelectorAll(".ed-img.over").forEach(z => z.classList.remove("over"));
+      card.querySelector(".ed-img").classList.add("over");
+    });
+    list.addEventListener("dragleave", e => { const card = cardOf(e.target); if (card && !card.contains(e.relatedTarget)) { const z = card.querySelector(".ed-img"); if (z) z.classList.remove("over"); } });
+    list.addEventListener("drop", e => {
+      const card = cardOf(e.target); const qi = qiOf(card); if (qi === null || !hasFiles(e)) return;
+      e.preventDefault(); card.querySelector(".ed-img").classList.remove("over");
+      const f = [...(e.dataTransfer.files || [])].find(x => /^image\//.test(x.type));
+      if (f) { edSetImageFromBlob(qi, f); return; }
+      if ((e.dataTransfer.files || []).length) { alert("Det där är ingen bild (JPG, PNG, GIF eller WEBP)."); return; }
+      // Bild dragen direkt från en annan webbsida → använd länken
+      const uri = (e.dataTransfer.getData("text/uri-list") || "").split("\n").map(x => x.trim()).find(x => /^https?:\/\//i.test(x));
+      const html = e.dataTransfer.getData("text/html") || "";
+      const m = html.match(/<img[^>]+src="(https?:[^"]+)"/i);
+      const u = (m && m[1]) || uri;
+      if (u) { collectEditor(); edQ[qi].img = u.replace(/&amp;/g, "&"); renderEditor(); }
+    });
+    list.addEventListener("focusin", e => { const card = cardOf(e.target); if (card && qiOf(card) !== null) edImgTarget = qiOf(card); });
+    list.addEventListener("pointerdown", e => { const card = cardOf(e.target); if (card && qiOf(card) !== null) edImgTarget = qiOf(card); });
+    document.addEventListener("paste", e => {
+      if ($("editor-modal").style.display !== "flex" || edImgTarget === null) return;
+      const f = [...((e.clipboardData && e.clipboardData.files) || [])].find(x => /^image\//.test(x.type));
+      if (!f) return;   // vanlig text klistras in som vanligt
+      e.preventDefault(); edSetImageFromBlob(edImgTarget, f);
+    });
+  }
+  // Säkerhet: en fil som släpps utanför en fråga får ALDRIG öppnas i fliken (då skulle spelet försvinna)
+  window.addEventListener("dragover", e => { if (e.dataTransfer && [...(e.dataTransfer.types || [])].includes("Files")) e.preventDefault(); });
+  window.addEventListener("drop", e => { if (e.dataTransfer && [...(e.dataTransfer.types || [])].includes("Files")) e.preventDefault(); });
+
   let edReadTime = 5;
   function renderEditor() {
-    $("editor-list").innerHTML = `
+    const running = S().phase && S().phase !== "lobby";
+    $("editor-list").innerHTML = (running ? `<div class="paste-err" style="margin:0;">⏳ Ett spel pågår – ändringar du sparar gäller från <b>nästa omgång</b>. Pågående spel fortsätter med samma frågor.</div>` : "") + `
       <div class="q-edit-card">
         <label class="ed-label" style="font-size:14px; color:#fff;">📖 Lästid innan svarsalternativen visas (sekunder, 0 = direkt)
           <input class="edit-input" style="max-width:120px;" id="ed_readtime" inputmode="numeric" value="${esc(edReadTime)}"></label>
@@ -2830,11 +3614,14 @@
           </div>
         </div>
         <input class="edit-input" id="ed_q_${qi}" value="${esc(q.q)}" placeholder="Skriv frågan…">
+        ${editorImageZone(q, qi)}
         ${editorTypeFields(q, qi)}
       </div>`).join("") + `
       <div class="ed-tools" style="justify-content:center;">
         ${Object.entries(TYPES).map(([k, v]) => `<button type="button" class="btn" onclick="edAdd('${k}')">➕ ${v.icon} ${v.label}</button>`).join("")}
       </div>`;
+    setupEditorImages();
+    hydrateImgs($("editor-list"));
   }
 
   window.openEditor = function() {
@@ -2870,6 +3657,8 @@
     if (!q.q) p.push(`${n}: frågetext saknas`);
     if ((t === "choice" || t === "puzzle") && q.answers.some(a => !a)) p.push(`${n}: alla 4 alternativ måste fyllas i`);
     if (t === "type" && !q.accepted.length) p.push(`${n}: minst ett godkänt svar behövs`);
+    if (t === "type" && q.accepted.length && !q.accepted.some(x => normText(x))) p.push(`${n}: godkänt svar måste innehålla bokstäver eller siffror`);
+    if (t === "puzzle" && !q.answers.some(a => !a) && new Set(q.answers.map(a => String(a).trim().toLowerCase())).size < 4) p.push(`${n}: pusslets 4 rader måste vara olika (annars går det inte att avgöra rätt ordning)`);
     if (t === "slider") {
       const s = q.slider;
       if (!(s.min < s.max)) p.push(`${n}: min måste vara mindre än max`);
@@ -2890,7 +3679,8 @@
     readTime = edReadTime;
     lsSet("abbhoot_read_time", readTime);
     closeEditor();
-    if (pin) upd({ "state/total": questions.length });
+    setTimeout(cleanupImages, 500);
+    if (pin && S().phase === "lobby") upd({ "state/total": questions.length });
   };
   window.resetDefaultQuestions = function() {
     if (!confirm("Ersätta alla frågor med originalfrågorna?")) return;
@@ -2989,7 +3779,7 @@ ${EX.type}
 - Exakt 4 rader numrerade 1: 2: 3: 4: skrivna i RÄTT ordning. Spelet blandar dem själv.
 - Frågan ska säga vad som sorteras och åt vilket håll (t.ex. "från äldst till nyast").
 - ÖVERST: och NEDERST: (valfritt) beskriver ändarna, t.ex. Minst / Störst.
-- Ordningen måste vara helt entydig – inga lika värden.
+- Ordningen måste vara helt entydig – fyra OLIKA rader, inga lika värden.
 Exempel:
 ${EX.puzzle}
 
@@ -3066,8 +3856,9 @@ ${EX.slider}
 
     blocks.forEach((b, bi) => {
       const nr = bi + 1, where = `Fråga ${nr} (rad ${b.start})`;
+      let multiRight = false;
       let type = null, q = "", answers = [], correctIdx = -1, accepted = null, ordered = {}, labels = { first: "", last: "" };
-      const sl = {}; let time = null, dbl = false;
+      const sl = {}; let time = null, dbl = false, img = "";
       const kv = (t) => { const m = t.match(/^([^:=]{1,20})\s*[:=]\s*(.*)$/); return m ? [m[1].trim().toUpperCase(), m[2].trim()] : null; };
       b.lines.forEach(({ t }) => {
         if (/^#/.test(t)) {
@@ -3083,7 +3874,7 @@ ${EX.slider}
         if (m && !/^ALT\w/i.test(t.split(":")[0].replace(/^ALT$/i, "x"))) {
           let txt = m[3].trim(); let right = !!m[2];
           if (/\s*(\*|✓|✔|\(rätt\))\s*$/i.test(txt)) { right = true; txt = txt.replace(/\s*(\*|✓|✔|\(rätt\))\s*$/i, "").trim(); }
-          if (right) correctIdx = answers.length;
+          if (right) { if (correctIdx >= 0) multiRight = true; correctIdx = answers.length; }
           answers.push(txt); return;
         }
         m = t.match(/^([1-9])\s*[:.)]\s*(.*)$/);
@@ -3106,6 +3897,7 @@ ${EX.slider}
         else if (/^(NEDERST|SIST|BOTTOM)$/.test(k)) labels.last = v;
         else if (/^(TID|TIME|SEKUNDER)$/.test(k)) time = num2(v);
         else if (/^(DUBBEL|DOUBLE|2X|DUBBELPOÄNG)$/.test(k)) dbl = /^(ja|yes|j|y|1|true|x)$/i.test(v);
+        else if (/^(BILD|IMAGE|IMG)$/.test(k)) img = v;
       });
       // Gissa typ om rubrik saknas
       if (!type) {
@@ -3119,9 +3911,11 @@ ${EX.slider}
       if (!type) errs.push("okänd frågetyp – börja blocket med # FLERVAL, # SKRIV SVAR, # PUSSEL eller # REGLAGE");
       const out = { type: type || "choice", q, double: dbl };
       if (Number.isFinite(time)) out.time = Math.max(5, Math.min(240, Math.round(time)));
+      if (img) { if (/^https?:\/\/\S+$/i.test(img)) out.img = img; else errs.push("BILD: måste vara en länk som börjar med https://"); }
       if (type === "choice") {
         if (answers.length !== 4) errs.push(`flerval kräver exakt 4 alternativ (hittade ${answers.length})`);
         if (correctIdx < 0) errs.push("rätt svar saknas – markera det med A*: …");
+        else if (multiRight) errs.push("flera alternativ är markerade som rätt – markera bara ETT med *");
         out.answers = answers.slice(0, 4); out.correct = Math.max(0, correctIdx);
       }
       if (type === "type") {
@@ -3131,6 +3925,7 @@ ${EX.slider}
       if (type === "puzzle") {
         const items = [1, 2, 3, 4].map(n => ordered[n] || "");
         if (items.some(x => !x)) errs.push("pussel kräver raderna 1: 2: 3: 4: i rätt ordning");
+        else if (new Set(items.map(x => x.toLowerCase())).size < 4) errs.push("pusslets 4 rader måste vara olika");
         out.answers = items; out.labels = labels;
       }
       if (type === "slider") {
@@ -3159,6 +3954,7 @@ ${EX.slider}
       if (t === "slider") { const s = q.slider; L.push(`MIN: ${s.min}`, `MAX: ${s.max}`, `STEG: ${s.step}`, `RÄTT: ${s.correct}`, `MARGINAL: ${s.margin || 0}`, `ENHET: ${s.unit || ""}`); }
       L.push(`TID: ${q.time || TYPES[t].time}`);
       if (q.double) L.push("DUBBEL: ja");
+      if (isImgRef(q.img) && !q.img.startsWith("idb:")) L.push(`BILD: ${q.img}`);
       out.push(L.join("\n")); if (i < qs.length - 1) out.push("---");
     });
     return out.join("\n");
@@ -3199,14 +3995,15 @@ ${EX.slider}
     const r = parseTemplate($("paste-text").value);
     if (!r.questions.length || r.errors.length) { pastePreview(); return; }
     collectEditor();
-    if (mode === "replace" && !confirm(`Ersätta alla ${edQ.length} nuvarande frågor med ${r.questions.length} nya?`)) return;
+    const ownImgs = edQ.filter(q => isImgRef(q.img) && q.img.startsWith("idb:")).length;
+    if (mode === "replace" && !confirm(`Ersätta alla ${edQ.length} nuvarande frågor med ${r.questions.length} nya?${ownImgs ? `\n\n⚠️ ${ownImgs} inlagda bilder försvinner också.` : ""}`)) return;
     edQ = mode === "replace" ? r.questions : edQ.concat(r.questions);
     if (r.readTime !== null) edReadTime = r.readTime;
     // Spara direkt så att inget försvinner om fönstret stängs
     questions = JSON.parse(JSON.stringify(edQ));
     lsSet(LS_QUESTIONS_KEY, questions);
     readTime = edReadTime; lsSet("abbhoot_read_time", readTime);
-    if (pin) upd({ "state/total": questions.length });
+    if (pin && S().phase === "lobby") upd({ "state/total": questions.length });
     $("paste-text").value = "";
     edTab("edit");
     const banner = document.createElement("div");
@@ -3237,9 +4034,10 @@ ${EX.slider}
   if (ROLE === "host") {
     document.addEventListener("keydown", e => {
       const tag = (e.target && e.target.tagName) || "";
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       if ($("editor-modal").style.display === "flex") return;
       if (document.body.classList.contains("host-locked")) return;
+      if (!isOwner) return;
       if (e.key === "p" || e.key === "P") { togglePanel(); return; }
       if (e.key !== "ArrowRight") return;
       e.preventDefault();
@@ -3263,6 +4061,8 @@ ${EX.slider}
         <h2>Gå med i ABBHOOT! 🎮</h2>
         <input class="p-input pin" id="in-pin" inputmode="numeric" maxlength="6" placeholder="PIN" value="${esc(prePin)}">
         <input class="p-input" id="in-name" maxlength="20" placeholder="Ditt namn" value="${esc(savedName)}">
+        <div class="p-av-label">Välj din avatar</div>
+        ${avatarGrid()}
         <div class="p-err" id="p-err">${esc(msg || "")}</div>
         <button type="button" class="btn-hype" style="width:100%;" id="btn-join" onclick="joinGame()">GÅ MED ➔</button>
       </div>`;
@@ -3270,6 +4070,23 @@ ${EX.slider}
     if (focusEl) focusEl.focus();
     ["in-pin", "in-name"].forEach(id => $(id).addEventListener("keydown", e => { if (e.key === "Enter") joinGame(); }));
   }
+  // Avatarväljare (mobil)
+  let pAvatar = (() => { const a = lsGet("abbhoot_player_avatar"); return AVATARS.includes(a) ? a : randomAvatar(); })();
+  function avatarGrid() {
+    return `<div class="p-av-grid">${AVATARS.map(a => `<button type="button" class="p-av ${a === pAvatar ? "sel" : ""}" onclick="pickAvatar(this.textContent)">${a}</button>`).join("")}</div>`;
+  }
+  window.pickAvatar = function(a) {
+    if (!AVATARS.includes(a)) return;
+    pAvatar = a; lsSet("abbhoot_player_avatar", a);
+    document.querySelectorAll(".p-av").forEach(b => b.classList.toggle("sel", b.textContent === a));
+    // Redan med i spelet (lobbyn)? Spara direkt
+    if (pid && pPin && PG && PG.players && PG.players[pid] && (PG.state || {}).phase === "lobby") {
+      update(R(`${pPin}/players/${pid}`), { avatar: a }).catch(showDbError);
+      pAvOpen = false; pViewKey = ""; setTimeout(playerRender, 0);
+    }
+  };
+  let pAvOpen = false;
+  window.toggleAvatarPicker = function() { pAvOpen = !pAvOpen; pViewKey = ""; playerRender(); };
 
   window.joinGame = async function() {
     const pinVal = ($("in-pin").value || "").replace(/\D/g, "");
@@ -3295,13 +4112,15 @@ ${EX.slider}
     const meRef = R(`${pinVal}/players/${pid}`);
     const ex = await get(meRef);
     if (ex.exists() && ex.val() && ex.val().name) {
-      await update(meRef, { name, online: true });
+      // Ronaldo-namnet sitter kvar även om mobilen laddas om (inget kort "Theo"-blink på storskärmen)
+      await update(meRef, ex.val().pranked ? { online: true, avatar: pAvatar } : { name, online: true, avatar: pAvatar });
     } else {
-      await set(meRef, { name, joinedAt: serverTimestamp(), online: true, score: 0, prevScore: 0, lastDelta: 0, streak: 0, rankClimb: 0, wasFastest: false });
+      await set(meRef, { name, avatar: pAvatar, joinedAt: serverTimestamp(), online: true, score: 0, prevScore: 0, lastDelta: 0, streak: 0, rankClimb: 0, wasFastest: false });
     }
     onDisconnect(R(`${pinVal}/players/${pid}/online`)).set(false);
     lsSet(`abbhoot_pid_${pinVal}`, pid);
     lsSet("abbhoot_player_name", name);
+    lsSet("abbhoot_player_avatar", pAvatar);
     lsSet("abbhoot_player_pin", pinVal);
     pViewKey = "";
     if (punsub) punsub();
@@ -3459,9 +4278,23 @@ ${EX.slider}
     playerJoinForm("");
   };
 
+  function lobbyAvatarBlock(me) {
+    return pAvOpen ? `<div class="p-av-label">Välj ny avatar</div>${avatarGrid()}`
+      : `<button type="button" class="btn" onclick="toggleAvatarPicker()">${avatarOf(me)} Byt avatar</button>`;
+  }
   function myRank() {
     const sorted = listPlayers(PG).sort((a, b) => (b.score || 0) - (a.score || 0));
     return { rank: sorted.findIndex(p => p.id === pid) + 1, total: sorted.length };
+  }
+  // Mitt lag: { team, rank, total } – team = null om jag inte är indelad
+  function myTeam() {
+    if (!isTeamMode(PG)) return null;
+    const me = PG.players && PG.players[pid];
+    const t = teamOfPlayer(PG, me);
+    if (t === null) return { team: null, rank: 0, total: rankedTeams(PG).length };
+    const ranked = rankedTeams(PG);
+    const k = ranked.findIndex(x => x.idx === t);
+    return { team: k >= 0 ? ranked[k] : teamList(PG)[t], rank: k + 1, total: ranked.length };
   }
 
   function playerRender() {
@@ -3475,23 +4308,29 @@ ${EX.slider}
     }
     const st = PG.state || {};
     $("p-topbar").style.display = "flex";
-    $("p-name").textContent = "🎮 " + me.name;
+    $("p-name").textContent = avatarOf(me) + " " + me.name;
     $("p-score").textContent = fmt(me.score) + " p";
+    const mt = myTeam(), pt = $("p-team");
+    if (pt) {
+      pt.style.display = mt ? "" : "none";
+      if (mt) { pt.textContent = mt.team ? `${mt.team.emoji} ${mt.team.name}` : "Inget lag än"; pt.style.background = mt.team ? mt.team.color : "#64748b"; }
+    }
+    const teamSig = mt ? JSON.stringify([mt.team && [mt.team.idx, mt.team.name, mt.team.color, mt.team.members.map(m => m.name), mt.team.score], mt.rank, mt.total]) : "";
 
     const i = st.qIndex;
-    const myAns = answersOf(PG, i)[pid];
+    const myAns = st.phase === "reveal" ? answerOf(PG, i, pid, st) : answersOf(PG, i)[pid];
     // Podium: samma tidslinje som storskärmen (avslöjas samtidigt), sedan kommentarsrutan
     let podStage = "";
     if (st.phase === "podium") {
       const pk = String(st.podiumAt);
       if (pk !== pPodKey) { pPodKey = pk; pPodStart = pFirstRender ? -Infinity : Date.now(); pEditComment = false; schedulePodiumStages(); }
       const el = Date.now() - pPodStart;
-      const POD = podTimeline(listPlayers(PG).length);
+      const POD = podTimeline(podCount(PG));
       podStage = el >= POD.after ? "comment" : el >= POD.winner ? "result" : "wait";
       podStage += (PG.comments && PG.comments[pid] ? ":sent" : ":new") + (pEditComment ? ":edit" : "");
     }
     pFirstRender = false;
-    const key = `${st.phase}|${podStage}|${i}|${myAns ? "a" : "-"}|${st.phase === "board" ? st.boardAt : ""}|${st.phase === "reveal" ? JSON.stringify(manualOf(PG, i)[pid] || {}) + (PG.fastest && PG.fastest[i]) : ""}`;
+    const key = `${st.phase}|${podStage}|${i}|${myAns ? "a" : "-"}|${st.phase === "board" ? st.boardAt : ""}|${st.phase === "lobby" || st.phase === "board" || st.phase === "podium" ? teamSig : ""}|${st.phase === "lobby" ? avatarOf(me) + (pAvOpen ? "o" : "") : ""}|${st.phase === "reveal" ? JSON.stringify(manualOf(PG, i)[pid] || {}) + (PG.fastest && PG.fastest[i]) : ""}`;
 
     // Bara timern uppdateras om vyn är oförändrad (så knapptryck inte tappas)
     if (key === pViewKey) {
@@ -3504,12 +4343,30 @@ ${EX.slider}
     pViewKey = key;
     const v = $("p-view");
 
-    if (st.phase === "lobby") {
+    if (st.phase === "lobby" && mt) {
+      v.innerHTML = mt.team ? `
+        <div class="p-card p-team-card" style="--tc:${mt.team.color};">
+          <div style="font-size:56px;">${mt.team.emoji}</div>
+          <h2>Du är i ${esc(mt.team.name)}!</h2>
+          <div class="p-teammates">${mt.team.members.map(m => `<span class="${m.id === pid ? "me" : ""}">${avatarOf(m)} ${esc(m.name)}</span>`).join("")}</div>
+          <p>Ni spelar var och en i er egen mobil – allas poäng läggs ihop till lagets.</p>
+          ${lobbyAvatarBlock(me)}
+          <button type="button" class="btn" onclick="leaveGame()">Lämna / byt namn</button>
+        </div>` : `
+        <div class="p-card">
+          <div class="p-big-av">${avatarOf(me)}</div>
+          <h2>Du är med!</h2>
+          <p>Vi kör <b>lagspel</b>. Vänta medan spelledaren delar in lagen…<br>Leta efter <b>${esc(me.name)}</b> på storskärmen.</p>
+          ${lobbyAvatarBlock(me)}
+          <button type="button" class="btn" onclick="leaveGame()">Lämna / byt namn</button>
+        </div>`;
+    } else if (st.phase === "lobby") {
       v.innerHTML = `
         <div class="p-card">
-          <div style="font-size:60px;">✅</div>
+          <div class="p-big-av">${avatarOf(me)}</div>
           <h2>Du är med!</h2>
-          <p>Leta efter <b>${esc(me.name)}</b> på storskärmen.<br>Vänta tills spelledaren startar.</p>
+          <p>Leta efter <b>${avatarOf(me)} ${esc(me.name)}</b> på storskärmen.<br>Vänta tills spelledaren startar.</p>
+          ${lobbyAvatarBlock(me)}
           <button type="button" class="btn" onclick="leaveGame()">Lämna / byt namn</button>
         </div>`;
     } else if (st.phase === "preview") {
@@ -3517,7 +4374,7 @@ ${EX.slider}
       const type = cur.type || "choice";
       v.innerHTML = `
         <div class="p-qmeta"><span>${TYPES[type].icon} FRÅGA ${i + 1} / ${st.total}${cur.double ? " · ⚡ 2X" : ""}</span><span>${TYPES[type].label}</span></div>
-        <div class="p-qtext">${esc(cur.q)}</div>
+        <div class="p-qtext">${esc(cur.q)}</div>${cur.img ? `<div class="p-imghint">🖼️ Titta på bilden på storskärmen!</div>` : ""}
         <div class="p-card"><div style="font-size:44px;">📖</div><h2>Läs frågan…</h2>
           <p>Svarsalternativen kommer om</p><div class="p-rank" id="p-preview">${st.paused ? "⏸" : st.preview}</div></div>`;
     } else if (st.phase === "question") {
@@ -3533,7 +4390,7 @@ ${EX.slider}
           pOrder = [0, 1, 2, 3];
           if (type === "slider") pSlider = snapSlider((cur.min + cur.max) / 2, cur);
         }
-        v.innerHTML = `${meta}<div class="p-qtext">${esc(cur.q)}</div>${playerQuestionInput(cur)}`;
+        v.innerHTML = `${meta}<div class="p-qtext">${esc(cur.q)}</div>${cur.img ? `<div class="p-imghint">🖼️ Bild på storskärmen</div>` : ""}${playerQuestionInput(cur)}`;
         if (type === "puzzle") renderPuzzleList();
         if (type === "slider") showSliderVal();
         if (type === "type") {
@@ -3561,6 +4418,17 @@ ${EX.slider}
       } else {
         v.innerHTML = `<div class="p-result none"><div style="font-size:60px;">⏰</div><div class="big">INGET SVAR</div><p>Rätt svar: <b>${correctTxt}</b></p></div>`;
       }
+    } else if (st.phase === "board" && mt && mt.team) {
+      const cls = me.lastDelta > 0 ? "right" : "none";
+      v.innerHTML = `
+        <div class="p-result ${cls}">
+          ${me.lastDelta > 0 ? `<div class="pts">+${fmt(me.lastDelta)} p</div><p style="margin:0;">till ${esc(mt.team.name)}</p>` : `<div class="big">0 p</div>`}
+          ${me.streak >= 2 ? `<div class="hype-badge badge-streak" style="background:#fff;">🔥 STREAK x${me.streak}</div>` : ""}
+        </div>
+        <div class="p-card p-team-card" style="--tc:${mt.team.color};"><p>${mt.team.emoji} ${esc(mt.team.name)} ligger på plats</p>
+          <div class="p-rank">${mt.rank} <span style="font-size:24px; color:var(--text-muted);">av ${mt.total}</span></div>
+          <p>${fmt(mt.team.score)} lagpoäng${mt.team.lastDelta > 0 ? ` (+${fmt(mt.team.lastDelta)})` : ""}</p>
+          ${mt.team.mvp ? `<p class="p-mvp">⭐ Lagets MVP: <b>${esc(mt.team.mvp.name)}</b>${mt.team.mvp.id === pid ? " – det är du! 🔥" : ""}</p>` : ""}</div>`;
     } else if (st.phase === "board") {
       const { rank, total } = myRank();
       const cls = me.lastDelta > 0 ? "right" : "none";
@@ -3581,7 +4449,7 @@ ${EX.slider}
     pPodTimers.forEach(clearTimeout); pPodTimers = [];
     pPodiumCelebrated = false;
     const el = Date.now() - pPodStart;
-    const POD = podTimeline(listPlayers(PG).length);
+    const POD = podTimeline(podCount(PG));
     [POD.winner, POD.after].forEach(ms => { if (ms > el) pPodTimers.push(setTimeout(() => { pViewKey = ""; playerRender(); }, ms - el + 30)); });
   }
 
@@ -3591,10 +4459,14 @@ ${EX.slider}
       v.innerHTML = `<div class="p-card p-suspense"><div class="drum">🥁</div><h2>Prisutdelning!</h2><p>Titta på storskärmen…<br>vem vinner?! 👀</p></div>`;
       return;
     }
-    const { rank, total } = myRank();
+    const mt = myTeam();
+    const { rank, total } = mt && mt.team ? { rank: mt.rank, total: mt.total } : myRank();
     const medal = rank === 1 ? "👑" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : "🎉";
     const first = stage.startsWith("result") && !pPodiumCelebrated;
-    let html = rank === 1
+    let html = mt && mt.team ? (rank === 1
+      ? `<div class="p-card p-winner"><div class="crown">👑</div><h2>DITT LAG VANN!</h2><div class="p-rank">1 <span style="font-size:24px; color:#fde68a;">av ${total}</span></div><p>${mt.team.emoji} ${esc(mt.team.name)} – ${fmt(mt.team.score)} poäng! 🏆</p><p>Du bidrog med ${fmt(me.score)} p</p>${mt.team.mvp && mt.team.mvp.id === pid ? `<p class="p-mvp">⭐ Du var lagets MVP!</p>` : ""}</div>`
+      : `<div class="p-card p-team-card" style="--tc:${mt.team.color};"><div style="font-size:72px;">${medal}</div><h2>${mt.team.emoji} ${esc(mt.team.name)}</h2><div class="p-rank">${rank} <span style="font-size:24px; color:var(--text-muted);">av ${total}</span></div><p>${fmt(mt.team.score)} lagpoäng · du bidrog med ${fmt(me.score)} p</p>${mt.team.mvp && mt.team.mvp.id === pid ? `<p class="p-mvp">⭐ Du var lagets MVP!</p>` : ""}</div>`)
+      : rank === 1
       ? `<div class="p-card p-winner"><div class="crown">👑</div><h2>DU VANN!</h2><div class="p-rank">1 <span style="font-size:24px; color:#fde68a;">av ${total}</span></div><p>${fmt(me.score)} poäng – dagens champion! 🏆</p></div>`
       : `<div class="p-card"><div style="font-size:72px;">${medal}</div><h2>Slutplacering</h2><div class="p-rank">${rank} <span style="font-size:24px; color:var(--text-muted);">av ${total}</span></div><p>${fmt(me.score)} poäng · Titta på storskärmen! 🏆</p></div>`;
 
@@ -3642,7 +4514,7 @@ ${EX.slider}
     if (tryPin && savedName && lsGet(`abbhoot_pid_${tryPin}`)) {
       try {
         const me = await get(R(`${tryPin}/players/${lsGet(`abbhoot_pid_${tryPin}`)}`));
-        if (me.exists() && me.val() && me.val().name) { await connectPlayer(tryPin, me.val().name); return; }
+        if (me.exists() && me.val() && me.val().name) { if (AVATARS.includes(me.val().avatar)) pAvatar = me.val().avatar; await connectPlayer(tryPin, me.val().name); return; }
       } catch (e) {}
     }
     pPin = urlPin || "";
