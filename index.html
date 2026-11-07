@@ -1242,6 +1242,33 @@
   .pxb-open { padding: 3px 10px !important; font-size: 12px !important; }
   .pxb-grid { align-content: start; grid-auto-rows: max-content; }
   .pxb-hit { width: 100%; height: auto; }
+
+  /* ===== All or Nothing ===== */
+  .tcount.wide { width: auto; padding: 0 12px; }
+  .aon-level { display: inline-flex; gap: 4px; }
+  #mode-aon.active { background: linear-gradient(135deg, #7f1d1d, #000); border-color: #f87171; box-shadow: 0 0 18px rgba(248,113,113,0.6); }
+  .aon-stage { background: linear-gradient(135deg, rgba(127,29,29,0.85), rgba(0,0,0,0.85)); border: 2px solid #f87171; border-radius: 16px; padding: 10px 18px; text-align: center; box-shadow: 0 0 30px rgba(248,113,113,0.35); }
+  .aon-title { font-size: clamp(20px, 2.2vw, 30px); font-weight: 900; letter-spacing: 2px; color: #fecaca; text-shadow: 0 0 14px rgba(248,113,113,0.8); }
+  .aon-sub { font-size: 15px; color: #fde68a; font-weight: 800; margin-top: 2px; }
+  .aon-counts { display: flex; gap: 22px; justify-content: center; font-size: 18px; font-weight: 800; margin-top: 4px; }
+  .aon-names { font-size: 15px; font-weight: 800; margin-top: 4px; color: #fecaca; }
+  .aon-names.win { color: #86efac; } .aon-names.loss { color: #fca5a5; }
+  .badge-aon-win { background: rgba(34,197,94,0.25); color: #bbf7d0; border: 1px solid #22c55e; }
+  .badge-aon-loss { background: rgba(239,68,68,0.25); color: #fecaca; border: 1px solid #ef4444; }
+  .lb-delta.neg { background: rgba(239,68,68,0.25) !important; color: #fca5a5 !important; }
+  .p-aon-head { text-align: center; font-weight: 900; font-size: 18px; color: #fecaca; background: linear-gradient(135deg, #7f1d1d, #111); border: 1px solid #f87171; border-radius: 14px; padding: 10px; }
+  .p-aon-head span { font-size: 14px; color: #fde68a; font-weight: 800; }
+  .p-wager { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; padding: 14px 16px; border-radius: 14px; border: 3px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; text-align: left; }
+  .p-wager .pw-t { font-size: 20px; font-weight: 900; }
+  .p-wager .pw-d { font-size: 13px; color: var(--text-muted); }
+  .p-wager.safe.sel { border-color: #60a5fa; background: rgba(59,130,246,0.25); }
+  .p-wager.risk.sel { border-color: #fb923c; background: rgba(249,115,22,0.25); }
+  .p-wager.allin.sel { border-color: #f87171; background: linear-gradient(135deg, rgba(220,38,38,0.5), rgba(0,0,0,0.6)); box-shadow: 0 0 20px rgba(248,113,113,0.6); }
+  .p-wager.sel .pw-d { color: #fff; }
+  .p-aon-note { text-align: center; font-size: 12px; color: var(--text-muted); }
+  .p-aon-ban { text-align: center; font-weight: 900; border-radius: 12px; padding: 6px; }
+  .p-aon-ban.allin { background: #7f1d1d; color: #fecaca; } .p-aon-ban.risk { background: #7c2d12; color: #fed7aa; }
+  .p-aon-res { font-weight: 900; font-size: 16px; margin-top: 4px; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -1324,6 +1351,8 @@
         <span class="mode-label">Spelläge:</span>
         <button type="button" class="mode-btn" id="mode-solo" onclick="setGameMode('solo')">👤 Solo</button>
         <button type="button" class="mode-btn" id="mode-team" onclick="setGameMode('team')">👥 Lag</button>
+        <button type="button" class="mode-btn" id="mode-aon" onclick="setGameMode('aon')">💀 All or Nothing</button>
+        <span class="aon-level" id="aon-level" style="display:none;"><button type="button" class="tcount wide" id="aon-bal" onclick="setAonLevel('balanced')">⚖️ Balanserad</button><button type="button" class="tcount wide" id="aon-wild" onclick="setAonLevel('wild')">🔥 Vild</button></span>
         <span class="mode-hint" id="mode-hint"></span>
       </div>
 
@@ -1379,6 +1408,7 @@
 
     <div class="q-image-wrap" id="q-image-wrap" style="display:none;"><img id="q-image" alt=""></div>
 
+    <div class="aon-stage" id="aon-stage" style="display:none;"></div>
     <div class="preview-stage" id="preview-stage" style="display:none;">
       <div class="preview-label">📖 Läs frågan – svarsalternativen kommer om <b id="preview-count">5</b></div>
       <div class="preview-track"><div class="preview-bar" id="preview-bar"></div></div>
@@ -1789,6 +1819,29 @@
     const prevOrder = [...list].sort((a, b) => (b.prevScore - a.prevScore) || (a.idx - b.idx)).map(t => t.idx);
     return list.sort((a, b) => (b.score - a.score) || (a.idx - b.idx))
       .map((t, k) => Object.assign(t, { rankClimb: prevOrder.indexOf(t.idx) - k }));
+  }
+  // ===== ALL OR NOTHING (läge 3) =====
+  // Fråga 1..n-3: vanliga poäng. Sista 3 frågorna: alla väljer insats under lästiden (🛡️ Säker / 🔥 Satsa / 💀 ALL IN).
+  // Rätt: vanliga poäng + insats × multiplikator (efter placering före frågan). Fel/inget svar: −insats. Aldrig under 0.
+  // Insatserna skalas efter antalet dubbelfrågor före slutrundan (simulerat: 20 000 matcher/variant).
+  const isAonMode = (G) => !!(G && G.state && G.state.mode === "aon");
+  const aonCfg = (G) => (G && G.state && G.state.aon) || null;
+  const isWagerQ = (G, i) => { const c = aonCfg(G); return !!(c && isAonMode(G) && typeof c.from === "number" && i >= c.from); };
+  const wagerOf = (G, i, pid) => { const w = G && G.wagers && G.wagers[i] && G.wagers[i][pid]; return w && (w.c === "risk" || w.c === "allin") ? w : null; };
+  const stakeFor = (cfg, c) => !cfg ? 0 : c === "allin" ? cfg.allin : c === "risk" ? cfg.risk : 0;
+  // Multiplikator efter placering: andel spelare som har STRIKT fler poäng (lika poäng = samma placering)
+  function aonMult(scoreOf, list, pid) {
+    const n = list.length; if (n <= 1) return 1;
+    const mine = scoreOf(pid), above = list.filter(p => scoreOf(p.id) > mine).length, r = above / (n - 1);
+    return r > 2 / 3 ? 2.5 : r > 1 / 3 ? 1.25 : 1;
+  }
+  const fmtMult = (m) => "×" + String(m).replace(".", ",");
+  function aonConfigFor(qs, level) {
+    const n = qs.length, from = Math.max(1, n - 3);
+    const dbl = qs.slice(0, from).filter(q => q && q.double).length;
+    const wild = level === "wild";
+    const [risk, allin] = dbl >= 3 ? (wild ? [1500, 3000] : [1250, 2500]) : (wild ? [1250, 2500] : [1000, 2000]);
+    return { from, risk, allin, dbl, level: wild ? "wild" : "balanced" };
   }
   const unassignedPlayers = (G) => listPlayers(G).filter(p => teamOfPlayer(G, p) === null);
   // Antal "platser" på prispallen: lag i lagläge, annars spelare
@@ -2204,7 +2257,8 @@
       await set(R(p), {
         createdAt: serverTimestamp(),
         state: { phase: "lobby", qIndex: -1, timer: QT, paused: false, scoredQ: -1, total: questions.length,
-                 mode: lsGet("abbhoot_mode") === "team" ? "team" : "solo", teamCount: Number(lsGet("abbhoot_team_count")) || 2 },
+                 mode: ["team", "aon"].includes(lsGet("abbhoot_mode")) ? lsGet("abbhoot_mode") : "solo", teamCount: Number(lsGet("abbhoot_team_count")) || 2,
+                 aonLevel: lsGet("abbhoot_aon_level") === "wild" ? "wild" : "balanced" },
         teams: lsGet("abbhoot_teams") || null
       });
       hideDbError();
@@ -2327,10 +2381,10 @@
 
   // ---------- SPELFLÖDE ----------
   function resetScoresUpdates() {
-    const u = { answers: null, manual: null, fastest: null, secret: null, pauses: null, comments: null, preScore: null, "state/scoredQ": -1 };
+    const u = { answers: null, manual: null, fastest: null, secret: null, pauses: null, comments: null, preScore: null, wagers: null, "state/scoredQ": -1 };
     listPlayers(G).forEach(p => Object.assign(u, {
       [`players/${p.id}/score`]: 0, [`players/${p.id}/prevScore`]: 0, [`players/${p.id}/lastDelta`]: 0,
-      [`players/${p.id}/streak`]: 0, [`players/${p.id}/rankClimb`]: 0, [`players/${p.id}/wasFastest`]: false
+      [`players/${p.id}/streak`]: 0, [`players/${p.id}/rankClimb`]: 0, [`players/${p.id}/wasFastest`]: false, [`players/${p.id}/lastWager`]: null
     }));
     return u;
   }
@@ -2378,7 +2432,8 @@
     starting = true; setTimeout(() => { starting = false; }, 1500);
     gameQs = JSON.parse(JSON.stringify(questions));
     lsSet(gqKey(), gameQs);
-    startQuestion(0, Object.assign(resetScoresUpdates(), prankUpdates()));
+    const aonU = { "state/aon": isAonMode(G) && gameQs.length >= 2 ? aonConfigFor(gameQs, (G.state || {}).aonLevel) : null };
+    startQuestion(0, Object.assign(resetScoresUpdates(), prankUpdates(), aonU));
   };
 
   const timeOf = (q) => Math.max(5, Math.min(240, Math.round(Number(q.time) || TYPES[qType(q)].time)));
@@ -2505,14 +2560,18 @@
     if (!q) return;
     const { cur, extra } = publicQuestion(q, i);
     const tl = timeOf(q);
+    // Insatsfråga: minst 10 s lästid så att alla hinner läsa frågan och välja insats
+    const aonC = (extra0 && "state/aon" in extra0) ? extra0["state/aon"] : aonCfg(G);
+    const wq = !!(aonC && isAonMode(G) && i >= aonC.from);
+    const pv = wq ? Math.max(readTime, 10) : readTime;
     const u = Object.assign({
-      [`answers/${i}`]: null, [`manual/${i}`]: null, [`fastest/${i}`]: null, [`pauses/${i}`]: null,
-      "state/phase": "preview", "state/preview": readTime, "state/qIndex": i, "state/timer": tl, "state/timeLimit": tl,
+      [`answers/${i}`]: null, [`manual/${i}`]: null, [`fastest/${i}`]: null, [`pauses/${i}`]: null, [`wagers/${i}`]: null,
+      "state/phase": "preview", "state/preview": pv, "state/previewTotal": pv, "state/qIndex": i, "state/timer": tl, "state/timeLimit": tl,
       "state/paused": false, "state/pauseKey": null, "state/startedAt": null, "state/revealedAt": null,
       "state/correct": null, "state/total": gq().length,
       "state/current": cur
     }, extra);
-    if (!(readTime > 0)) Object.assign(u, { "state/phase": "question", "state/startedAt": serverTimestamp() });
+    if (!(pv > 0)) Object.assign(u, { "state/phase": "question", "state/startedAt": serverTimestamp() });
     upd(extra0 ? mergeUpdates(extra0, u) : u);
   }
 
@@ -2578,6 +2637,7 @@
     const fast = fastestPid(G, i, st);
     const newScore = {};
     const u = { preScore: base, "state/phase": "board", "state/scoredQ": i, "state/boardAt": Date.now() };
+    const wq = isWagerQ(G, i), cfg = aonCfg(G);
 
     list.forEach(p => {
       const b = baseOf(p.id);
@@ -2590,11 +2650,25 @@
         const streakBonus = streak >= 2 ? Math.min(streak * 100, 500) : 0;   // svarsserie: +100 per fråga i rad, max +500
         delta = basePts + streakBonus;
       }
+      let lw = null;
+      if (wq) {
+        // Insats räknas bara om den valdes innan svarsalternativen visades (marginal 1,5 s för nätfördröjning)
+        let w = wagerOf(G, i, p.id);
+        if (w && typeof w.at === "number" && typeof st.startedAt === "number" && w.at > st.startedAt + 1500) w = null;
+        const stake = w ? stakeFor(cfg, w.c) : 0;
+        if (stake > 0) {
+          const m = aonMult(id => baseOf(id).score, list, p.id);
+          const change = right ? Math.round(stake * m) : -Math.min(stake, b.score + delta);
+          delta += change;
+          lw = { c: w.c, stake, m, ok: !!right, change };
+        }
+      }
       newScore[p.id] = b.score + delta;
       Object.assign(u, {
         [`players/${p.id}/prevScore`]: b.score,
         [`players/${p.id}/score`]: b.score + delta,
         [`players/${p.id}/lastDelta`]: delta,
+        [`players/${p.id}/lastWager`]: lw,
         [`players/${p.id}/streak`]: streak,
         [`players/${p.id}/wasFastest`]: right && fast === p.id
       });
@@ -2724,6 +2798,24 @@
         botTimers.set(key, setTimeout(fire, delay));
       });
     }
+    if (st.phase === "preview" && isWagerQ(G, i)) {
+      const list = listPlayers(G), total = (st.previewTotal || 10) * 1000;
+      bots.forEach(bot => {
+        const key = `${bot.id}|w|${i}|${st.previewTotal}`;
+        if (botTimers.has(key)) return;
+        const m = aonMult(id => (G.players[id] || {}).score || 0, list, bot.id);
+        const sk = bot.skill || 0.6, u2 = Math.random();
+        // Smartare bottar chansar oftare när de ligger efter (hög multiplikator) eller är duktiga
+        const pAll = Math.min(0.85, 0.1 + (m - 1) * 0.35 + (sk - 0.5) * 0.6), pRisk = 0.3;
+        const c = u2 < pAll ? "allin" : u2 < pAll + pRisk ? "risk" : "safe";
+        if (c === "safe") { botTimers.set(key, 0); return; }
+        botTimers.set(key, setTimeout(() => {
+          const s2 = S();
+          if (!isOwner || s2.phase !== "preview" || s2.qIndex !== i || !G.players || !G.players[bot.id]) return;
+          set(R(`${pin}/wagers/${i}/${bot.id}`), { c, at: serverTimestamp() }).catch(() => {});
+        }, 800 + Math.random() * Math.max(500, total - 3500)));
+      });
+    }
     if (st.phase === "podium" && typeof st.podiumAt === "number") {
       const POD = podTimeline(podCount(G));
       bots.forEach(bot => {
@@ -2776,9 +2868,17 @@
     $("bot-count").textContent = nb ? `${nb} testspelare med` : "";
     $("bot-remove").style.display = nb ? "" : "none";
     const team = isTeamMode(G);
-    $("mode-solo").classList.toggle("active", !team);
+    const aon = isAonMode(G);
+    $("mode-solo").classList.toggle("active", !team && !aon);
     $("mode-team").classList.toggle("active", team);
-    $("mode-hint").textContent = team ? "Alla spelar i sin egen mobil – poängen läggs ihop per lag" : "Alla tävlar mot alla";
+    $("mode-aon").classList.toggle("active", aon);
+    const cfgPrev = aonConfigFor(questions, (G.state || {}).aonLevel);
+    $("mode-hint").textContent = team ? "Alla spelar i sin egen mobil – poängen läggs ihop per lag"
+      : aon ? `Sista ${questions.length - cfgPrev.from} frågorna: välj insats – Satsa ${fmt(cfgPrev.risk)} p / ALL IN ${fmt(cfgPrev.allin)} p. De som ligger sist får ×2,5!`
+      : "Alla tävlar mot alla";
+    $("aon-level").style.display = aon ? "" : "none";
+    $("aon-bal").classList.toggle("active", aon && cfgPrev.level !== "wild");
+    $("aon-wild").classList.toggle("active", aon && cfgPrev.level === "wild");
     $("lobby-players-grid").style.display = team ? "none" : "";
     $("team-setup").style.display = team ? "" : "none";
     if (team) { renderTeamSetup(list); return; }
@@ -2850,8 +2950,9 @@
   window.setGameMode = function(m) {
     if (S().phase !== "lobby") return;
     lsSet("abbhoot_mode", m);
-    upd({ "state/mode": m === "team" ? "team" : "solo", "state/teamCount": teamCountOf(G) });
+    upd({ "state/mode": m === "team" ? "team" : m === "aon" ? "aon" : "solo", "state/teamCount": teamCountOf(G) });
   };
+  window.setAonLevel = function(l) { if (S().phase === "lobby") { lsSet("abbhoot_aon_level", l); upd({ "state/aonLevel": l === "wild" ? "wild" : "balanced" }); } };
   window.setTeamCount = function(n) {
     if (S().phase !== "lobby") return;
     n = Math.max(2, Math.min(MAX_TEAMS, n));
@@ -2970,8 +3071,31 @@
   }
   window.addEventListener("resize", () => { if (typeof fitQImage === "function") fitQImage(); });
 
+  function renderAonStage(st) {
+    const el = $("aon-stage"); if (!el) return;
+    const i = st.qIndex;
+    if (!isWagerQ(G, i) || !["preview", "question", "reveal"].includes(st.phase)) { if (el.style.display !== "none") { el.style.display = "none"; el.__html = null; } return; }
+    el.style.display = "";
+    const cfg = aonCfg(G), list = listPlayers(G);
+    const ws = list.map(p => ({ p, w: wagerOf(G, i, p.id) }));
+    const allin = ws.filter(x => x.w && x.w.c === "allin"), risk = ws.filter(x => x.w && x.w.c === "risk");
+    const left = (G.state.total || gq().length) - i;
+    const names = (arr) => arr.slice(0, 12).map(x => `${avatarOf(x.p)} ${esc(x.p.name)}`).join(" · ") + (arr.length > 12 ? ` · +${arr.length - 12}` : "");
+    let html = `<div class="aon-title">💀 ALL OR NOTHING ${left === 1 ? "– SISTA FRÅGAN!" : `– ${left} frågor kvar`}</div>`;
+    if (st.phase === "preview") html += `<div class="aon-sub">Välj insats i mobilen nu: 🛡️ Säker · 🔥 Satsa ${fmt(cfg.risk)} p · 💀 ALL IN ${fmt(cfg.allin)} p · <b>Sist ×2,5 · Mitten ×1,25 · Topp ×1</b></div>`;
+    html += `<div class="aon-counts"><span>💀 ALL IN: <b>${allin.length}</b></span><span>🔥 Satsa: <b>${risk.length}</b></span><span>🛡️ Säker: <b>${list.length - allin.length - risk.length}</b></span></div>`;
+    if (allin.length && st.phase !== "reveal") html += `<div class="aon-names">💀 ${names(allin)}</div>`;
+    if (st.phase === "reveal" && (allin.length || risk.length)) {
+      const ok = [...allin, ...risk].filter(x => isRight(G, x.p.id, i, st)), bad = [...allin, ...risk].filter(x => !isRight(G, x.p.id, i, st));
+      if (ok.length) html += `<div class="aon-names win">✔ VANN: ${names(ok)}</div>`;
+      if (bad.length) html += `<div class="aon-names loss">✘ FÖRLORADE: ${names(bad)}</div>`;
+    }
+    setHtml("aon-stage", html);
+  }
+
   function renderHostQuestion() {
     const st = S();
+    renderAonStage(st);
     const i = st.qIndex;
     const cur = st.current || {};
     const revealed = st.phase === "reveal";
@@ -3009,7 +3133,7 @@
     $("preview-stage").style.display = preview ? "flex" : "none";
     document.querySelector(".answer-counter").style.visibility = preview ? "hidden" : "visible";
     if (preview) {
-      const total = readTime > 0 ? readTime : 1, left = typeof st.preview === "number" ? st.preview : total;
+      const total = st.previewTotal > 0 ? st.previewTotal : (readTime > 0 ? readTime : 1), left = typeof st.preview === "number" ? st.preview : total;
       tEl.textContent = st.paused ? "⏸" : (st.timeLimit || QT);
       tEl.classList.remove("urgent");
       $("preview-count").textContent = st.paused ? "⏸" : left;
@@ -3198,7 +3322,7 @@
     // Topp 10 på storskärmen (alla ser sin egen placering i mobilen)
     const TOP = 10, shown = sorted.slice(0, TOP);
     // Rita inte om topplistan om inget som syns har ändrats (t.ex. en mobil som somnar) – annars flimrar raderna
-    const sig = JSON.stringify([team, st.qIndex, sorted.length, shown.map(p => [p.id, p.name, p.avatar, p.score, p.prevScore, p.lastDelta, p.rankClimb, p.streak, p.wasFastest, p.color, p.mvp && [p.mvp.name, p.mvp.score], p.members && p.members.length])]);
+    const sig = JSON.stringify([team, st.qIndex, sorted.length, shown.map(p => [p.id, p.name, p.avatar, p.score, p.prevScore, p.lastDelta, p.rankClimb, p.streak, p.wasFastest, p.lastWager && [p.lastWager.c, p.lastWager.ok], p.color, p.mvp && [p.mvp.name, p.mvp.score], p.members && p.members.length])]);
     if (!animate && sig === lastBoardSig) return;
     lastBoardSig = sig;
     const anyPrev = team && sorted.some(t => t.prevScore > 0);
@@ -3214,6 +3338,7 @@
         if (p.mvp) badges += `<span class="hype-badge badge-mvp">⭐ MVP ${avatarOf(p.mvp)} ${esc(p.mvp.name)} · ${fmt(p.mvp.score)} p</span>`;
       } else {
         if (p.rankClimb > 0) badges += `<span class="hype-badge badge-climb">🚀 KLÄTTRADE +${p.rankClimb}</span>`;
+        if (p.lastWager) badges += `<span class="hype-badge ${p.lastWager.ok ? "badge-aon-win" : "badge-aon-loss"}">${p.lastWager.c === "allin" ? "💀 ALL IN" : "🔥 SATSA"} ${p.lastWager.ok ? `✔ ${fmtMult(p.lastWager.m)}` : "✘"}</span>`;
         if (p.streak >= 2) badges += `<span class="hype-badge badge-streak">🔥 STREAK x${p.streak}</span>`;
         if (p.wasFastest) badges += `<span class="hype-badge badge-fast">⚡ SNABBAST</span>`;
       }
@@ -3225,7 +3350,7 @@
           <div class="lb-row-fill" style="width:${pct}%;${team ? `background:linear-gradient(90deg, ${p.color}55, ${p.color}22);` : ""}"></div>
           <div class="lb-left"><div class="lb-rank-circle">${icon}</div>${nameHtml}${badges}</div>
           <div class="lb-right">
-            ${p.lastDelta > 0 ? `<span class="lb-delta">+${fmt(p.lastDelta)} p</span>` : ""}
+            ${p.lastDelta > 0 ? `<span class="lb-delta">+${fmt(p.lastDelta)} p</span>` : p.lastDelta < 0 ? `<span class="lb-delta neg">−${fmt(-p.lastDelta)} p</span>` : ""}
             <span class="lb-score" id="lb-score-${p.id}">${fmt(animate ? p.prevScore : p.score)} p</span>
           </div>
         </div>`;
@@ -4457,6 +4582,13 @@ ${EX.slider}
     playerJoinForm("");
   };
 
+  window.pickWager = function(c) {
+    const st = (PG && PG.state) || {};
+    if (st.phase !== "preview" || !isWagerQ(PG, st.qIndex) || !pid) return;
+    if (!["safe", "risk", "allin"].includes(c)) return;
+    set(R(`${pPin}/wagers/${st.qIndex}/${pid}`), c === "safe" ? null : { c, at: serverTimestamp() }).catch(showDbError);
+    if (navigator.vibrate) try { navigator.vibrate(c === "allin" ? [60, 40, 120] : 40); } catch (e) {}
+  };
   function lobbyAvatarBlock(me) {
     return pAvOpen ? `<div class="p-av-label">Välj ny avatar</div>${avatarGrid()}`
       : `<button type="button" class="btn" onclick="toggleAvatarPicker()">${avatarOf(me)} Byt avatar</button>`;
@@ -4509,7 +4641,8 @@ ${EX.slider}
       podStage += (PG.comments && PG.comments[pid] ? ":sent" : ":new") + (pEditComment ? ":edit" : "");
     }
     pFirstRender = false;
-    const key = `${st.phase}|${podStage}|${i}|${myAns ? "a" : "-"}|${st.phase === "board" ? st.boardAt : ""}|${st.phase === "lobby" || st.phase === "board" || st.phase === "podium" ? teamSig : ""}|${st.phase === "lobby" ? avatarOf(me) + (pAvOpen ? "o" : "") : ""}|${st.phase === "reveal" ? JSON.stringify(manualOf(PG, i)[pid] || {}) + (PG.fastest && PG.fastest[i]) : ""}`;
+    const myWg = st.phase === "preview" ? (wagerOf(PG, i, pid) || {}).c || "safe" : "";
+    const key = `${st.phase}|${myWg}|${podStage}|${i}|${myAns ? "a" : "-"}|${st.phase === "board" ? st.boardAt : ""}|${st.phase === "lobby" || st.phase === "board" || st.phase === "podium" ? teamSig : ""}|${st.phase === "lobby" ? avatarOf(me) + (pAvOpen ? "o" : "") : ""}|${st.phase === "reveal" ? JSON.stringify(manualOf(PG, i)[pid] || {}) + (PG.fastest && PG.fastest[i]) : ""}`;
 
     // Bara timern uppdateras om vyn är oförändrad (så knapptryck inte tappas)
     if (key === pViewKey) {
@@ -4548,6 +4681,24 @@ ${EX.slider}
           ${lobbyAvatarBlock(me)}
           <button type="button" class="btn" onclick="leaveGame()">Lämna / byt namn</button>
         </div>`;
+    } else if (st.phase === "preview" && isWagerQ(PG, i)) {
+      const cur = st.current || {};
+      const type = cur.type || "choice";
+      const cfg = aonCfg(PG), list = listPlayers(PG);
+      const m = aonMult(id => (PG.players[id] || {}).score || 0, list, pid);
+      const myW = wagerOf(PG, i, pid), c = myW ? myW.c : "safe";
+      const left = (st.total || 0) - i;
+      const btn = (key, icon, label, stake) => `<button type="button" class="p-wager ${key} ${c === key ? "sel" : ""}" onclick="pickWager('${key}')">
+          <span class="pw-t">${icon} ${label}</span>
+          <span class="pw-d">${stake ? `Rätt: <b>+${fmt(Math.round(stake * m))} p</b> · Fel: <b>−${fmt(stake)} p</b>` : "Inget att förlora"}</span></button>`;
+      v.innerHTML = `
+        <div class="p-qmeta"><span>${TYPES[type].icon} FRÅGA ${i + 1} / ${st.total}${cur.double ? " · ⚡ 2X" : ""}</span><span>⏳ <b id="p-preview">${st.paused ? "⏸" : st.preview}</b></span></div>
+        <div class="p-qtext">${esc(cur.q)}</div>${cur.img ? `<div class="p-imghint">🖼️ Titta på bilden på storskärmen!</div>` : ""}
+        <div class="p-aon-head">💀 ALL OR NOTHING ${left === 1 ? "· SISTA FRÅGAN" : ""}<br><span>Din multiplikator: <b>${fmtMult(m)}</b>${m > 1 ? " – du ligger efter, chansa!" : ""}</span></div>
+        ${btn("safe", "🛡️", "Säker", 0)}
+        ${btn("risk", "🔥", `Satsa ${fmt(cfg.risk)} p`, cfg.risk)}
+        ${btn("allin", "💀", `ALL IN ${fmt(cfg.allin)} p`, cfg.allin)}
+        <div class="p-aon-note">Låses när svarsalternativen visas. Du kan inte hamna under 0.</div>`;
     } else if (st.phase === "preview") {
       const cur = st.current || {};
       const type = cur.type || "choice";
@@ -4569,7 +4720,9 @@ ${EX.slider}
           pOrder = [0, 1, 2, 3];
           if (type === "slider") pSlider = snapSlider((cur.min + cur.max) / 2, cur);
         }
-        v.innerHTML = `${meta}<div class="p-qtext">${esc(cur.q)}</div>${cur.img ? `<div class="p-imghint">🖼️ Bild på storskärmen</div>` : ""}${playerQuestionInput(cur)}`;
+        const myW2 = isWagerQ(PG, i) ? wagerOf(PG, i, pid) : null;
+        const wban = myW2 ? `<div class="p-aon-ban ${myW2.c}">${myW2.c === "allin" ? "💀 ALL IN" : "🔥 SATSA"} ${fmt(stakeFor(aonCfg(PG), myW2.c))} p – svara rätt!</div>` : "";
+        v.innerHTML = `${meta}${wban}<div class="p-qtext">${esc(cur.q)}</div>${cur.img ? `<div class="p-imghint">🖼️ Bild på storskärmen</div>` : ""}${playerQuestionInput(cur)}`;
         if (type === "puzzle") renderPuzzleList();
         if (type === "slider") showSliderVal();
         if (type === "type") {
@@ -4610,10 +4763,12 @@ ${EX.slider}
           ${mt.team.mvp ? `<p class="p-mvp">⭐ Lagets MVP: <b>${esc(mt.team.mvp.name)}</b>${mt.team.mvp.id === pid ? " – det är du! 🔥" : ""}</p>` : ""}</div>`;
     } else if (st.phase === "board") {
       const { rank, total } = myRank();
-      const cls = me.lastDelta > 0 ? "right" : "none";
+      const cls = me.lastDelta > 0 ? "right" : me.lastDelta < 0 ? "wrong" : "none";
+      const lw = me.lastWager;
       v.innerHTML = `
         <div class="p-result ${cls}">
-          ${me.lastDelta > 0 ? `<div class="pts">+${fmt(me.lastDelta)} p</div>` : `<div class="big">0 p</div>`}
+          ${me.lastDelta > 0 ? `<div class="pts">+${fmt(me.lastDelta)} p</div>` : me.lastDelta < 0 ? `<div class="pts">−${fmt(-me.lastDelta)} p</div>` : `<div class="big">0 p</div>`}
+          ${lw ? `<div class="p-aon-res">${lw.c === "allin" ? "💀 ALL IN" : "🔥 SATSA"} ${lw.ok ? `✔ +${fmt(lw.change)} p (${fmt(lw.stake)} × ${String(lw.m).replace(".", ",")})` : `✘ −${fmt(-lw.change)} p`}</div>` : ""}
           ${me.streak >= 2 ? `<div class="hype-badge badge-streak" style="background:#fff;">🔥 STREAK x${me.streak}</div>` : ""}
         </div>
         <div class="p-card"><p>Du ligger på plats</p><div class="p-rank">${rank} <span style="font-size:24px; color:var(--text-muted);">av ${total}</span></div><p>${fmt(me.score)} poäng totalt</p></div>`;
