@@ -1269,6 +1269,186 @@
   .p-aon-ban { text-align: center; font-weight: 900; border-radius: 12px; padding: 6px; }
   .p-aon-ban.allin { background: #7f1d1d; color: #fecaca; } .p-aon-ban.risk { background: #7c2d12; color: #fed7aa; }
   .p-aon-res { font-weight: 900; font-size: 16px; margin-top: 4px; }
+
+  /* Kompakt toppfält på laptop (≤1500 px) så att alla knappar ryms på en rad */
+  @media (max-width: 1500px) {
+    body:not(.role-player) .header-controls { gap: 8px; }
+    body:not(.role-player) .header-controls .btn { padding: 8px 12px; font-size: 13px; }
+    body:not(.role-player) .header-controls .theme-btn { padding: 8px 10px; }
+  }
+
+  /* =====================================================================
+     LJUST LÄGE – Kahoots färger: lila #46178f, ljusgrå bakgrund #f2f2f2,
+     vita kort, mörk text #333. Svarsfärgerna (röd/blå/gul/grön) är desamma.
+     Podiet behåller en lila scen (som Kahoot) så att hypen syns.
+     ===================================================================== */
+  html[data-theme="light"] {
+    --bg-deep: #ffffff;
+    --bg-arena: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-hover: #faf7ff;
+    --accent-purple: #46178f;
+    --accent-pink: #864cbf;
+    --accent-blue: #1368ce;
+    --accent-green: #26890c;
+    --accent-amber: #46178f;
+    --accent-red: #e21b3c;
+    --text-main: #333333;
+    --text-muted: #6e6e6e;
+    --border-glow: rgba(70, 23, 143, 0.22);
+    --k-purple: #46178f;
+    --k-purple-dark: #25076b;
+    --k-line: #e3e3e3;
+    color-scheme: light;
+  }
+  html[data-theme="light"] body { background: #f2f2f2; color: #333; }
+  html[data-theme="light"] .bg-orb { display: none; }
+
+  /* Sidhuvud */
+  html[data-theme="light"] header { background: #ffffff; border-bottom: 1px solid var(--k-line); box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+  html[data-theme="light"] .brand-logo { color: #fff; background: #46178f; box-shadow: none; }
+
+  /* Knappar */
+  html[data-theme="light"] button.btn { background: #ffffff; color: #333; border: 1px solid #cfcfcf; box-shadow: 0 2px 0 rgba(0,0,0,0.08); }
+  html[data-theme="light"] button.btn:hover { background: #f0e9fb; border-color: #46178f; }
+  html[data-theme="light"] button.btn-hype { background: #46178f; color: #fff; box-shadow: 0 4px 0 #25076b; }
+  html[data-theme="light"] .next-fab { background: #46178f; border-color: #fff; box-shadow: 0 6px 0 #25076b, 0 10px 30px rgba(70,23,143,0.35); }
+  html[data-theme="light"] .next-fab .arrow { color: #46178f; }
+  html[data-theme="light"] .screen-status { background: #fff; border-color: #cfcfcf; color: #333; }
+  html[data-theme="light"] .screen-status.on { background: #e9f6e5; border-color: #26890c; color: #1d6a09; }
+  html[data-theme="light"] .bgm-wrap { background: #fff; border: 1px solid #cfcfcf; color: #333; }
+  html[data-theme="light"] .bgm-wrap select,
+  html[data-theme="light"] .ed-tools select,
+  html[data-theme="light"] .team-warn select,
+  html[data-theme="light"] .pxb-searchrow select { background: #fff; color: #333; border: 1px solid #cfcfcf; }
+
+  /* Fält */
+  html[data-theme="light"] .edit-input,
+  html[data-theme="light"] .add-player-input,
+  html[data-theme="light"] .p-input,
+  html[data-theme="light"] .paste-area,
+  html[data-theme="light"] .team-name-in { background: #fff; color: #333; border: 2px solid #cfcfcf; }
+  html[data-theme="light"] .edit-input:focus, html[data-theme="light"] .p-input:focus { border-color: #46178f; outline: none; }
+
+  /* Lobby */
+  html[data-theme="light"] .lobby-hero { background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-color: var(--k-line); }
+  html[data-theme="light"] .lobby-title { background: linear-gradient(90deg, #46178f, #864cbf, #1368ce); -webkit-background-clip: text; background-clip: text; text-shadow: none; }
+  html[data-theme="light"] .join-pin { background: #fff; color: #333; border: 2px solid var(--k-line); }
+  html[data-theme="light"] .qr-box { border: 2px solid var(--k-line); }
+  html[data-theme="light"] .lobby-player-chip { background: #46178f; color: #fff; box-shadow: 0 3px 0 #25076b; }
+  html[data-theme="light"] .mode-btn { background: #fff; color: #333; border: 2px solid #cfcfcf; }
+  html[data-theme="light"] .mode-btn.active { background: #46178f; color: #fff; border-color: #46178f; box-shadow: 0 4px 0 #25076b; }
+  html[data-theme="light"] #mode-aon.active { background: #e21b3c; border-color: #e21b3c; box-shadow: 0 4px 0 #a81029; }
+  html[data-theme="light"] .tcount { background: #fff; color: #333; border: 2px solid #cfcfcf; }
+  html[data-theme="light"] .tcount.active { background: #46178f; color: #fff; border-color: #46178f; }
+  html[data-theme="light"] .bot-bar { border: 1px dashed #bdbdbd; background: #fff; }
+  html[data-theme="light"] .team-col { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  html[data-theme="light"] .team-col.free { --tc: #bdbdbd; }
+  html[data-theme="light"] .team-head { background: color-mix(in srgb, var(--tc) 18%, #fff); }
+  html[data-theme="light"] .team-n { background: #eee; color: #333; }
+  html[data-theme="light"] .team-chip { background: #f7f7f7; border: 1px solid #ddd; color: #333; }
+  html[data-theme="light"] .team-chip.sel { background: #f0e9fb; outline-color: #46178f; }
+  html[data-theme="light"] .team-dot, html[data-theme="light"] .lb-team-dot { border-color: #333; }
+  html[data-theme="light"] .team-warn { background: #fff; color: #333; border-color: #e21b3c; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+  html[data-theme="light"] .ts-ok { color: #26890c; } html[data-theme="light"] .ts-bad { color: #e21b3c; } html[data-theme="light"] .ts-warn { color: #9c7200; }
+
+  /* Fråga */
+  html[data-theme="light"] .question-stage { background: #fff; color: #333; box-shadow: 0 3px 12px rgba(0,0,0,0.12); border: none; }
+  html[data-theme="light"] .timer-circle { background: #46178f; color: #fff; border-color: #46178f; }
+  html[data-theme="light"] .q-num-pill { background: #46178f; color: #fff; }
+  html[data-theme="light"] .answer-counter { background: #fff; border: 2px solid var(--k-line); color: #333; }
+  html[data-theme="light"] .preview-stage { background: #fff; border-color: var(--k-line); color: #333; }
+  html[data-theme="light"] .preview-track, html[data-theme="light"] .slider-track { background: #e6e6e6; }
+  html[data-theme="light"] .preview-bar { background: #46178f; }
+  html[data-theme="light"] .chart-bar { box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+  html[data-theme="light"] .chart-col.correct-col .chart-bar { box-shadow: 0 0 0 4px #26890c; }
+  html[data-theme="light"] .k-card { box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
+  html[data-theme="light"] .k-card.correct-highlight { box-shadow: 0 0 0 5px #26890c, 0 6px 0 rgba(0,0,0,0.2); }
+  html[data-theme="light"] .alt-stage { background: #fff; border-color: var(--k-line); color: #333; }
+  html[data-theme="light"] .alt-chip { background: #f2f2f2; color: #333; border-color: #ddd; }
+  html[data-theme="light"] .alt-chip.ok { background: #e9f6e5; border-color: #26890c; }
+  html[data-theme="light"] .alt-order-row .n { background: #fff; color: #333; }
+  html[data-theme="light"] .q-image-wrap img { border-color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.18); background: #fff; }
+  html[data-theme="light"] .p-ctrl-card { background: #fff; border: 1px solid var(--k-line); color: #333; }
+  html[data-theme="light"] .award-btn { background: #fff; color: #333; border: 1px solid #cfcfcf; }
+  html[data-theme="light"] .aon-stage { background: linear-gradient(135deg, #e21b3c, #a81029); border-color: #a81029; box-shadow: 0 6px 18px rgba(226,27,60,0.3); }
+  html[data-theme="light"] .aon-title { color: #fff; text-shadow: none; }
+  html[data-theme="light"] .aon-sub { color: #fff3c4; }
+  html[data-theme="light"] .aon-names { color: #fff; }
+
+  /* Topplista – som Kahoot: vita rader, ettan lila */
+  html[data-theme="light"] .hype-title { background: none; -webkit-text-fill-color: #333; color: #333; }
+  html[data-theme="light"] .lb-row { background: #fff; border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.1); color: #333; }
+  html[data-theme="light"] .lb-row.rank-1 { background: #46178f; color: #fff; }
+  html[data-theme="light"] .lb-row.rank-1 .lb-score, html[data-theme="light"] .lb-row.rank-1 .lb-name { color: #fff; }
+  html[data-theme="light"] .lb-row-fill { opacity: 0.18; }
+  html[data-theme="light"] .lb-score { color: #333; }
+  html[data-theme="light"] .lb-rank-circle { background: #f2f2f2; color: #333; }
+  html[data-theme="light"] .lb-delta { background: #e9f6e5; color: #1d6a09; }
+  html[data-theme="light"] .lb-delta.neg { background: #fde8ec !important; color: #a81029 !important; }
+  html[data-theme="light"] .lb-more { color: #6e6e6e; }
+  html[data-theme="light"] .badge-climb { background: #e9f6e5; color: #1d6a09; }
+  html[data-theme="light"] .badge-streak { background: #fff1e0; color: #9a4a00; }
+  html[data-theme="light"] .badge-fast { background: #e7f0fb; color: #0d4a96; }
+  html[data-theme="light"] .badge-mvp { background: #fff6d6; color: #7a5a00; border-color: #d89e00; }
+  html[data-theme="light"] .badge-aon-win { background: #e9f6e5; color: #1d6a09; }
+  html[data-theme="light"] .badge-aon-loss { background: #fde8ec; color: #a81029; }
+
+  /* Podium – lila Kahoot-scen */
+  html[data-theme="light"] #screen-podium { background: linear-gradient(180deg, #46178f 0%, #25076b 100%); color: #fff; border-radius: 18px; --text-muted: #d9c9f2; }
+  html[data-theme="light"] #screen-podium .comment-card { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); color: #fff; }
+  html[data-theme="light"] #screen-podium .lb-row { background: rgba(255,255,255,0.12); color: #fff; box-shadow: none; }
+  html[data-theme="light"] #screen-podium .lb-row .lb-score, html[data-theme="light"] #screen-podium .lb-name { color: #fff; }
+  html[data-theme="light"] #screen-podium .lb-rank-circle { background: rgba(255,255,255,0.2); color: #fff; }
+
+  /* Redigerare + rutor */
+  html[data-theme="light"] .modal-overlay, html[data-theme="light"] .pxb-modal { background: rgba(30,10,60,0.55); }
+  html[data-theme="light"] .modal-box, html[data-theme="light"] .pxb-box { background: #fff; color: #333; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border-color: var(--k-line); }
+  html[data-theme="light"] .q-edit-card { background: #f8f8f8; border: 1px solid var(--k-line); }
+  html[data-theme="light"] .ed-tabs { border-bottom-color: var(--k-line); }
+  html[data-theme="light"] .ed-tab { color: #6e6e6e; }
+  html[data-theme="light"] .ed-tab.active { background: #fff; border-color: var(--k-line); color: #46178f; }
+  html[data-theme="light"] .pv-card { background: #f8f8f8; border-color: var(--k-line); }
+  html[data-theme="light"] .tpl-step { color: #333; }
+  html[data-theme="light"] .ed-img { border-color: #bdbdbd; color: #6e6e6e; }
+  html[data-theme="light"] .ed-img.busy::after { color: #333; }
+  html[data-theme="light"] .host-passive, html[data-theme="light"] #host-passive { background: rgba(255,255,255,0.96); color: #333; }
+
+  /* Mobil */
+  html[data-theme="light"] .p-topbar { background: #fff; border: 1px solid var(--k-line); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+  html[data-theme="light"] .p-topbar .p-score { color: #46178f; }
+  html[data-theme="light"] .p-card { background: #fff; border: 1px solid var(--k-line); box-shadow: 0 2px 10px rgba(0,0,0,0.06); color: #333; }
+  html[data-theme="light"] .p-rank { color: #46178f; }
+  html[data-theme="light"] .p-qtext, html[data-theme="light"] .p-text-input, html[data-theme="light"] .p-comment { background: #fff; color: #333; border: 1px solid var(--k-line); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+  html[data-theme="light"] .p-result.right { background: #26890c; }
+  html[data-theme="light"] .p-result.wrong { background: #e21b3c; }
+  html[data-theme="light"] .p-result.none { background: #6e6e6e; }
+  html[data-theme="light"] .p-result { color: #fff; }
+  html[data-theme="light"] .p-answered-tag.no, html[data-theme="light"] .p-comment-done { background: #fff; color: #333; border: 1px solid var(--k-line); }
+  html[data-theme="light"] .p-av { background: #f2f2f2; }
+  html[data-theme="light"] .p-av.sel { background: #f0e9fb; border-color: #46178f; }
+  html[data-theme="light"] .p-av-label, html[data-theme="light"] .mode-label { color: #46178f; }
+  html[data-theme="light"] .p-teammates span { background: #f2f2f2; color: #333; }
+  html[data-theme="light"] .p-teammates span.me { color: #fff; }
+  html[data-theme="light"] .p-imghint { background: #fff6d6; color: #7a5a00; border-color: #d89e00; }
+  html[data-theme="light"] .p-winner { background: linear-gradient(180deg, #46178f, #25076b); color: #fff; }
+  html[data-theme="light"] .p-winner p { color: #fff; }
+  html[data-theme="light"] .p-wager { background: #fff; color: #333; border-color: #ddd; }
+  html[data-theme="light"] .p-wager .pw-d { color: #6e6e6e; }
+  html[data-theme="light"] .p-wager.safe.sel { background: #1368ce; color: #fff; border-color: #0d4a96; }
+  html[data-theme="light"] .p-wager.risk.sel { background: #d89e00; color: #fff; border-color: #9c7200; }
+  html[data-theme="light"] .p-wager.allin.sel { background: #e21b3c; color: #fff; border-color: #a81029; box-shadow: 0 0 0 3px rgba(226,27,60,0.3); }
+  html[data-theme="light"] .p-wager.sel .pw-d { color: #fff; }
+  html[data-theme="light"] .p-aon-head { background: #e21b3c; border-color: #a81029; color: #fff; }
+  html[data-theme="light"] .p-aon-head span { color: #fff3c4; }
+  html[data-theme="light"] .p-aon-note { color: #6e6e6e; }
+  html[data-theme="light"] .p-pausenote { color: #333; }
+
+  /* Temaknapp */
+  .theme-btn { font-size: 15px; }
+  html[data-theme="light"] .aon-stage, html[data-theme="light"] .aon-counts { color: #fff; }
+  html[data-theme="light"] .q-type-pill { background: #e7f0fb; border-color: #1368ce; color: #0d4a96; }
+  html[data-theme="light"] .p-team-card .p-teammates span.me { background: var(--tc); color: #fff; font-weight: 900; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -1300,8 +1480,9 @@
         <option value="kahoot-kungar">Kahoot-Kungar</option>
       </select>
     </label>
-    <button type="button" class="btn host-only host-auth-only" id="sound-btn" onclick="toggleSound()">🔊 Ljud & Musik: PÅ</button>
-    <button type="button" class="btn host-only host-auth-only" onclick="confirmNewGame()">🆕 Nytt spel (ny PIN)</button>
+    <button type="button" class="btn host-only host-auth-only" id="sound-btn" onclick="toggleSound()">🔊 Ljud: PÅ</button>
+    <button type="button" class="btn host-only host-auth-only theme-btn" id="theme-btn" onclick="toggleTheme()" title="Byt till ljust läge" aria-label="Byt färgläge">☀️</button>
+    <button type="button" class="btn host-only host-auth-only" onclick="confirmNewGame()" title="Nytt spel med ny PIN">🆕 Nytt spel</button>
     <span class="screen-status on host-only host-auth-only" id="host-user">👤</span>
     <button type="button" class="btn host-only host-auth-only" onclick="hostLogout()">🚪 Logga ut</button>
   </div>
@@ -1612,6 +1793,16 @@
   const ROLE = params.has("host") ? "host" : "player";
   document.body.classList.add(ROLE === "host" ? "role-host" : "role-player");
   if (ROLE === "host") document.body.classList.add("hide-controls");
+  // ===== TEMA: mörkt (standard) eller ljust (Kahoot-färger). Spelledaren väljer – mobilerna följer med. =====
+  const THEME_LS = ROLE === "host" ? "abbhoot_theme" : "abbhoot_theme_player";
+  function applyTheme(t) {
+    const v = t === "light" ? "light" : "dark";
+    if (document.documentElement.dataset.theme !== v) document.documentElement.dataset.theme = v;
+    const b = document.getElementById("theme-btn");
+    if (b) { b.textContent = v === "light" ? "🌙" : "☀️"; b.title = v === "light" ? "Byt till mörkt läge" : "Byt till ljust läge"; }
+    return v;
+  }
+  try { applyTheme(JSON.parse(localStorage.getItem(THEME_LS) || '"dark"')); } catch (e) { applyTheme("dark"); }
 
   const QT = 20;   // standardtid (sekunder)
   const SHAPES = ["▲", "◆", "●", "■"];
@@ -1941,7 +2132,7 @@
 
   window.toggleSound = function() {
     soundEnabled = !soundEnabled;
-    document.getElementById("sound-btn").textContent = soundEnabled ? "🔊 Ljud & Musik: PÅ" : "🔇 Ljud & Musik: AV";
+    document.getElementById("sound-btn").textContent = soundEnabled ? "🔊 Ljud: PÅ" : "🔇 Ljud: AV";
     if (typeof bgmChoose === "function") { if (!soundEnabled) { if (bgmAudio) { bgmAudio.pause(); } } else if (bgmTrack && S().phase !== "podium") bgmChoose(bgmTrack); }
     if (!soundEnabled && typeof podAudio !== "undefined" && podAudio) podAudio.pause();
   };
@@ -2258,7 +2449,8 @@
         createdAt: serverTimestamp(),
         state: { phase: "lobby", qIndex: -1, timer: QT, paused: false, scoredQ: -1, total: questions.length,
                  mode: ["team", "aon"].includes(lsGet("abbhoot_mode")) ? lsGet("abbhoot_mode") : "solo", teamCount: Number(lsGet("abbhoot_team_count")) || 2,
-                 aonLevel: lsGet("abbhoot_aon_level") === "wild" ? "wild" : "balanced" },
+                 aonLevel: lsGet("abbhoot_aon_level") === "wild" ? "wild" : "balanced",
+                 theme: lsGet("abbhoot_theme") === "light" ? "light" : "dark" },
         teams: lsGet("abbhoot_teams") || null
       });
       hideDbError();
@@ -2275,6 +2467,7 @@
   // Senast öppnade flik tar över. Stängs den tar den gamla automatiskt över igen efter ca 4 s.
   // Signalen ligger på en EGEN plats (abbhoot/lease/PIN) så att spelet och mobilerna inte ritas om av den.
   const TAB_ID = Math.random().toString(36).slice(2, 10);
+  let bgmPending = "";   // låt vald innan fliken hunnit bli styrande
   let isOwner = false, beatSeen = null, beatChangedAt = 0, beatInt = null, lease = null, leaseUnsub = null;
   const LR = () => ref(db, `abbhoot/lease/${pin}`);
   function claimHost() {
@@ -2285,6 +2478,7 @@
     updateOwnerUi();
     // Tog över från en annan flik → starta timern/låten direkt (annars står timern still tills något annat ändras)
     if (!was && G) { hostRender(); ensureTick(); }
+    if (bgmPending) { const t = bgmPending; bgmPending = ""; bgmChoose(t); }
   }
   window.claimHost = claimHost;
   function updateOwnerUi() {
@@ -2834,7 +3028,13 @@
   }
 
   // ---------- RENDERING (spelledare) ----------
+  window.toggleTheme = function() {
+    const t = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+    applyTheme(t); lsSet(THEME_LS, t);
+    if (pin && isOwner && G) upd({ "state/theme": t });
+  };
   function hostRender() {
+    if (G && G.state && G.state.theme) applyTheme(G.state.theme);
     const st = S();
     const phase = st.phase || "lobby";
     if (lastBoardKey === null && phase !== "board") lastBoardKey = "";   // omladdad mitt i spelet, inte på topplistan → nästa topplista animeras som vanligt
@@ -3392,11 +3592,12 @@
   function bgmStop(reset) {
     cancelAnimationFrame(bgmFade);
     if (bgmAudio) { try { bgmAudio.pause(); bgmAudio.currentTime = 0; } catch (e) {} bgmAudio.src = ""; bgmAudio = null; }
-    if (reset) { bgmTrack = ""; const sel = $("bgm-select"); if (sel) sel.value = ""; }
+    if (reset) { bgmTrack = ""; bgmPending = ""; const sel = $("bgm-select"); if (sel) sel.value = ""; }
   }
   window.bgmChoose = function(track) {
     bgmStop(false);
-    if (!isOwner) { const sel = $("bgm-select"); if (sel) sel.value = ""; bgmTrack = ""; return; }
+    if (!isOwner) { bgmTrack = ""; bgmPending = track || ""; return; }   // fliken har inte hunnit ta över än → spelas när den gör det
+    bgmPending = "";
     bgmTrack = track || "";
     if (!bgmTrack) return;
     if (S().phase === "podium") { $("bgm-select").value = ""; bgmTrack = ""; return; }   // prisutdelningen har sin egen låt
@@ -4609,6 +4810,7 @@ ${EX.slider}
   }
 
   function playerRender() {
+    if (PG && PG.state) { const tv = applyTheme(PG.state.theme); if (lsGet(THEME_LS) !== tv) lsSet(THEME_LS, tv); }
     if (!PG) { playerJoinForm("Spelet är avslutat. Be spelledaren om en ny PIN."); return; }
     const me = PG.players && PG.players[pid];
     if (!me || !me.name) {
