@@ -1758,6 +1758,18 @@
   </div>
 </div>
 
+<script>
+  // Reserv: om spelet inte kommit igång när sidan laddat klart (t.ex. dåligt nät, blockerad anslutning eller för gammal
+  // webbläsare) → säg det tydligt i stället för att visa en tom sida.
+  window.addEventListener("load", function () {
+    setTimeout(function () {
+      if (window.__ABBHOOT_LOADED__) return;
+      var d = document.getElementById("db-error"); if (!d) return;
+      d.textContent = "⚠️ Sidan kunde inte laddas klart. Kontrollera internet och ladda om sidan. Hjälper inte det: prova en annan webbläsare (Chrome eller Safari).";
+      d.style.display = "block";
+    }, 4000);
+  });
+</script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getDatabase, ref, set, update, get, push, remove, onValue, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -1922,13 +1934,21 @@
   const fmt = (n) => Number(n || 0).toLocaleString("sv-SE");
   const $ = (id) => document.getElementById(id);
 
+  let dbErrShown = false, noticeT = null;   // dbErrShown = bannern visar ett DATABASFEL (släcks när databasen svarar igen)
+  // Annan varning (inte databasfel): ligger kvar en stund och släcks sedan av sig själv
+  function showNotice(text, ms = 12000) {
+    if (dbErrShown) return;   // ett databasfel är viktigare
+    const b = $("db-error"); b.textContent = text; b.style.display = "block";
+    clearTimeout(noticeT); noticeT = setTimeout(() => { if (!dbErrShown) b.style.display = "none"; }, ms);
+  }
   function showDbError(e) {
+    dbErrShown = true; clearTimeout(noticeT);
     const b = $("db-error");
     b.textContent = "⚠️ Databasfel: " + (e && e.message ? e.message : e) +
       " – kontrollera att regeln för \"abbhoot\" är publicerad i Firebase (Realtime Database → Rules).";
     b.style.display = "block";
   }
-  function hideDbError() { $("db-error").style.display = "none"; }
+  function hideDbError() { dbErrShown = false; clearTimeout(noticeT); $("db-error").style.display = "none"; }
 
   function showScreen(id) {
     document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
@@ -1962,11 +1982,20 @@
   }
 
   // Gemensamt: spelare ur databasen (filtrerar bort halva poster från t.ex. onDisconnect)
+  // Allt som kommer från spelarnas mobiler tvättas här: bara giltiga id:n, tal är alltid tal och namn har en maxlängd.
+  // (Annars kan en påhittad post i databasen krascha visningen eller köra kod på storskärmen.)
+  const idOk = (id) => /^[A-Za-z0-9_-]{1,64}$/.test(id) && !(id in Object.prototype);
+  const numOr0 = (v) => { const x = Number(v); return Number.isFinite(x) ? x : 0; };
+  const cleanWager = (w) => (w && (w.c === "risk" || w.c === "allin")) ? { c: w.c, stake: numOr0(w.stake), m: numOr0(w.m) || 1, ok: !!w.ok, change: numOr0(w.change) } : null;
   function listPlayers(G) {
     return Object.entries((G && G.players) || {})
-      .filter(([, p]) => p && typeof p.name === "string" && p.name)
-      .map(([id, p]) => ({ id, ...p }));
+      .filter(([id, p]) => idOk(id) && p && typeof p.name === "string" && p.name.trim())
+      .map(([id, p]) => ({ ...p, id, name: p.name.slice(0, 40), score: numOr0(p.score), prevScore: numOr0(p.prevScore), lastDelta: numOr0(p.lastDelta),
+        streak: numOr0(p.streak), rankClimb: numOr0(p.rankClimb), lastWager: cleanWager(p.lastWager) }));
   }
+  const scoreMap = (list) => { const m = new Map(list.map(p => [p.id, p.score])); return (id) => m.get(id) || 0; };
+  // Blanda rättvist (Fisher–Yates)
+  function shuffled(arr) { const p = arr.slice(); for (let k = p.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [p[k], p[j]] = [p[j], p[k]]; } return p; }
   // Avatarer – bara emojis ur listan godkänns (skyddar mot att någon skriver in egen text/kod)
   const AVATARS = ["🦊","🐼","🐸","🐯","🦁","🐨","🐵","🦄","🐙","🦖","🐳","🦉","🐧","🐝","🦋","🐢","🐶","🐱","🐻","🐰","🐷","🦈","🦀","🍕","🌮","🍩","🚀","⚡","🔥","👻","🤖","👽","🎸","⚽","🏒","🎮","😎","🤠","🥷","👑"];
   const avatarOf = (p) => (p && AVATARS.includes(p.avatar)) ? p.avatar : "🙂";
@@ -2018,7 +2047,7 @@
   const isAonMode = (G) => !!(G && G.state && G.state.mode === "aon");
   const aonCfg = (G) => (G && G.state && G.state.aon) || null;
   const isWagerQ = (G, i) => { const c = aonCfg(G); return !!(c && isAonMode(G) && typeof c.from === "number" && i >= c.from); };
-  const wagerOf = (G, i, pid) => { const w = G && G.wagers && G.wagers[i] && G.wagers[i][pid]; return w && (w.c === "risk" || w.c === "allin") ? w : null; };
+  const wagerOf = (G, i, pid) => { const w = G && G.wagers && G.wagers[i] && G.wagers[i][pid]; return w && (w.c === "risk" || w.c === "allin") && typeof w.at === "number" ? w : null; };
   const stakeFor = (cfg, c) => !cfg ? 0 : c === "allin" ? cfg.allin : c === "risk" ? cfg.risk : 0;
   // Multiplikator efter placering: andel spelare som har STRIKT fler poäng (lika poäng = samma placering)
   function aonMult(scoreOf, list, pid) {
@@ -2026,7 +2055,7 @@
     const mine = scoreOf(pid), above = list.filter(p => scoreOf(p.id) > mine).length, r = above / (n - 1);
     return r > 2 / 3 ? 2.5 : r > 1 / 3 ? 1.25 : 1;
   }
-  const fmtMult = (m) => "×" + String(m).replace(".", ",");
+  const fmtMult = (m) => "×" + String(numOr0(m) || 1).replace(".", ",");
   function aonConfigFor(qs, level) {
     const n = qs.length, from = Math.max(1, n - 3);
     const dbl = qs.slice(0, from).filter(q => q && q.double).length;
@@ -2055,9 +2084,9 @@
     if (type === "slider") {
       if (typeof a.value !== "number") return { right: false, factor: 0 };
       const dist = Math.abs(a.value - correct.value);
-      const margin = Math.max(0, correct.margin || 0);
-      if (dist > margin) return { right: false, factor: 0 };
-      return { right: true, factor: margin > 0 ? 1 - 0.5 * (dist / margin) : 1 };   // exakt = 100 %, i kanten = 50 %
+      const margin = Math.max(0, Number(correct.margin) || 0);
+      if (!(dist <= margin + 1e-9)) return { right: false, factor: 0 };   // 1e-9: 0,8 − 0,7 är 0,10000000000000009 i en dator
+      return { right: true, factor: margin > 0 ? 1 - 0.5 * Math.min(1, dist / margin) : 1 };   // exakt = 100 %, i kanten = 50 %
     }
     return { right: false, factor: 0 };
   }
@@ -2078,7 +2107,7 @@
   function judge(G, pid, i, st) {
     const m = manualOf(G, i)[pid];
     if (m && typeof m.correct === "boolean") return { right: m.correct, factor: m.correct ? 1 : 0 };
-    const type = (st && st.current && st.current.type) || "choice";
+    const type = qType(st && st.current);
     return judgeAnswer(type, answerOf(G, i, pid, st), st && st.correct);
   }
   const isRight = (G, pid, i, st) => judge(G, pid, i, st).right;
@@ -2099,7 +2128,7 @@
     const cur = st.current || {}, c = st.correct;
     if (c === undefined || c === null) return "";
     if (cur.type === "type") return (c.accepted || [])[0] || "";
-    if (cur.type === "puzzle") return c.map((d, k) => `${k + 1}. ${(cur.items || [])[d]}`).join("  →  ");
+    if (cur.type === "puzzle") return (Array.isArray(c) ? c : []).map((d, k) => `${k + 1}. ${(cur.items || [])[d]}`).join("  →  ");
     if (cur.type === "slider") return `${fmtNum(c.value)}${cur.unit ? " " + cur.unit : ""}`;
     return `${SHAPES[c]} ${(cur.answers || [])[c] || ""}`;
   }
@@ -2107,8 +2136,8 @@
 
   function answerText(cur, a) {
     if (!a) return "";
-    if (cur.type === "type") return a.text || "";
-    if (cur.type === "puzzle") return (a.order || []).map(d => SHAPES[d]).join(" ");
+    if (cur.type === "type") return typeof a.text === "string" ? a.text.slice(0, 120) : "";
+    if (cur.type === "puzzle") return (Array.isArray(a.order) ? a.order : []).map(d => SHAPES[d] || "?").join(" ");
     if (cur.type === "slider") return `${fmtNum(a.value)}${cur.unit ? " " + cur.unit : ""}`;
     return SHAPES[a.choice] || "";
   }
@@ -2364,7 +2393,7 @@
   let podiumAnimUntil = 0;
 
   const S = () => (G && G.state) || {};
-  const upd = (obj) => update(R(pin), obj).then(hideDbError).catch(showDbError);
+  const upd = (obj) => update(R(pin), obj).then(() => { if (dbErrShown) hideDbError(); }).catch(showDbError);
 
   function genPin() { return String(Math.floor(100000 + Math.random() * 900000)); }
   function joinBaseUrl() { return location.origin + location.pathname; }
@@ -2506,13 +2535,15 @@
   function attachGame(p) {
     pin = p;
     gameQs = lsGet(gqKey());   // pågående spels låsta frågor (överlever omladdning)
-    lastBoardKey = null; lastPodiumKey = lastQuestionKey = "";
+    lastBoardKey = null; lastPodiumKey = null; lastQuestionKey = "";
+    // Städa bort låsta frågekopior från gamla spel (annars blir deras bilder aldrig bortstädade)
+    try { Object.keys(localStorage).forEach(k => { if (k.startsWith("abbhoot_gameqs_") && k !== gqKey()) localStorage.removeItem(k); }); } catch (e) {}
     renderJoinInfo();
     let first = true;
     unsub = onValue(R(p), snap => {
       G = snap.val();
       if (!G) return;
-      hideDbError();
+      if (dbErrShown) hideDbError();
       if (first) { first = false; claimHost(); startBeat(); }
       hostRender();
       if (isOwner) ensureTick(); else stopTick();
@@ -2592,7 +2623,7 @@
   function prankUpdates() {
     const u = {}, list = listPlayers(G);
     const used = new Set(list.filter(p => p.pranked && p.prankName).map(p => p.prankName));
-    const free = PRANK_NAMES.filter(n => !used.has(n)).sort(() => Math.random() - 0.5);
+    const free = shuffled(PRANK_NAMES.filter(n => !used.has(n)));
     let extra = 2;
     list.forEach(p => {
       if (p.pranked && p.prankName) { if (p.name !== p.prankName) u[`players/${p.id}/name`] = p.prankName; return; }
@@ -2687,7 +2718,8 @@
   const isImgRef = (r) => typeof r === "string" && (/^idb:[a-z0-9]{6,40}$/.test(r) || /^https?:\/\/\S+$/i.test(r));
   async function imgSrc(ref) {
     if (!isImgRef(ref)) return null;
-    if (!ref.startsWith("idb:")) return ref;
+    // På en https-sida (Netlify) kan bilder via http:// blockeras → hämta dem via https:// i stället
+    if (!ref.startsWith("idb:")) return location.protocol === "https:" ? ref.replace(/^http:\/\//i, "https://") : ref;
     if (imgUrlCache.has(ref)) return imgUrlCache.get(ref);
     try {
       const blob = await IMGDB.get(ref.slice(4));
@@ -2788,9 +2820,19 @@
     return q.correct;
   }
 
+  // Har den här datorn frågorna som hör till det pågående spelet? (Startades spelet i en annan webbläsare/dator
+  // finns de inte här – då får vi ALDRIG gissa rätt svar ur fel frågelista.)
+  function haveGameQuestion(st) {
+    const q = gq()[st.qIndex], cur = st.current || {};
+    return !!(q && q.q === cur.q && qType(q) === qType(cur));
+  }
+  function warnWrongQuestions() {
+    showNotice("⚠️ Den här datorn har inte frågorna till det pågående spelet (det startades i en annan webbläsare eller på en annan dator). Fortsätt därifrån – eller starta ett nytt spel här.");
+  }
   window.reveal = function() {
     const st = S();
     if (st.phase !== "question") return;
+    if (!haveGameQuestion(st)) { warnWrongQuestions(); return; }
     stopTick();
     const q = gq()[st.qIndex];
     const u = { "state/phase": "reveal", "state/correct": correctFor(q, st.qIndex), "state/revealedAt": serverTimestamp(), "state/paused": false, "state/pauseKey": null };
@@ -2878,6 +2920,7 @@
   window.nextQuestion = function() {
     const st = S();
     if (st.phase !== "board" || st.scoredQ !== st.qIndex) return;
+    if (!haveGameQuestion(st)) { warnWrongQuestions(); return; }
     if (st.qIndex + 1 < gq().length) startQuestion(st.qIndex + 1);
     else upd({ "state/phase": "podium", "state/podiumAt": Date.now() });
   };
@@ -2941,7 +2984,7 @@
   const botTimers = new Map();   // botId|frågenyckel → timer
   function botClearAll() { botTimers.forEach(t => clearTimeout(t)); botTimers.clear(); }
   function botAnswerFor(bot, st, i) {
-    const cur = st.current || {}, type = cur.type || "choice";
+    const cur = st.current || {}, type = qType(cur);
     const q = gq()[i];
     const known = q && q.q === cur.q;           // vet spelledaren rätt svar? (samma frågor)
     const right = known && Math.random() < (bot.skill || 0.6);
@@ -2951,13 +2994,13 @@
       return { choice: right ? c : pick([0, 1, 2, 3].filter(k => k !== c)) };
     }
     if (type === "type") {
-      if (right) { const a = pick(q.accepted || ["?"]); return { text: pick([a, a.toUpperCase(), a + "!", " " + a.toLowerCase() + " "]).slice(0, 80) }; }
+      if (right) { const a = String(pick(q.accepted || ["?"])); return { text: pick([a, a.toUpperCase(), a + "!", " " + a.toLowerCase() + " "]).slice(0, 80) }; }
       return { text: pick(BOT_WRONG_TEXT) };
     }
     if (type === "puzzle") {
       const corr = known ? correctFor(q, i) : [0, 1, 2, 3];
       if (right) return { order: corr.slice() };
-      let o; do { o = [0, 1, 2, 3].sort(() => Math.random() - 0.5); } while (o.join() === corr.join());
+      let o; do { o = shuffled([0, 1, 2, 3]); } while (o.join() === corr.join());
       return { order: o };
     }
     if (type === "slider") {
@@ -2997,7 +3040,7 @@
       bots.forEach(bot => {
         const key = `${bot.id}|w|${i}|${st.previewTotal}`;
         if (botTimers.has(key)) return;
-        const m = aonMult(id => (G.players[id] || {}).score || 0, list, bot.id);
+        const m = aonMult(scoreMap(list), list, bot.id);
         const sk = bot.skill || 0.6, u2 = Math.random();
         // Smartare bottar chansar oftare när de ligger efter (hög multiplikator) eller är duktiga
         const pAll = Math.min(0.85, 0.1 + (m - 1) * 0.35 + (sk - 0.5) * 0.6), pRisk = 0.3;
@@ -3033,11 +3076,19 @@
     applyTheme(t); lsSet(THEME_LS, t);
     if (pin && isOwner && G) upd({ "state/theme": t });
   };
-  function hostRender() {
+  // Skyddsnät: om något i omritningen kraschar ska spelet ändå gå vidare (timern startar, nästa ändring ritar om på nytt).
+  // Felet kastas vidare i bakgrunden så att det syns i webbläsarens konsol.
+  function renderFailed(e) {
+    showNotice("⚠️ Något gick fel när sidan ritades om. Fortsätter det: ladda om sidan – spelet och poängen ligger kvar.", 8000);
+    setTimeout(() => { throw e; }, 0);
+  }
+  function hostRender() { try { hostRenderInner(); } catch (e) { renderFailed(e); } }
+  function hostRenderInner() {
     if (G && G.state && G.state.theme) applyTheme(G.state.theme);
     const st = S();
     const phase = st.phase || "lobby";
     if (lastBoardKey === null && phase !== "board") lastBoardKey = "";   // omladdad mitt i spelet, inte på topplistan → nästa topplista animeras som vanligt
+    if (lastPodiumKey === null && phase !== "podium") lastPodiumKey = "";
     updateNextFab();
     renderTeamWarn();
     enforcePranks();
@@ -3056,7 +3107,13 @@
     else if (phase === "podium") {
       showScreen("screen-podium");
       const key = String(st.podiumAt);
-      if (key !== lastPodiumKey) { lastPodiumKey = key; renderPodium(true); }
+      if (key !== lastPodiumKey) {
+        // Sidan laddades om EFTER att prisutdelningen (45 s) var klar → visa slutresultatet direkt, spela inte om låten
+        const done = lastPodiumKey === null && typeof st.podiumAt === "number" && Date.now() - st.podiumAt > podTimeline(podCount(G)).after;
+        lastPodiumKey = key;
+        if (done) { podiumAnimUntil = 0; podWinnerShown = true; bgmStop(true); renderPodium(false); }
+        else renderPodium(true);
+      }
       else renderPodium(false);
     }
   }
@@ -3074,7 +3131,8 @@
     $("mode-aon").classList.toggle("active", aon);
     const cfgPrev = aonConfigFor(questions, (G.state || {}).aonLevel);
     $("mode-hint").textContent = team ? "Alla spelar i sin egen mobil – poängen läggs ihop per lag"
-      : aon ? `Sista ${questions.length - cfgPrev.from} frågorna: välj insats – Satsa ${fmt(cfgPrev.risk)} p / ALL IN ${fmt(cfgPrev.allin)} p. De som ligger sist får ×2,5!`
+      : aon && questions.length < 2 ? "All or Nothing kräver minst 2 frågor – med 1 fråga blir det ett vanligt solospel"
+      : aon ? `Sista ${questions.length - cfgPrev.from === 1 ? "frågan" : (questions.length - cfgPrev.from) + " frågorna"}: välj insats – Satsa ${fmt(cfgPrev.risk)} p / ALL IN ${fmt(cfgPrev.allin)} p. De som ligger sist får ×2,5!`
       : "Alla tävlar mot alla";
     $("aon-level").style.display = aon ? "" : "none";
     $("aon-bal").classList.toggle("active", aon && cfgPrev.level !== "wild");
@@ -3163,7 +3221,7 @@
   };
   window.shuffleTeams = function() {
     if (S().phase !== "lobby") return;
-    const n = teamCountOf(G), list = listPlayers(G).sort(() => Math.random() - 0.5), u = {};
+    const n = teamCountOf(G), list = shuffled(listPlayers(G)), u = {};
     if (list.length > n * MAX_PER_TEAM) {
       alert(`${list.length} spelare får inte plats i ${n} lag (max ${MAX_PER_TEAM} per lag).\n\nVälj minst ${Math.min(MAX_TEAMS, Math.ceil(list.length / MAX_PER_TEAM))} lag${list.length > MAX_TEAMS * MAX_PER_TEAM ? ` – eller kör solo (lagläget rymmer max ${MAX_TEAMS * MAX_PER_TEAM})` : ""}.`);
       return;
@@ -3311,7 +3369,7 @@
     $("q-double-badge").style.display = cur.double ? "inline-block" : "none";
     $("question-text").textContent = cur.q || "";
     renderQImage(st, cur);
-    const type = cur.type || "choice";
+    const type = qType(cur);
     $("q-type-badge").textContent = `${TYPES[type].icon} ${TYPES[type].label.toUpperCase()}`;
     const cardTexts = type === "puzzle" ? (cur.items || []) : (cur.answers || []);
     const showCards = type === "choice" || (type === "puzzle" && !revealed);
@@ -3429,17 +3487,17 @@
 
     if (type === "type") {
       if (!revealed) { el.innerHTML = `<div class="alt-hint">✍️ Skriv ditt svar i mobilen!</div>`; return; }
-      const groups = {};
+      const groups = Object.create(null);
       list.forEach(p => {
         const a = ans[p.id]; if (!a || typeof a.text !== "string") return;
         const key = normText(a.text);
-        if (!groups[key]) groups[key] = { text: a.text.trim(), n: 0, right: judgeAnswer("type", a, st.correct).right };
+        if (!groups[key]) groups[key] = { text: a.text.trim().slice(0, 120), n: 0, right: judgeAnswer("type", a, st.correct).right };
         groups[key].n++;
       });
       const rows = Object.values(groups).sort((a, b) => (b.right - a.right) || (b.n - a.n)).slice(0, 10);
       el.innerHTML = `
         <div class="alt-correct">✓ ${esc(correctText(st))}</div>
-        ${(st.correct.accepted || []).length > 1 ? `<div class="alt-sub">Godkänt även: ${esc(st.correct.accepted.slice(1).join(", "))}</div>` : ""}
+        ${((st.correct || {}).accepted || []).length > 1 ? `<div class="alt-sub">Godkänt även: ${esc(st.correct.accepted.slice(1).join(", "))}</div>` : ""}
         ${rightLine}
         <div class="alt-chips">${rows.map(r => `<span class="alt-chip ${r.right ? "ok" : "bad"}">${esc(r.text)} <b>×${r.n}</b></span>`).join("") || `<span class="alt-sub">Inga svar</span>`}</div>`;
       return;
@@ -3453,7 +3511,7 @@
       }
       el.innerHTML = `
         ${lab && lab.first ? `<div class="alt-sub">⬆ ${esc(lab.first)}</div>` : ""}
-        <div class="alt-order">${st.correct.map((d, k) => `
+        <div class="alt-order">${(Array.isArray(st.correct) ? st.correct : []).map((d, k) => `
           <div class="alt-order-row" style="background:${KCOLORS[d]};"><span class="n">${k + 1}</span><span class="s">${SHAPES[d]}</span><span>${esc((cur.items || [])[d])}</span></div>`).join("")}
         </div>
         ${lab && lab.last ? `<div class="alt-sub">⬇ ${esc(lab.last)}</div>` : ""}
@@ -3469,7 +3527,7 @@
         el.innerHTML = `<div class="alt-hint">🎚️ Dra reglaget i mobilen!</div><div class="alt-sub">Mellan ${fmtNum(cur.min)} och ${fmtNum(cur.max)}${unit}</div>`;
         return;
       }
-      const c = st.correct;
+      const c = st.correct || { value: NaN, margin: 0 };
       const dots = list.map(p => ans[p.id]).filter(a => a && typeof a.value === "number");
       el.innerHTML = `
         <div class="alt-correct">✓ ${esc(correctText(st))}</div>
@@ -3491,7 +3549,7 @@
       : "🎛 Vilka som har svarat (inte vad). Klicka på timern för paus.";
     const fast = revealed ? fastestPid(G, st.qIndex, st) : null;
     const cur = st.current || {};
-    $("player-control-grid").innerHTML = list.map(p => {
+    setHtml("player-control-grid", list.map(p => {
       const has = !!ans[p.id];
       const right = revealed && isRight(G, p.id, st.qIndex, st);
       return `
@@ -3507,7 +3565,7 @@
             <button type="button" class="award-btn ${fast === p.id ? "active-fast" : ""}" onclick="toggleFast('${p.id}')">⚡ Snabbast</button>
           </div>
         </div>`;
-    }).join("");
+    }).join(""));
   }
 
   let lastBoardSig = "";
@@ -3607,9 +3665,7 @@
     const tryPlay = (k) => {
       if (bgmTrack !== tk) return;
       if (k >= sources.length) {
-        const b = $("db-error");
-        b.textContent = `⚠️ Hittar inte ${tk}.mp3 – ladda upp filen till GitHub, bredvid index.html.`;
-        b.style.display = "block";
+        showNotice(`⚠️ Hittar inte ${tk}.mp3 – ladda upp filen till GitHub, bredvid index.html.`, 15000);
         bgmAudio = null; return;
       }
       const a = new Audio(sources[k]);
@@ -3658,7 +3714,7 @@
 
   function renderCommentWall() {
     const list = Object.entries((G && G.comments) || {})
-      .map(([cid, c]) => c && Object.assign({}, c, { av: avatarOf(G.players && G.players[cid]) }))
+      .map(([cid, c]) => c && typeof c === "object" && Object.assign({}, c, { av: avatarOf(G.players && G.players[cid]) }))
       .filter(c => c && c.text)
       .sort((a, b) => (b.at || 0) - (a.at || 0));
     $("comment-count").textContent = `(${list.length})`;
@@ -3668,7 +3724,7 @@
       ? list.map(c => {
           const k = c.name + "|" + c.text;
           const isNew = !seen.has(k); if (isNew) { seen.add(k); fresh = true; }
-          return `<div class="comment-card ${isNew ? "new" : ""}"><div class="comment-name">${c.av} ${esc(c.name)}</div><div class="comment-text">${esc(c.text)}</div></div>`;
+          return `<div class="comment-card ${isNew ? "new" : ""}"><div class="comment-name">${c.av} ${esc(String(c.name ?? "").slice(0, 40))}</div><div class="comment-text">${esc(String(c.text).slice(0, 200))}</div></div>`;
         }).join("")
       : `<div class="alt-sub">Spelarna kan skriva en kommentar i mobilen nu ✍️</div>`;
     if (fresh && list.length && Date.now() >= podiumAnimUntil) playPopSound(820);
@@ -3957,6 +4013,8 @@
     const c = lsGet(PXB_CACHE_LS) || {}, e = c[url];
     return e && Date.now() - e.t < 24 * 3600 * 1000 ? e.d : null;
   }
+  // Spara bara fälten som används (annars tar 25 sökningar × 30 träffar ~1 MB av webbläsarens 5 MB)
+  const pxbSlim = (d) => ({ totalHits: Number(d && d.totalHits) || 0, hits: ((d && d.hits) || []).map(h => h && ({ id: h.id, previewURL: h.previewURL, webformatURL: h.webformatURL, largeImageURL: h.largeImageURL, tags: h.tags, pageURL: h.pageURL })).filter(Boolean) });
   function pxbCachePut(url, d) {
     const c = lsGet(PXB_CACHE_LS) || {}, now = Date.now();
     Object.keys(c).forEach(k => { if (!c[k] || now - c[k].t > 24 * 3600 * 1000) delete c[k]; });
@@ -3997,7 +4055,6 @@
     collectEditor(); pxbQi = qi;
     const m = pxbModal(); m.style.display = "flex"; pxbShowKeyUi();
     const qtext = (edQ[qi] && edQ[qi].q) || "";
-    if (!$("pxb-q").value && qtext) $("pxb-q").value = "";
     $("pxb-status").textContent = pxbKey() ? `Bild till fråga ${qi + 1}: "${qtext.slice(0, 60)}"` : "";
     setTimeout(() => { const f = pxbKey() ? $("pxb-q") : $("pxb-key"); if (f) f.focus(); }, 30);
   };
@@ -4041,10 +4098,10 @@
     try {
       let lang = page === 1 ? "sv" : pxbState.lang, url = build(lang);
       let d = pxbCacheGet(url.replace(key, "K"));
-      if (!d) { d = await pxbFetch(url); pxbCachePut(url.replace(key, "K"), d); }
+      if (!d) { d = pxbSlim(await pxbFetch(url)); pxbCachePut(url.replace(key, "K"), d); }
       if (page === 1 && (!d.hits || !d.hits.length)) {            // inget på svenska → prova engelska
         lang = "en"; url = build(lang);
-        d = pxbCacheGet(url.replace(key, "K")) || await pxbFetch(url); pxbCachePut(url.replace(key, "K"), d);
+        d = pxbCacheGet(url.replace(key, "K")) || pxbSlim(await pxbFetch(url)); pxbCachePut(url.replace(key, "K"), d);
       }
       pxbState.lang = lang; pxbState.page = page;
       const hits = (d.hits || []).filter(h => h && h.previewURL && (h.largeImageURL || h.webformatURL));
@@ -4054,7 +4111,8 @@
       $("pxb-status").textContent = `${pxbState.hits.length} av ${Math.min(pxbState.total, 500)} bilder${lang === "en" && page === 1 ? " (inga svenska träffar – visar engelska)" : ""} · klicka på en bild för att använda den`;
       $("pxb-more").style.display = pxbState.hits.length < Math.min(pxbState.total, 500) ? "" : "none";
     } catch (e) {
-      $("pxb-status").textContent = "⚠️ " + (e && e.message === "jsonp" || e.message === "timeout" ? "Kunde inte nå Pixabay. Kontrollera internet och API-nyckeln." : e.message);
+      const em = (e && e.message) || String(e);
+      $("pxb-status").textContent = "⚠️ " + (em === "jsonp" || em === "timeout" ? "Kunde inte nå Pixabay. Kontrollera internet och API-nyckeln." : em);
     } finally { pxbState.busy = false; }
   };
   // Hämta bilden (största tillåtna) → komprimera → spara i datorn som en egen bild
@@ -4134,6 +4192,7 @@
     edReadTime = readTime;
     if ($("paste-panel")) { $("paste-panel").style.display = "none"; $("editor-list").style.display = "flex"; $("ed-footer").style.display = "flex"; $("tab-edit").classList.add("active"); $("tab-paste").classList.remove("active"); }
     renderEditor();
+    edMarkClean();
     $("editor-modal").style.display = "flex";
   };
   window.edChangeType = function(qi, type) { collectEditor(); edQ[qi] = defaultsFor(type, edQ[qi]); renderEditor(); };
@@ -4155,7 +4214,17 @@
     renderEditor();
     const last = $(`ed_q_${edQ.length - 1}`); if (last && last.scrollIntoView) last.scrollIntoView({ block: "center" });
   };
-  window.closeEditor = function() { $("editor-modal").style.display = "none"; };
+  // Fråga innan osparade ändringar kastas (✕ Stäng). force = true när ändringarna just har sparats.
+  let edCleanSig = "";
+  const edSig = () => JSON.stringify([edQ, edReadTime]);
+  function edMarkClean() { collectEditor(); edCleanSig = edSig(); }
+  window.closeEditor = function(force) {
+    if (force !== true && $("editor-modal").style.display === "flex") {
+      collectEditor();
+      if (edSig() !== edCleanSig && !confirm("Stänga utan att spara?\n\nDina ändringar i frågorna försvinner.")) return;
+    }
+    $("editor-modal").style.display = "none";
+  };
 
   function editorProblems(q, qi) {
     const t = qType(q), n = `#${qi + 1}`, p = [];
@@ -4171,6 +4240,12 @@
       if (!(s.step > 0)) p.push(`${n}: steg måste vara större än 0`);
       else if (s.max - s.min > 0 && (s.max - s.min) / s.step > 100000) p.push(`${n}: för litet steg för intervallet`);
       if (s.margin < 0) p.push(`${n}: felmarginal kan inte vara negativ`);
+      // Går rätt värde att ställa in med det steget? (t.ex. min 0, steg 5, rätt 1987 → ingen kan svara rätt)
+      if (s.min < s.max && s.step > 0 && s.correct >= s.min && s.correct <= s.max && (s.max - s.min) / s.step <= 100000) {
+        const near = Math.min(s.max, Number((Math.round((s.correct - s.min) / s.step) * s.step + s.min).toFixed(6)));
+        const miss = Math.min(Math.abs(s.correct - near), Math.abs(s.correct - s.max));
+        if (miss > Math.max(0, s.margin || 0) + 1e-9) p.push(`${n}: rätt värde ${fmtNum(s.correct)} går inte att ställa in med steg ${fmtNum(s.step)} (närmaste läge är ${fmtNum(near)}) – ändra steget eller sätt felmarginal minst ${fmtNum(Number(miss.toFixed(6)))}`);
+      }
     }
     return p;
   }
@@ -4183,7 +4258,7 @@
     lsSet(LS_QUESTIONS_KEY, questions);
     readTime = edReadTime;
     lsSet("abbhoot_read_time", readTime);
-    closeEditor();
+    closeEditor(true);
     setTimeout(cleanupImages, 500);
     if (pin && S().phase === "lobby") upd({ "state/total": questions.length });
   };
@@ -4511,6 +4586,7 @@ ${EX.slider}
     if (pin && S().phase === "lobby") upd({ "state/total": questions.length });
     $("paste-text").value = "";
     edTab("edit");
+    edMarkClean();   // importen är redan sparad
     const banner = document.createElement("div");
     banner.className = "paste-ok"; banner.style.margin = "0 0 6px";
     banner.textContent = `✅ ${r.questions.length} frågor importerade och sparade (${mode === "replace" ? "ersatte de gamla" : "lades till sist"}). Totalt ${questions.length} frågor.`;
@@ -4744,7 +4820,7 @@ ${EX.slider}
   window.submitSlider = function() { submitAnswer({ value: pSlider }); };
 
   function playerQuestionInput(cur) {
-    const type = cur.type || "choice";
+    const type = qType(cur);
     if (type === "type") return `
       <input class="p-text-input" id="p-text" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Skriv ditt svar…">
       <button type="button" class="btn-hype p-submit" onclick="submitText()">SKICKA SVAR ➔</button>`;
@@ -4756,7 +4832,7 @@ ${EX.slider}
       <button type="button" class="btn-hype p-submit" onclick="submitPuzzle()">LÅS ORDNINGEN ➔</button>`;
     if (type === "slider") return `
       <div class="p-slider-val" id="p-slider-val"></div>
-      <input type="range" class="p-range" id="p-range" min="${cur.min}" max="${cur.max}" step="${cur.step > 0 ? cur.step : 1}" value="${pSlider}" oninput="sliderInput(this.value)">
+      <input type="range" class="p-range" id="p-range" min="${numOr0(cur.min)}" max="${numOr0(cur.max)}" step="${cur.step > 0 ? numOr0(cur.step) : 1}" value="${numOr0(pSlider)}" oninput="sliderInput(this.value)">
       <div class="p-range-ends"><span>${fmtNum(cur.min)}</span><span>${fmtNum(cur.max)}</span></div>
       <div class="p-step-btns">
         <button type="button" class="btn" style="justify-content:center; font-size:20px;" onclick="sliderStep(-1)">−</button>
@@ -4809,17 +4885,23 @@ ${EX.slider}
     return { team: k >= 0 ? ranked[k] : teamList(PG)[t], rank: k + 1, total: ranked.length };
   }
 
-  function playerRender() {
+  // Skyddsnät: kraschar omritningen nollställs vyn så att nästa ändring (senast inom en sekund under en fråga) ritar om allt.
+  // Utan detta kunde mobilen stå kvar på en gammal vy resten av frågan.
+  function playerRender() { try { playerRenderInner(); } catch (e) { pViewKey = ""; renderFailed(e); } }
+  function playerRenderInner() {
     if (PG && PG.state) { const tv = applyTheme(PG.state.theme); if (lsGet(THEME_LS) !== tv) lsSet(THEME_LS, tv); }
     if (!PG) { playerJoinForm("Spelet är avslutat. Be spelledaren om en ny PIN."); return; }
-    const me = PG.players && PG.players[pid];
-    if (!me || !me.name) {
+    const meRaw = PG.players && PG.players[pid];
+    const me = meRaw && typeof meRaw.name === "string" && meRaw.name ? Object.assign({}, meRaw, { score: numOr0(meRaw.score), lastDelta: numOr0(meRaw.lastDelta), streak: numOr0(meRaw.streak) }) : null;
+    if (!me) {
       onDisconnect(R(`${pPin}/players/${pid}/online`)).cancel();
       try { localStorage.removeItem(`abbhoot_pid_${pPin}`); } catch (e) {}
       playerJoinForm("Du har tagits bort från spelet. Gå med igen om du vill.");
       return;
     }
-    const st = PG.state || {};
+    // Talen ur spelläget skrivs in i sidan → se till att de verkligen är tal
+    const raw = PG.state || {};
+    const st = Object.assign({}, raw, { qIndex: Number.isInteger(raw.qIndex) ? raw.qIndex : -1, total: numOr0(raw.total), timer: numOr0(raw.timer), preview: numOr0(raw.preview) });
     $("p-topbar").style.display = "flex";
     $("p-name").textContent = avatarOf(me) + " " + me.name;
     $("p-score").textContent = fmt(me.score) + " p";
@@ -4885,9 +4967,9 @@ ${EX.slider}
         </div>`;
     } else if (st.phase === "preview" && isWagerQ(PG, i)) {
       const cur = st.current || {};
-      const type = cur.type || "choice";
+      const type = qType(cur);
       const cfg = aonCfg(PG), list = listPlayers(PG);
-      const m = aonMult(id => (PG.players[id] || {}).score || 0, list, pid);
+      const m = aonMult(scoreMap(list), list, pid);
       const myW = wagerOf(PG, i, pid), c = myW ? myW.c : "safe";
       const left = (st.total || 0) - i;
       const btn = (key, icon, label, stake) => `<button type="button" class="p-wager ${key} ${c === key ? "sel" : ""}" onclick="pickWager('${key}')">
@@ -4903,7 +4985,7 @@ ${EX.slider}
         <div class="p-aon-note">Låses när svarsalternativen visas. Du kan inte hamna under 0.</div>`;
     } else if (st.phase === "preview") {
       const cur = st.current || {};
-      const type = cur.type || "choice";
+      const type = qType(cur);
       v.innerHTML = `
         <div class="p-qmeta"><span>${TYPES[type].icon} FRÅGA ${i + 1} / ${st.total}${cur.double ? " · ⚡ 2X" : ""}</span><span>${TYPES[type].label}</span></div>
         <div class="p-qtext">${esc(cur.q)}</div>${cur.img ? `<div class="p-imghint">🖼️ Titta på bilden på storskärmen!</div>` : ""}
@@ -4911,12 +4993,12 @@ ${EX.slider}
           <p>Svarsalternativen kommer om</p><div class="p-rank" id="p-preview">${st.paused ? "⏸" : st.preview}</div></div>`;
     } else if (st.phase === "question") {
       const cur = st.current || {};
-      const type = cur.type || "choice";
+      const type = qType(cur);
       const meta = `<div class="p-qmeta"><span>${TYPES[type].icon} FRÅGA ${i + 1} / ${st.total}${cur.double ? " · ⚡ 2X" : ""}</span><span class="p-timer" id="p-timer">${st.paused ? "⏸" : "⏱ " + st.timer}</span></div>
         <div class="p-pausenote" id="p-pausenote" style="display:${st.paused ? "block" : "none"};">⏸ Pausat av spelledaren – vänta lite</div>`;
       if (!myAns) {
         // Ny fråga → nollställ lokal pussel-/reglageställning
-        const lk = `${i}|${PG.state.timeLimit}|${cur.q}`;
+        const lk = `${i}|${st.timeLimit}|${st.startedAt}|${cur.q}`;
         if (lk !== pLocalKey) {
           pLocalKey = lk;
           pOrder = [0, 1, 2, 3];
@@ -4933,7 +5015,7 @@ ${EX.slider}
         }
       } else {
         const big = type === "choice"
-          ? `<div class="p-big-shape" style="color:${KCOLORS[myAns.choice]};">${SHAPES[myAns.choice]}</div>`
+          ? `<div class="p-big-shape" style="color:${KCOLORS[myAns.choice] || "#fff"};">${SHAPES[myAns.choice] || "?"}</div>`
           : `<div style="font-size:30px; font-weight:900;">${esc(answerText(cur, myAns))}</div>`;
         v.innerHTML = `${meta}
           <div class="p-card">${big}<h2>Svar låst! 🔒</h2><p>Väntar på de andra…</p></div>`;
@@ -4966,11 +5048,11 @@ ${EX.slider}
     } else if (st.phase === "board") {
       const { rank, total } = myRank();
       const cls = me.lastDelta > 0 ? "right" : me.lastDelta < 0 ? "wrong" : "none";
-      const lw = me.lastWager;
+      const lw = cleanWager(me.lastWager);
       v.innerHTML = `
         <div class="p-result ${cls}">
           ${me.lastDelta > 0 ? `<div class="pts">+${fmt(me.lastDelta)} p</div>` : me.lastDelta < 0 ? `<div class="pts">−${fmt(-me.lastDelta)} p</div>` : `<div class="big">0 p</div>`}
-          ${lw ? `<div class="p-aon-res">${lw.c === "allin" ? "💀 ALL IN" : "🔥 SATSA"} ${lw.ok ? `✔ +${fmt(lw.change)} p (${fmt(lw.stake)} × ${String(lw.m).replace(".", ",")})` : `✘ −${fmt(-lw.change)} p`}</div>` : ""}
+          ${lw ? `<div class="p-aon-res">${lw.c === "allin" ? "💀 ALL IN" : "🔥 SATSA"} ${lw.ok ? `✔ +${fmt(lw.change)} p (${fmt(lw.stake)} × ${fmtMult(lw.m).slice(1)})` : `✘ −${fmt(-lw.change)} p`}</div>` : ""}
           ${me.streak >= 2 ? `<div class="hype-badge badge-streak" style="background:#fff;">🔥 STREAK x${me.streak}</div>` : ""}
         </div>
         <div class="p-card"><p>Du ligger på plats</p><div class="p-rank">${rank} <span style="font-size:24px; color:var(--text-muted);">av ${total}</span></div><p>${fmt(me.score)} poäng totalt</p></div>`;
