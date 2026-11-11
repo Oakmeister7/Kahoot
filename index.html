@@ -991,6 +991,7 @@
   #screen-podium.pod-winner .winner-rays { opacity: 1; animation: raysSpin 14s linear infinite; transition: opacity 0.8s; }
   @keyframes raysSpin { to { transform: rotate(360deg); } }
   #podium-name-1 { font-size: 30px; color: var(--accent-amber); }
+  .podium-name .pod-av { -webkit-text-fill-color: initial; }   /* emojin behåller sina färger även när namnet har guldtoning */
   #screen-podium.pod-winner #podium-name-1 { font-size: 52px; line-height: 1.05;
     background: linear-gradient(90deg, #fde68a, #fbbf24, #fff, #fbbf24, #fde68a); background-size: 250% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     animation: winnerZoom 0.9s cubic-bezier(.2,1.6,.4,1), hypeShimmer 2.2s linear infinite; filter: drop-shadow(0 0 22px rgba(251,191,36,0.9)); }
@@ -1063,7 +1064,9 @@
   #screen-podium.pod-beat .podium-stage { animation: beatBump 0.3s ease-out; }
   #screen-podium.pod-beat .winner-rays { filter: brightness(1.6); }
   @keyframes beatBump { 0% { transform: scale(1.035); } 100% { transform: scale(1); } }
-  #screen-podium.pod-winner #podium-name-1 { font-size: 64px; }
+  /* Vinnarnamnet på EN rad (avatar + namn). Storleken sätts efter namnets längd (--win-fs) så att kronan ovanför inte
+     trycks ut ur bild – med avatar på egen rad blev kronan avklippt och långa namn hamnade utanför scenen. */
+  #screen-podium.pod-winner #podium-name-1 { font-size: var(--win-fs, 64px); white-space: nowrap; width: max-content; }
 
   /* ===== KLISTRA IN FRÅGOR ===== */
   .ed-tabs { display: flex; gap: 6px; margin-top: 12px; border-bottom: 1px solid rgba(255,255,255,0.15); }
@@ -1396,6 +1399,9 @@
 
   /* Podium – lila Kahoot-scen */
   html[data-theme="light"] #screen-podium { background: linear-gradient(180deg, #46178f 0%, #25076b 100%); color: #fff; border-radius: 18px; --text-muted: #d9c9f2; }
+  /* På den lila scenen måste accentfärgen vara ljus (annars mörklila text på mörklila/svart) och rubriken vit */
+  html[data-theme="light"] #screen-podium { --accent-amber: #fbbf24; }
+  html[data-theme="light"] #screen-podium .hype-title { -webkit-text-fill-color: #ffffff; color: #ffffff; }
   html[data-theme="light"] #screen-podium .comment-card { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); color: #fff; }
   html[data-theme="light"] #screen-podium .lb-row { background: rgba(255,255,255,0.12); color: #fff; box-shadow: none; }
   html[data-theme="light"] #screen-podium .lb-row .lb-score, html[data-theme="light"] #screen-podium .lb-name { color: #fff; }
@@ -1492,7 +1498,7 @@
 
 <!-- ===================== INLOGGNING SPELLEDARE ===================== -->
 <div class="host-login host-only" id="host-login" style="display:none;">
-  <div class="p-card" style="max-width:420px; width:100%;">
+  <form class="p-card" style="max-width:420px; width:100%; margin:0;" onsubmit="event.preventDefault(); hostLogin();">
     <div style="font-size:54px;">🔒</div>
     <h2>Spelledare</h2>
     <p>Logga in för att skapa och leda ett spel.</p>
@@ -1501,7 +1507,7 @@
     <div class="p-err" id="hl-err"></div>
     <button type="button" class="btn-hype" style="width:100%;" id="hl-btn" onclick="hostLogin()">LOGGA IN ➔</button>
     <p style="font-size:13px;">Ska du spela? Gå till startsidan utan <b>?host</b> i adressen.</p>
-  </div>
+  </form>
 </div>
 
 <div class="host-passive host-only" id="host-passive" style="display:none;">
@@ -1763,7 +1769,7 @@
   // webbläsare) → säg det tydligt i stället för att visa en tom sida.
   window.addEventListener("load", function () {
     setTimeout(function () {
-      if (window.__ABBHOOT_LOADED__) return;
+      if (window.__ABBHOOT_READY__) return;
       var d = document.getElementById("db-error"); if (!d) return;
       d.textContent = "⚠️ Sidan kunde inte laddas klart. Kontrollera internet och ladda om sidan. Hjälper inte det: prova en annan webbläsare (Chrome eller Safari).";
       d.style.display = "block";
@@ -3698,7 +3704,12 @@
       const p = sorted[n - 1];
       $(`podium-col-${n}`).classList.toggle("empty", !p);
       $(`podium-col-${n}`).style.setProperty("--tc", team && p ? p.color : "");
-      $(`podium-name-${n}`).textContent = p ? (team ? `${p.emoji} ${p.name}` : `${avatarOf(p)} ${p.name}`) : (n === 1 ? "–" : "Ledig plats");
+      // Avataren i egen <span>: vinnarnamnets guldtoning (genomskinlig text) gjorde annars emojin till en enfärgad siluett
+      const nameEl = $(`podium-name-${n}`);
+      if (p) nameEl.innerHTML = `<span class="pod-av">${team ? p.emoji : avatarOf(p)}</span> ${esc(p.name)}`;
+      else nameEl.textContent = n === 1 ? "–" : "Ledig plats";
+      // Vinnaren: en rad, högst ca 720 px bred → kortare namn 64 px, långa namn krymper (minst 28 px)
+      if (n === 1) nameEl.style.setProperty("--win-fs", Math.max(28, Math.min(64, Math.floor(720 / (0.62 * ([...((p && p.name) || "")].length + 2.3))))) + "px");
       $(`podium-pts-${n}`).textContent = p ? fmt(p.score) + " p" : "–";
       $(`podium-sub-${n}`).innerHTML = team && p ? subOf(p) : "";
     });
@@ -5143,6 +5154,7 @@ ${EX.slider}
   if (ROLE === "host") hostGate();
   else playerInit();
 
+  window.__ABBHOOT_READY__ = true;   // sist i skriptet: kraschar något ovanför visas "Sidan kunde inte laddas klart"
 </script>
 </body>
 </html>
