@@ -1528,7 +1528,11 @@
     grid-row: 1; grid-column: 1; justify-self: start; align-self: start; margin: 16px 0 0 18px;
     background: rgba(20, 8, 40, 0.55); font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 6px;
   }
-  body.role-host #screen-question .q-double-pill { grid-row: 1; grid-column: 3; justify-self: end; align-self: start; margin: 16px 18px 0 0; }
+  /* Dubbelpoäng-pillen ligger under frågenumret till vänster (uppe till höger sitter knappen) */
+  body.role-host #screen-question .q-double-pill {
+    grid-row: 1; grid-column: 1; justify-self: start; align-self: start; margin: 52px 0 0 18px;
+    font-size: 12px; font-weight: 700; padding: 4px 10px; white-space: nowrap; border-radius: 6px;
+  }
 
   body.role-host #screen-question .question-stage {
     grid-row: 1; grid-column: 2; justify-self: center; align-self: start;
@@ -1598,6 +1602,68 @@
   .intro-overlay.s2 .intro-title { display: block; }
   @keyframes introTitle { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
+  /* ===== Dubbelpoäng-skärm före läsfasen (efter Kahoots tidslinje: typ-ikon → bollar → ×2 → vänds bort) ===== */
+  .dbl-overlay {
+    --d: clamp(150px, 24vmin, 280px);
+    position: fixed; inset: 0; z-index: 250; display: none; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--scene-url) center bottom / cover no-repeat, #5b2a9a; cursor: pointer; overflow: hidden;
+  }
+  .dbl-overlay.run { animation: dblOut 0.35s ease 2.5s both; }
+  @keyframes dblOut { from { opacity: 1; } to { opacity: 0; } }
+  .dbl-stage { position: relative; z-index: 2; width: var(--d); height: var(--d); perspective: 700px; }
+  .dbl-overlay.run .dbl-stage { animation: dblFlip 0.35s ease-in 2.45s both; }
+  @keyframes dblFlip { from { transform: rotateY(0); } to { transform: rotateY(88deg) scale(0.85); } }
+  /* 1. Typ-ikon på mörk skiva (0–0,85 s) */
+  .dbl-disc { position: absolute; inset: 0; border-radius: 50%; background: rgba(35, 12, 80, 0.55); opacity: 0; }
+  .dbl-overlay.run .dbl-disc { animation: dblDisc 1.3s linear both; }
+  @keyframes dblDisc { 0% { transform: scale(0.4); opacity: 0; } 14% { transform: scale(1); opacity: 1; } 92% { opacity: 1; } 100% { opacity: 0; } }
+  .dbl-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; }
+  .dbl-overlay.run .dbl-icon { animation: dblIcon 0.9s ease both; }
+  @keyframes dblIcon {
+    0% { transform: rotate(12deg) scale(0.5); opacity: 0; } 14% { transform: rotate(12deg) scale(1.06); opacity: 1; }
+    22% { transform: rotate(12deg) scale(1); } 80% { transform: rotate(12deg) scale(1); opacity: 1; } 100% { transform: rotate(12deg) scale(0.3); opacity: 0; }
+  }
+  .dbl-card {
+    display: none; width: calc(var(--d) * 0.5); height: calc(var(--d) * 0.7); padding: calc(var(--d) * 0.02); gap: calc(var(--d) * 0.02);
+    grid-template: 1fr 1fr / 1fr 1fr; background: #fff; border-radius: calc(var(--d) * 0.05); box-sizing: border-box;
+  }
+  .dbl-card i { display: flex; align-items: center; justify-content: center; font-style: normal; color: #fff; font-size: calc(var(--d) * 0.12); border-radius: calc(var(--d) * 0.025); }
+  .dbl-card i:nth-child(1) { background: #e21b3c; } .dbl-card i:nth-child(2) { background: #1368ce; }
+  .dbl-card i:nth-child(3) { background: #d89e00; } .dbl-card i:nth-child(4) { background: #26890c; }
+  .dbl-overlay[data-type="choice"] .dbl-card { display: grid; }
+  .dbl-emoji { display: none; font-size: calc(var(--d) * 0.5); line-height: 1; }
+  .dbl-overlay:not([data-type="choice"]) .dbl-emoji { display: block; }
+  /* 2. Två vita bollar glider isär och flyter ihop till en cirkel (0,75–1,3 s) */
+  .dbl-ball { position: absolute; left: 50%; top: 50%; width: calc(var(--d) * 0.3); height: calc(var(--d) * 0.3); margin: calc(var(--d) * -0.15) 0 0 calc(var(--d) * -0.15); border-radius: 50%; background: #fff; opacity: 0; }
+  .dbl-overlay.run .dbl-ball.b1 { animation: dblB1 0.55s ease-in-out 0.75s both; }
+  .dbl-overlay.run .dbl-ball.b2 { animation: dblB2 0.55s ease-in-out 0.75s both; }
+  @keyframes dblB1 { 0% { opacity: 0; transform: translateY(0) scale(0.25); } 20% { opacity: 1; } 55% { transform: translateY(calc(var(--d) * -0.3)) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(3.3); } }
+  @keyframes dblB2 { 0% { opacity: 0; transform: translateY(0) scale(0.25); } 20% { opacity: 1; } 55% { transform: translateY(calc(var(--d) * 0.3)) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(3.3); } }
+  /* 3. ×2-myntet (1,25 s →) */
+  .dbl-coin {
+    position: absolute; inset: 0; border-radius: 50%; background: #fff; box-sizing: border-box; opacity: 0;
+    border: calc(var(--d) * 0.06) solid #fff;
+    display: flex; align-items: center; justify-content: center; color: #2e2e2e; font-weight: 800; line-height: 1;
+  }
+  .dbl-coin::after { content: ""; position: absolute; inset: calc(var(--d) * 0.03); border-radius: 50%; border: calc(var(--d) * 0.02) solid #3a1a6e; opacity: 0; }
+  .dbl-overlay.run .dbl-coin { animation: dblCoin 0.25s ease 1.25s both, dblRing 0.25s ease 1.45s both; }
+  .dbl-overlay.run .dbl-coin::after { animation: dblFade 0.25s ease 1.5s both; }
+  @keyframes dblCoin { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+  @keyframes dblRing { from { border-color: #fff; } to { border-color: #2a0f55; } }
+  @keyframes dblFade { from { opacity: 0; } to { opacity: 1; } }
+  .dbl-coin .dbl-x { font-size: calc(var(--d) * 0.26); margin-right: calc(var(--d) * 0.02); transform: translateY(8%); opacity: 0; }
+  .dbl-coin .dbl-2 { font-size: calc(var(--d) * 0.46); opacity: 0; }
+  .dbl-overlay.run .dbl-coin .dbl-x, .dbl-overlay.run .dbl-coin .dbl-2 { animation: dblFade 0.2s ease 1.5s both; }
+  /* Bandet: typnamn först, sedan "Dubbla poäng" */
+  .dbl-band { position: relative; z-index: 1; width: 100%; margin-top: calc(var(--d) * -0.04); background: rgba(40, 10, 90, 0.5); text-align: center; padding: clamp(14px, 3vmin, 34px) 20px; display: grid; opacity: 0; }
+  .dbl-overlay.run .dbl-band { animation: dblBand 0.35s cubic-bezier(.2,.8,.2,1) 0.1s both; }
+  @keyframes dblBand { from { transform: translateY(22px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .dbl-band span { grid-area: 1 / 1; color: #fff; font-weight: 800; font-size: clamp(30px, 6.4vmin, 78px); letter-spacing: 0.01em; opacity: 0; }
+  .dbl-overlay.run .dbl-band .dbl-t1 { animation: dblT1 1.4s ease both; }
+  .dbl-overlay.run .dbl-band .dbl-t2 { animation: dblT2 0.35s cubic-bezier(.2,1.3,.4,1) 1.35s both; }
+  @keyframes dblT1 { 0% { opacity: 0; } 10% { opacity: 1; } 84% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes dblT2 { from { opacity: 0; transform: scale(0.55); } to { opacity: 1; transform: scale(1); } }
+
   /* Redigerare: fältet för quiznamn */
   .ed-title-input { max-width: 560px; }
 </style>
@@ -1612,6 +1678,16 @@
   <div class="intro-overlay" id="intro-overlay" style="display:none;" aria-hidden="true">
   <div class="abb-logo intro-logo" role="img" aria-label="ABBHOOT!"></div>
   <div class="intro-title" id="intro-title"></div>
+</div>
+
+<div class="dbl-overlay" id="dbl-overlay" data-type="choice" style="display:none;" aria-hidden="true" title="Klicka för att hoppa över">
+  <div class="dbl-stage">
+    <div class="dbl-disc"></div>
+    <div class="dbl-icon"><div class="dbl-card"><i>▲</i><i>◆</i><i>●</i><i>■</i></div><div class="dbl-emoji" id="dbl-emoji"></div></div>
+    <div class="dbl-ball b1"></div><div class="dbl-ball b2"></div>
+    <div class="dbl-coin"><span class="dbl-x">×</span><span class="dbl-2">2</span></div>
+  </div>
+  <div class="dbl-band"><span class="dbl-t1" id="dbl-t1">Quiz</span><span class="dbl-t2">Dubbla poäng</span></div>
 </div>
 
 <header>
@@ -2167,14 +2243,23 @@
   // Spelarens lag (index) – null om spelaren inte är indelad (eller laget inte finns längre)
   function teamOfPlayer(G, p) { const t = p && p.team; return (typeof t === "number" && t >= 0 && t < teamCountOf(G)) ? t : null; }
   const byScore = (a, b) => ((b.score || 0) - (a.score || 0)) || String(a.name).localeCompare(String(b.name), "sv");
+  // LAGPOÄNG – matematiskt jämnt oavsett lagstorlek (t.ex. 5,5,4,4,4 · 1,2,2,2,2 · 2,2,2,3):
+  // varje fråga får laget SNITTET av medlemmarnas poäng på just den frågan × S, där S = största lagets storlek vid start.
+  // Poängen räknas fram en gång per fråga (toBoard) och sparas i teamScores – så en sen spelare påverkar bara frågorna
+  // hen spelar, och en utsparkad spelares tidigare bidrag ligger kvar. Lika stora lag → exakt samma som summan.
+  const maxTeamSize = (G) => { const pl = listPlayers(G); return Math.max(1, ...[...Array(teamCountOf(G)).keys()].map(t => pl.filter(p => teamOfPlayer(G, p) === t).length)); };
+  const teamScaleOf = (G) => { const s = Number(G && G.state && G.state.teamScale); return s >= 1 ? s : maxTeamSize(G); };
   function teamList(G) {
-    const players = listPlayers(G);
+    const players = listPlayers(G), ts = (G && G.teamScores) || {};
     return [...Array(teamCountOf(G)).keys()].map(t => {
       const members = players.filter(p => teamOfPlayer(G, p) === t).sort(byScore);
-      const sum = k => members.reduce((s, p) => s + (Number(p[k]) || 0), 0);
-      return Object.assign(teamInfo(G, t), { members, score: sum("score"), prevScore: sum("prevScore"), lastDelta: sum("lastDelta"), mvp: members[0] || null });
+      const rec = ts["t" + t] || {};
+      return Object.assign(teamInfo(G, t), { members, score: Number(rec.s) || 0, prevScore: Number(rec.p) || 0, lastDelta: Number(rec.d) || 0,
+        rawScore: members.reduce((s, p) => s + (Number(p.score) || 0), 0), scaleTo: teamScaleOf(G), mvp: members[0] || null });
     });
   }
+  // Är lagen olika stora? (då visas en rad om hur lagpoängen räknas)
+  function teamsUneven(G) { const s = teamList(G).filter(t => t.members.length).map(t => t.members.length); return s.length > 1 && Math.min(...s) !== Math.max(...s); }
   // Lag med minst en spelare, bäst först (lika poäng → lagnummer)
   function rankedTeams(G) {
     const list = teamList(G).filter(t => t.members.length);
@@ -2525,6 +2610,14 @@
   // =====================================================================
   // ============================ SPELLEDARE =============================
   // =====================================================================
+  // ===== Förladdat quiz: läggs in EN gång per webbläsare (ersätter sparade frågor + lästid 5 s).
+  // Ändringar som görs efteråt sparas som vanligt. Hoppas över i automatiska tester (navigator.webdriver).
+  const PRELOAD_QUIZ = { id: "fredag-2026-11-13", readTime: 5, questions: [{"type": "type", "q": "Vad betyder \"rizz\"? (ett ord)", "double": false, "time": 30, "accepted": ["Charisma", "Karisma", "Carisma"]}, {"type": "choice", "q": "Vilket land har flest pyramider?", "double": true, "time": 20, "answers": ["Egypten", "Sudan", "Mexiko", "Peru"], "correct": 1}, {"type": "type", "q": "Vad hette den svenska sociala nätverkssajten som ursprungligen startade som Stajl Plejs och blev enormt populär under 2000-talet?", "double": false, "time": 30, "accepted": ["Lunarstorm", "Lunar", "Lunarstorm.se"]}, {"type": "choice", "q": "Vilken choklad med pistagekräm och krispiga kataifi-trådar blev en av TikToks största mattrender 2024?", "double": true, "time": 20, "answers": ["Istanbulchoklad", "Beirutchoklad", "Dubaichoklad", "Marrakechchoklad"], "correct": 2}, {"type": "puzzle", "q": "Sortera i tidsordning efter när de kom. ÄLDST överst, NYAST längst ned!", "double": false, "time": 30, "answers": ["Game Boy", "YouTube", "iPhone", "TikTok"], "labels": {"first": "Äldst", "last": "Nyast"}}, {"type": "choice", "q": "Vilket är störst till landarealen?", "double": true, "time": 20, "answers": ["Sollefteå kommun", "Gotlands län", "Öland", "Orust"], "correct": 0}, {"type": "choice", "q": "På MSN kunde man skicka något som fick mottagarens hela chattfönster att skaka och låta. Vad gjorde man när man skickade detta?", "double": false, "time": 20, "answers": ["Puffa", "Pinga", "Knacka", "Vibba"], "correct": 3}, {"type": "choice", "q": "Vilken svensk blev 2025 dyraste spelaren i brittisk fotbollshistoria?", "double": false, "time": 20, "answers": ["Gyökeres", "Isak", "Kulusevski", "Ibrahimović"], "correct": 1}, {"type": "slider", "q": "Hur många öar finns det i Sverige enligt SCB (2013)?", "double": false, "time": 25, "slider": {"min": 100000, "max": 400000, "step": 1000, "correct": 267570, "margin": 10000, "unit": "öar"}}, {"type": "choice", "q": "Vilken var den första icke-engelskspråkiga filmen som vann Oscar för bästa film (2020)?", "double": false, "time": 20, "answers": ["Parasite", "Roma", "Joker", "Jojo Rabbit"], "correct": 0}] };
+  try {
+    if (!navigator.webdriver && lsGet("abbhoot_preload") !== PRELOAD_QUIZ.id && isValidQuestions(PRELOAD_QUIZ.questions)) {
+      lsSet(LS_QUESTIONS_KEY, PRELOAD_QUIZ.questions); lsSet("abbhoot_read_time", PRELOAD_QUIZ.readTime); lsSet("abbhoot_preload", PRELOAD_QUIZ.id);
+    }
+  } catch (e) {}
   let questions = isValidQuestions(lsGet(LS_QUESTIONS_KEY)) ? lsGet(LS_QUESTIONS_KEY) : JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
   // Frågorna för PÅGÅENDE spel låses vid start – ändringar i redigeraren gäller från nästa omgång
   let gameQs = null;
@@ -2708,26 +2801,39 @@
   // ---------- TIMER (körs bara hos spelledaren) ----------
   function ensureTick() {
     const ph = S().phase;
-    if (ph === "question" || ph === "preview") { if (!tickInt) tickInt = setInterval(hostTick, 1000); }
+    if (ph === "question" || ph === "preview") { if (!tickInt) { tickLast = performance.now(); tickAcc = 0; tickInt = setInterval(hostTick, 1000); } }
     else stopTick();
   }
   function stopTick() {
     if (tickInt) { clearInterval(tickInt); tickInt = null; }
+    tickLast = null; tickAcc = 0; tickMem = null;
     if (autoRevealT) { clearTimeout(autoRevealT); autoRevealT = null; }
   }
+  // Klockan räknar VERKLIG förfluten tid (performance.now), inte antal tick. Kommer ett tick sent – datorn är hårt
+  // belastad eller webbläsaren stryper fliken (bakgrund/minimerad/annat fönster) – räknas alla missade sekunder ikapp.
+  let tickLast = null, tickAcc = 0, tickMem = null;
   function hostTick() {
+    const now = performance.now();
+    if (tickLast === null) tickLast = now;
+    tickAcc += now - tickLast; tickLast = now;
     const st = S();
-    if (st.paused) return;
+    if (st.paused || (st.phase !== "preview" && st.phase !== "question")) { tickAcc = 0; return; }
+    const steps = Math.floor((tickAcc + 50) / 1000);   // 50 ms marginal för vanlig timer-jitter
+    if (steps < 1) return;
+    tickAcc = Math.max(0, tickAcc - steps * 1000);
+    // Räkna ner från spelledarens EGET senaste värde (inte från databasen) – annars skrivs samma sekund två gånger
+    // om databasen svarar långsamt, och klockan går för sakta.
+    const k = `${st.qIndex}|${st.phase}`;
+    if (!tickMem || tickMem.k !== k) tickMem = { k, v: st.phase === "preview" ? (typeof st.preview === "number" ? st.preview : 0) : (typeof st.timer === "number" ? st.timer : QT), done: false };
+    if (tickMem.done) return;
+    const left = Math.max(0, tickMem.v - steps); tickMem.v = left;
     if (st.phase === "preview") {
-      const r = Math.max(0, (typeof st.preview === "number" ? st.preview : 0) - 1);
-      if (r > 0) upd({ "state/preview": r }); else openAnswers();
+      if (left > 0) upd({ "state/preview": left }); else { tickMem.done = true; openAnswers(); }
       return;
     }
-    if (st.phase !== "question") return;
-    const t = Math.max(0, (typeof st.timer === "number" ? st.timer : QT) - 1);
-    upd({ "state/timer": t });
-    if (t > 0) playTickSound(t <= 5);
-    else reveal();
+    upd({ "state/timer": left });
+    if (left > 0) playTickSound(left <= 5);
+    else { tickMem.done = true; reveal(); }
   }
 
   // Paus: varje paus sparas med servertid så att den inte räknas som svarstid
@@ -2748,7 +2854,8 @@
 
   // ---------- SPELFLÖDE ----------
   function resetScoresUpdates() {
-    const u = { answers: null, manual: null, fastest: null, secret: null, pauses: null, comments: null, preScore: null, wagers: null, "state/scoredQ": -1 };
+    const u = { answers: null, manual: null, fastest: null, secret: null, pauses: null, comments: null, preScore: null, wagers: null, "state/scoredQ": -1,
+                teamScores: null, preTeam: null, "state/teamScale": isTeamMode(G) ? maxTeamSize(G) : null };
     listPlayers(G).forEach(p => Object.assign(u, {
       [`players/${p.id}/score`]: 0, [`players/${p.id}/prevScore`]: 0, [`players/${p.id}/lastDelta`]: 0,
       [`players/${p.id}/streak`]: 0, [`players/${p.id}/rankClimb`]: 0, [`players/${p.id}/wasFastest`]: false, [`players/${p.id}/lastWager`]: null
@@ -2784,7 +2891,7 @@
     if (Object.keys(u).length) { prankBusy = true; upd(u).finally(() => { prankBusy = false; }); }
   }
 
-  let starting = false;
+  let starting = false, introEndAt = -1e9;
   // Kontroller före start. ask = true första gången (får fråga), false efter introt (tyst: bara det som inte får hända)
   function startChecks(ask) {
     if (isTeamMode(G)) {
@@ -2816,6 +2923,7 @@
       let done = false; const timers = [];
       const finish = () => {
         if (done) return; done = true; timers.forEach(clearTimeout);
+        introEndAt = performance.now();   // tryck som ligger i kö efter "hoppa över introt" får inte hoppa förbi ×2/läsfasen
         ov.style.display = "none"; ov.className = "intro-overlay";
         document.removeEventListener("keydown", finish, true); ov.removeEventListener("click", finish);
         resolve();
@@ -2962,6 +3070,8 @@
     return u;
   }
 
+  const DBL_INTRO_S = 3;      // sekunder för "Dubbla poäng"-skärmen före läsfasen
+  let dblSkipKey = null;      // klickad bort på den här datorn
   function startQuestion(i, extra0) {
     const q = gq()[i];
     if (!q) return;
@@ -2971,9 +3081,12 @@
     const aonC = (extra0 && "state/aon" in extra0) ? extra0["state/aon"] : aonCfg(G);
     const wq = !!(aonC && isAonMode(G) && i >= aonC.from);
     const pv = wq ? Math.max(readTime, 10) : readTime;
+    // Dubbelfråga: "×2 Dubbla poäng"-skärmen visas först. Den får egna sekunder ovanpå lästiden (preview > previewTotal),
+    // så lästiden blir intakt. Hoppas över i automatiska tester och när lästiden är 0.
+    const dblIntro = (cur.double && pv > 0 && !automatedRun()) ? DBL_INTRO_S : 0;
     const u = Object.assign({
       [`answers/${i}`]: null, [`manual/${i}`]: null, [`fastest/${i}`]: null, [`pauses/${i}`]: null, [`wagers/${i}`]: null,
-      "state/phase": "preview", "state/preview": pv, "state/previewTotal": pv, "state/qIndex": i, "state/timer": tl, "state/timeLimit": tl,
+      "state/phase": "preview", "state/preview": pv + dblIntro, "state/previewTotal": pv, "state/qIndex": i, "state/timer": tl, "state/timeLimit": tl,
       "state/paused": false, "state/pauseKey": null, "state/startedAt": null, "state/revealedAt": null,
       "state/correct": null, "state/total": gq().length,
       "state/current": cur
@@ -3093,6 +3206,22 @@
     [...list].sort((a, b) => newScore[b.id] - newScore[a.id]).forEach((p, k) => {
       u[`players/${p.id}/rankClimb`] = prevRank[p.id] - (k + 1);
     });
+    // Lagläge: lagets poäng för frågan = snitt av medlemmarnas poäng på frågan × S (se teamList)
+    if (isTeamMode(G)) {
+      const S_ = teamScaleOf(G), ts = G.teamScores || {};
+      // Samma fråga poängsätts igen (tillbaka till facit + rättning)? Utgå från lagens läge före frågan → ingen dubbelräkning
+      const again = st.scoredQ === i && G.preTeam && G.preTeam._q === i;
+      const baseT = {};
+      if (again) Object.keys(G.preTeam).forEach(k => { if (k !== "_q") baseT[k] = Number(G.preTeam[k]) || 0; });
+      else Object.keys(ts).forEach(k => { baseT[k] = Number(ts[k] && ts[k].s) || 0; });
+      u.preTeam = Object.assign({ _q: i }, baseT);
+      for (let t = 0; t < teamCountOf(G); t++) {
+        const k = "t" + t, base = Number(baseT[k]) || 0;
+        const mem = list.filter(p => teamOfPlayer(G, p) === t);
+        const d = mem.length ? Math.round(mem.reduce((s, p) => s + (newScore[p.id] - baseOf(p.id).score), 0) / mem.length * S_) : 0;
+        if (mem.length || base) u[`teamScores/${k}`] = { s: base + d, p: base, d };
+      }
+    }
     upd(u);
   };
 
@@ -3311,7 +3440,7 @@
     $("mode-team").classList.toggle("active", team);
     $("mode-aon").classList.toggle("active", aon);
     const cfgPrev = aonConfigFor(questions, (G.state || {}).aonLevel);
-    $("mode-hint").textContent = team ? "Alla spelar i sin egen mobil – poängen läggs ihop per lag"
+    $("mode-hint").textContent = team ? "Alla spelar i sin egen mobil – lagpoäng = snitt per spelare (rättvist även med olika stora lag)"
       : aon && questions.length < 2 ? "All or Nothing kräver minst 2 frågor – med 1 fråga blir det ett vanligt solospel"
       : aon ? `Sista ${questions.length - cfgPrev.from === 1 ? "frågan" : (questions.length - cfgPrev.from) + " frågorna"}: välj insats – Satsa ${fmt(cfgPrev.risk)} p / ALL IN ${fmt(cfgPrev.allin)} p. De som ligger sist får ×2,5!`
       : "Alla tävlar mot alla";
@@ -3350,7 +3479,7 @@
       : empty.length ? `<span class="ts-bad">⛔ ${empty.map(t => esc(t.name)).join(", ")} har inga spelare</span>`
       : `<span class="ts-ok">✅ Alla är indelade – redo att starta!</span>`;
     const flash = Date.now() < teamFlash.until ? `<div class="ts-flash">⛔ ${esc(teamFlash.text)}</div>` : "";
-    setHtml("team-status", flash + msg + (uneven ? ` <span class="ts-warn">⚠️ Lagen är olika stora (${sizes.join(" / ")}) – poängen räknas som summa</span>` : ""));
+    setHtml("team-status", flash + msg + (uneven ? ` <span class="ts-ok" style="margin-left:8px;">ℹ️ Lagen är olika stora (${sizes.join(" / ")}) – lagpoängen räknas som snitt per spelare, så det blir rättvist</span>` : ""));
     // Behåll fokus/markör om spelledaren skriver ett lagnamn när någon ansluter
     const ae = document.activeElement, focusT = ae && ae.dataset && ae.dataset.tname, selS = ae && ae.selectionStart, selE = ae && ae.selectionEnd, typed = ae && ae.value;
     setHtml("team-grid", `
@@ -3563,6 +3692,23 @@
     tEl.textContent = st.paused ? "⏸" : (revealed ? "✓" : t);
     tEl.classList.toggle("urgent", !revealed && !st.paused && t <= 5);
 
+    // Dubbelpoäng-skärm: syns så länge preview ligger över lästiden (de extra sekunderna), annars aldrig
+    {
+      const ov = $("dbl-overlay");
+      if (ov) {
+        const key = `${i}|${st.previewTotal}|${cur.q}`;
+        if (!preview) dblSkipKey = null;
+        const on = preview && !!cur.double && typeof st.preview === "number" && st.previewTotal > 0 && st.preview > st.previewTotal && dblSkipKey !== key;
+        if (on && ov.style.display !== "flex") {
+          ov.dataset.type = type; $("dbl-t1").textContent = type === "choice" ? "Quiz" : TYPES[type].label; $("dbl-emoji").textContent = TYPES[type].icon;
+          ov.className = "dbl-overlay"; void ov.offsetWidth; ov.className = "dbl-overlay run"; ov.style.display = "flex"; ov.__shownAt = performance.now();
+        }
+        else if (!on && ov.style.display !== "none") { ov.style.display = "none"; ov.className = "dbl-overlay"; }
+        // Klick hoppar över – men inte de första 0,7 s (annars tar ett dubbelklick för att hoppa över introt även bort ×2-skärmen)
+        ov.onclick = () => { if (performance.now() - (ov.__shownAt || 0) < 700) return; dblSkipKey = key; ov.style.display = "none"; ov.className = "dbl-overlay"; };
+      }
+    }
+
     // Läsfas: bara frågan + nedräkning, inga alternativ
     const list = listPlayers(G);
     $("preview-stage").style.display = preview ? "flex" : "none";
@@ -3644,6 +3790,7 @@
   window.hostNext = function() {
     const now = performance.now();
     if (now - lastNextAt < 700) return;   // skydd mot dubbelklick / snabba tryck
+    if (now - introEndAt < 1200) return;  // precis efter introt: extra tryck på klickaren ska inte hoppa över frågan
     lastNextAt = now;
     const ph = S().phase;
     if (ph === "lobby") startGame();
@@ -3751,7 +3898,8 @@
     const team = isTeamMode(G);
     const sorted = team ? rankedTeams(G) : listPlayers(G).sort(byScore);
     const maxScore = Math.max(1000, (sorted[0] && sorted[0].score) || 0);
-    $("lb-subtitle").textContent = `${team ? "LAGSTÄLLNING" : "STÄLLNING"} EFTER FRÅGA ${st.qIndex + 1} AV ${st.total || gq().length}`;
+    $("lb-subtitle").textContent = `${team ? "LAGSTÄLLNING" : "STÄLLNING"} EFTER FRÅGA ${st.qIndex + 1} AV ${st.total || gq().length}`
+      + (team && teamsUneven(G) && sorted[0] ? ` · LAGPOÄNG = SNITT PER SPELARE × ${sorted[0].scaleTo}` : "");
     $("next-q-btn").textContent = st.qIndex + 1 >= gq().length ? "🏆 AVSLÖJA SLUTPODIET! ➔" : `Nästa Fråga (${st.qIndex + 2}/${gq().length}) ➔`;
 
     // Topp 10 på storskärmen (alla ser sin egen placering i mobilen)
@@ -5133,7 +5281,7 @@ ${EX.slider}
           <div style="font-size:56px;">${mt.team.emoji}</div>
           <h2>Du är i ${esc(mt.team.name)}!</h2>
           <div class="p-teammates">${mt.team.members.map(m => `<span class="${m.id === pid ? "me" : ""}">${avatarOf(m)} ${esc(m.name)}</span>`).join("")}</div>
-          <p>Ni spelar var och en i er egen mobil – allas poäng läggs ihop till lagets.</p>
+          <p>Ni spelar var och en i er egen mobil – lagets poäng är snittet av allas poäng, så små och stora lag tävlar på lika villkor.</p>
           ${lobbyAvatarBlock(me)}
           <button type="button" class="btn" onclick="leaveGame()">Lämna / byt namn</button>
         </div>` : `
