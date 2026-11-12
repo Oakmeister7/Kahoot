@@ -1988,96 +1988,69 @@
 
   const DEFAULT_QUESTIONS = [
     {
-      q: "Vilket djur bajsar fyrkantiga kuber (för att kuberna inte ska rulla iväg från reviret)?",
-      answers: ["Sengångare", "Vombat", "Näbbdjur", "Koala"],
+      type: "type",
+      q: "Vad betyder \"rizz\"? (ett ord)",
+      accepted: ["Charisma", "Karisma", "Carisma"],
+      double: false,
+      time: 30
+    },
+    {
+      q: "Vilket land har flest pyramider?",
+      answers: ["Egypten", "Sudan", "Mexiko", "Peru"],
       correct: 1,
-      double: false
-    },
-    {
-      q: "Hur lång tid varade världshistoriens kortaste krig (mellan Storbritannien och Zanzibar 1896)?",
-      answers: ["38 minuter", "4 timmar", "2 dygn", "1 vecka"],
-      correct: 0,
-      double: false
-    },
-    {
-      q: "Vad såldes Ketchup ursprungligen som på apoteken under 1830-talet?",
-      answers: ["Hårfärgningsmedel", "Skokräm", "Medicin mot magsjuka", "Råttgift"],
-      correct: 2,
-      double: false
-    },
-    {
-      q: "Vilket land i världen har flest öar (över 267 000 stycken)?",
-      answers: ["Indonesien", "Kanada", "Filippinerna", "Sverige"],
-      correct: 3,
       double: true
-    },
-    {
-      q: "Vad stämmer rent botaniskt om bananer och jordgubbar?",
-      answers: [
-        "Båda är stenfrukter",
-        "Bananen är ett bär – jordgubben är en nöt",
-        "Bananen är en rotfrukt",
-        "Båda räknas som grönsaker"
-      ],
-      correct: 1,
-      double: false
-    },
-    {
-      q: "Hur många näsor (lukttentakler) har en vanlig mördarsnigel?",
-      answers: ["Ingen alls", "1 näsa", "2 näsor", "4 näsor"],
-      correct: 3,
-      double: false
-    },
-    {
-      q: "Om du kunde vika ett vanligt A4-papper på mitten 42 gånger – hur tjockt skulle det bli?",
-      answers: [
-        "Som en tjock bok (12 cm)",
-        "Högt som Eiffeltornet (330 m)",
-        "Det når hela vägen till månen",
-        "Ungefär 1 mil"
-      ],
-      correct: 2,
-      double: true
-    },
-    {
-      q: "Hur länge kan en vanlig snigel sova i sträck om vädret är för torrt och tråkigt?",
-      answers: ["Upp till 3 år", "Max 2 veckor", "3 månader", "48 timmar"],
-      correct: 0,
-      double: false
-    },
-    {
-      q: "Vad kallas den officiella fobin för rädslan att vara utan sin mobiltelefon eller få slut på batteri?",
-      answers: ["Fonofobi", "Nomofobi", "Teknofobi", "Telefobi"],
-      correct: 1,
-      double: false
     },
     {
       type: "type",
-      q: "SKRIV SVAR: Vilket grundämne har det kemiska tecknet Fe?",
-      accepted: ["Järn", "Jarn", "Iron"],
+      q: "Vad hette den svenska sociala nätverkssajten som ursprungligen startade som Stajl Plejs och blev enormt populär under 2000-talet?",
+      accepted: ["Lunarstorm", "Lunar", "Lunarstorm.se"],
       double: false,
       time: 30
+    },
+    {
+      q: "Vilken choklad med pistagekräm och krispiga kataifi-trådar blev en av TikToks största mattrender 2024?",
+      answers: ["Istanbulchoklad", "Beirutchoklad", "Dubaichoklad", "Marrakechchoklad"],
+      correct: 2,
+      double: true
     },
     {
       type: "puzzle",
-      q: "PUSSEL: Sortera djuren från minst till störst!",
-      answers: ["Myra", "Katt", "Häst", "Blåval"],
-      labels: { first: "Minst", last: "Störst" },
+      q: "Sortera i tidsordning efter när de kom. ÄLDST överst, NYAST längst ned!",
+      answers: ["Game Boy", "YouTube", "iPhone", "TikTok"],
+      labels: { first: "Äldst", last: "Nyast" },
       double: false,
       time: 30
     },
     {
-      type: "slider",
-      q: "SKJUTREGLAGE: Vilket år invigdes Öresundsbron?",
-      slider: { min: 1980, max: 2020, step: 1, correct: 2000, margin: 3, unit: "" },
-      double: false,
-      time: 20
+      q: "Vilket är störst till landarealen?",
+      answers: ["Sollefteå kommun", "Gotlands län", "Öland", "Orust"],
+      correct: 0,
+      double: true
     },
     {
-      q: "FINALFRÅGA: Vilken kroppsdel växer inte en enda millimeter, utan är lika stor när du föds som när du är 90 år?",
-      answers: ["Öronen", "Knäskålarna", "Ögongloberna", "Näsan"],
-      correct: 2,
-      double: true
+      q: "På MSN kunde man skicka något som fick mottagarens hela chattfönster att skaka och låta. Vad gjorde man när man skickade detta?",
+      answers: ["Puffa", "Pinga", "Knacka", "Vibba"],
+      correct: 3,
+      double: false
+    },
+    {
+      q: "Vilken svensk blev 2025 dyraste spelaren i brittisk fotbollshistoria?",
+      answers: ["Gyökeres", "Isak", "Kulusevski", "Ibrahimović"],
+      correct: 1,
+      double: false
+    },
+    {
+      type: "slider",
+      q: "Hur många öar finns det i Sverige enligt SCB (2013)?",
+      slider: { min: 100000, max: 400000, step: 1000, correct: 267570, margin: 10000, unit: "öar" },
+      double: false,
+      time: 25
+    },
+    {
+      q: "Vilken var den första icke-engelskspråkiga filmen som vann Oscar för bästa film (2020)?",
+      answers: ["Parasite", "Roma", "Joker", "Jojo Rabbit"],
+      correct: 0,
+      double: false
     }
   ];
 
