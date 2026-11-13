@@ -1690,7 +1690,7 @@
   .ed-title-input { max-width: 560px; }
 
   /* Status för prisutdelningslåten */
-  .song-badge.wait { opacity: 0.75; }
+  .song-badge:not(.bad) { display: none !important; }   /* syns bara när låten inte går att spela */
   .song-badge.bad { background: #e21b3c !important; color: #fff !important; border-color: #fff !important; font-weight: 800; cursor: pointer; animation: songWarn 1.2s ease-in-out infinite; }
   @keyframes songWarn { 50% { transform: scale(1.06); } }
 
@@ -1743,7 +1743,7 @@
       </select>
     </label>
     <button type="button" class="btn host-only host-auth-only" id="sound-btn" onclick="toggleSound()">🔊 Ljud: PÅ</button>
-    <span class="screen-status host-only host-auth-only song-badge wait" id="song-badge" onclick="retryPodSong()" title="Prisutdelningslåten (podium-45s.mp3)">🎵 Podiumlåt: laddar…</span>
+    <span class="screen-status host-only host-auth-only song-badge wait" id="song-badge" onclick="retryPodSong()" title="Prisutdelningslåten"></span>
     <button type="button" class="btn host-only host-auth-only theme-btn" id="theme-btn" onclick="toggleTheme()" title="Byt till ljust läge" aria-label="Byt färgläge">☀️</button>
     <button type="button" class="btn host-only host-auth-only" onclick="confirmNewGame()" title="Nytt spel med ny PIN">🆕 Nytt spel</button>
     <span class="screen-status on host-only host-auth-only" id="host-user">👤</span>
@@ -4100,12 +4100,12 @@
   // Allt styrs av låtens klocka (audio.currentTime) så att bild och musik aldrig glider isär.
   let podAudio = null, podRaf = 0, podT0 = 0, podUseAudio = false, podWinnerShown = true;
   // Prisutdelningslåten hämtas HELT till minnet direkt vid inloggning (inte först vid podiet),
-  // så att nätet inte spelar någon roll när podiet väl startar. Status visas i sidhuvudet.
+  // så att nätet inte spelar någon roll när podiet väl startar. Bara om något går fel visas en röd varning i sidhuvudet.
   let podSong = "idle", podSongTry = 0, podSongTimer = 0;   // idle | loading | ok | fail
   function renderSongBadge() {
     const el = $("song-badge"); if (!el) return;
     el.className = "screen-status host-only host-auth-only song-badge " + (podSong === "ok" ? "on" : podSong === "fail" ? "bad" : "wait");
-    el.textContent = podSong === "ok" ? "🎵 Podiumlåt: klar" : podSong === "fail" ? "⚠️ Podiumlåt SAKNAS – tryck för att försöka igen" : "🎵 Podiumlåt: laddar…";
+    el.textContent = podSong === "fail" ? "⚠️ Podiumlåten går inte att spela – tryck för att försöka igen" : "";   // syns bara vid fel
   }
   async function loadPodSong() {
     if (!PODIUM_SONG || podSong === "ok" || podSong === "loading") return;
