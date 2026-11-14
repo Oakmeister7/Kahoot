@@ -2341,6 +2341,8 @@
     return !!(c && isAonMode(G) && typeof c.from === "number" && i >= c.from && !isPoll);
   };
   const wagerOf = (G, i, pid) => { const w = G && G.wagers && G.wagers[i] && G.wagers[i][pid]; return w && (w.c === "risk" || w.c === "allin") && typeof w.at === "number" ? w : null; };
+  // Lästid som visas: aldrig mer än själva lästiden (de extra sekunderna för ×2-skärmen räknas inte)
+  const previewShown = (st) => (st.previewTotal > 0 && typeof st.preview === "number") ? Math.min(st.preview, st.previewTotal) : st.preview;
   const stakeFor = (cfg, c) => !cfg ? 0 : c === "allin" ? cfg.allin : c === "risk" ? cfg.risk : 0;
   // Multiplikator efter placering: andel spelare som har STRIKT fler poäng (lika poäng = samma placering)
   function aonMult(scoreOf, list, pid) {
@@ -2585,19 +2587,26 @@
         life: 110
       });
     }
-    if (!animating) { animating = true; requestAnimationFrame(updateConfetti); }
+    if (!animating) { animating = true; confettiLast = 0; requestAnimationFrame(updateConfetti); }
   }
 
-  function updateConfetti() {
+  // Konfettin räknar verklig tid (dt = 1 vid 60 bilder/s), så den faller lika fort på 120 Hz-skärmar
+  let confettiLast = 0;
+  function updateConfetti(now) {
+    const dt = confettiLast && now ? Math.max(0.2, Math.min(2.5, (now - confettiLast) / 16.667)) : 1;
+    confettiLast = now || 0;
     cctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(part => {
-      part.x += part.vx; part.y += part.vy; part.vy += (part.g ?? 0.35); part.life -= 1.1;
+    let w = 0;
+    for (let k = 0; k < particles.length; k++) {
+      const part = particles[k];
+      part.x += part.vx * dt; part.y += part.vy * dt; part.vy += (part.g ?? 0.35) * dt; part.life -= 1.1 * dt;
       cctx.fillStyle = part.color;
       cctx.fillRect(part.x, part.y, part.size, part.size);
-    });
-    particles = particles.filter(part => part.life > 0);
+      if (part.life > 0) particles[w++] = part;
+    }
+    particles.length = w;
     if (particles.length) requestAnimationFrame(updateConfetti);
-    else { animating = false; cctx.clearRect(0, 0, canvas.width, canvas.height); }
+    else { animating = false; confettiLast = 0; cctx.clearRect(0, 0, canvas.width, canvas.height); }
   }
 
 
@@ -2691,6 +2700,14 @@
   let gameQs = null;
   const gq = () => gameQs || questions;
   const gqKey = () => `abbhoot_gameqs_${pin}`;
+  // Pusslets blandning (= facit) sparas bara hos spelledaren – aldrig i databasen, där mobilerna kan läsa den
+  const secKey = () => `abbhoot_secret_${pin}`;
+  let hostSecret = null, hostSecretPin = null;
+  function secretMap() {
+    if (hostSecretPin !== pin) { hostSecretPin = pin; hostSecret = {}; try { const v = JSON.parse(localStorage.getItem(secKey()) || "{}"); if (v && typeof v === "object") hostSecret = v; } catch (e) {} }
+    return hostSecret;
+  }
+  function saveSecret() { try { localStorage.setItem(secKey(), JSON.stringify(hostSecret || {})); } catch (e) {} }
   let pin = null, G = null, unsub = null, tickInt = null, autoRevealT = null;
   let lastBoardKey = "", lastPodiumKey = "", lastQuestionKey = "";
   let podiumAnimUntil = 0;
@@ -2841,7 +2858,7 @@
     gameQs = lsGet(gqKey());   // pågående spels låsta frågor (överlever omladdning)
     lastBoardKey = null; lastPodiumKey = null; lastQuestionKey = "";
     // Städa bort låsta frågekopior från gamla spel (annars blir deras bilder aldrig bortstädade)
-    try { Object.keys(localStorage).forEach(k => { if (k.startsWith("abbhoot_gameqs_") && k !== gqKey()) localStorage.removeItem(k); }); } catch (e) {}
+    try { Object.keys(localStorage).forEach(k => { if ((k.startsWith("abbhoot_gameqs_") && k !== gqKey()) || (k.startsWith("abbhoot_secret_") && k !== secKey())) localStorage.removeItem(k); }); } catch (e) {}
     renderJoinInfo();
     let first = true;
     unsub = onValue(R(p), snap => {
@@ -2911,6 +2928,7 @@
     if (st.phase !== "question" && st.phase !== "preview") return;
     const i = st.qIndex;
     if (!st.paused) {
+      if (autoRevealT) { clearTimeout(autoRevealT); autoRevealT = null; }
       const u = { "state/paused": true };
       if (st.phase === "question") { const k = "p" + Date.now(); u[`pauses/${i}/${k}`] = { s: serverTimestamp() }; u["state/pauseKey"] = k; }
       upd(u);
@@ -3052,7 +3070,7 @@
       const perm = shuffledPerm(4);           // perm[visad position] = ursprungligt index
       cur.items = perm.map(o => q.answers[o]);
       cur.labels = q.labels && (q.labels.first || q.labels.last) ? { first: q.labels.first || "", last: q.labels.last || "" } : null;
-      extra[`secret/${i}`] = perm;
+      secretMap()[i] = perm; saveSecret();
     }
     if (type === "slider") {
       const s = q.slider;
@@ -3159,7 +3177,7 @@
     const tl = timeOf(q);
     // Insatsfråga: minst 10 s lästid så att alla hinner läsa frågan och välja insats
     const aonC = (extra0 && "state/aon" in extra0) ? extra0["state/aon"] : aonCfg(G);
-    const wq = !!(aonC && isAonMode(G) && i >= aonC.from);
+    const wq = !!(aonC && isAonMode(G) && i >= aonC.from) && cur.type !== "poll";
     const pv = wq ? Math.max(readTime, 10) : readTime;
     // Dubbelfråga: "×2 Dubbla poäng"-skärmen visas först. Den får egna sekunder ovanpå lästiden (preview > previewTotal),
     // så lästiden blir intakt. Hoppas över i automatiska tester och när lästiden är 0.
@@ -3188,7 +3206,8 @@
     if (type === "type") return { accepted: q.accepted.map(a => String(a).trim()).filter(Boolean) };
     if (type === "slider") return { value: q.slider.correct, margin: Math.max(0, Number(q.slider.margin) || 0) };
     if (type === "puzzle") {
-      const perm = (G.secret && G.secret[i]) || [0, 1, 2, 3];
+      const sm = secretMap();
+      const perm = (Array.isArray(sm[i]) && sm[i].length === 4) ? sm[i] : ((G.secret && G.secret[i]) || [0, 1, 2, 3]);
       return [0, 1, 2, 3].map(orig => perm.indexOf(orig));   // rätt ordning uttryckt i visade positioner
     }
     if (type === "poll") return { poll: true };
@@ -3220,7 +3239,12 @@
     if (a && typeof a.at === "number" && typeof st.startedAt === "number") {
       let ms = a.at - st.startedAt;
       const ps = (G.pauses && G.pauses[i]) || {};
-      Object.values(ps).forEach(pz => { if (pz && typeof pz.s === "number" && typeof pz.e === "number" && pz.e <= a.at) ms -= (pz.e - pz.s); });
+      // dra bort den del av varje paus som ligger före svaret (även om svaret kom in precis under en paus)
+      Object.values(ps).forEach(pz => {
+        if (!pz || typeof pz.s !== "number") return;
+        const end = typeof pz.e === "number" ? pz.e : a.at;
+        ms -= Math.max(0, Math.min(a.at, end) - Math.max(st.startedAt, pz.s));
+      });
       return Math.max(0, Math.min(ms, TL * 1000));
     }
     if (a && typeof a.timeLeft === "number") return Math.max(0, Math.min(TL, TL - a.timeLeft)) * 1000;   // reserv
@@ -3795,7 +3819,16 @@
         }
         else if (!on && ov.style.display !== "none") { ov.style.display = "none"; ov.className = "dbl-overlay"; }
         // Klick hoppar över – men inte de första 0,7 s (annars tar ett dubbelklick för att hoppa över introt även bort ×2-skärmen)
-        ov.onclick = () => { if (performance.now() - (ov.__shownAt || 0) < 700) return; dblSkipKey = key; ov.style.display = "none"; ov.className = "dbl-overlay"; };
+        ov.onclick = () => {
+          if (performance.now() - (ov.__shownAt || 0) < 700) return;
+          dblSkipKey = key; ov.style.display = "none"; ov.className = "dbl-overlay";
+          // hoppa över de extra sekunderna på riktigt, så att lästiden börjar direkt (annars står stapeln still i upp till 3 s)
+          const s2 = S();
+          if (isOwner && s2.phase === "preview" && s2.qIndex === i && s2.previewTotal > 0 && s2.preview > s2.previewTotal) {
+            tickMem = { k: `${s2.qIndex}|preview`, v: s2.previewTotal, done: false }; tickAcc = 0; tickLast = performance.now();
+            upd({ "state/preview": s2.previewTotal });
+          }
+        };
       }
     }
 
@@ -3804,7 +3837,7 @@
     $("preview-stage").style.display = preview ? "flex" : "none";
     document.querySelector(".answer-counter").style.visibility = preview ? "hidden" : "visible";
     if (preview) {
-      const total = st.previewTotal > 0 ? st.previewTotal : (readTime > 0 ? readTime : 1), left = typeof st.preview === "number" ? st.preview : total;
+      const total = st.previewTotal > 0 ? st.previewTotal : (readTime > 0 ? readTime : 1), left = typeof st.preview === "number" ? Math.min(st.preview, total) : total;
       tEl.textContent = st.paused ? "⏸" : (st.timeLimit || QT);
       tEl.classList.remove("urgent");
       $("preview-count").textContent = st.paused ? "⏸" : left;
@@ -3830,7 +3863,7 @@
 
     // Alla (online) har svarat → avslöja automatiskt
     const online = list.filter(p => p.online !== false);
-    if (isOwner && st.phase === "question" && online.length > 0 && online.every(p => ans[p.id])) {
+    if (isOwner && st.phase === "question" && !st.paused && online.length > 0 && online.every(p => ans[p.id])) {
       if (!autoRevealT) autoRevealT = setTimeout(() => { autoRevealT = null; reveal(); }, 1200);
     }
 
@@ -3898,14 +3931,15 @@
   // Storskärmsvy för Skriv svar / Pussel / Skjutreglage
   function renderAltStage(type, cur, st, list, ans, revealed) {
     const el = $("alt-stage");
-    if (CHOICE_LIKE(type)) { el.style.display = "none"; el.innerHTML = ""; return; }
+    const out = { set h(v) { if (el.__html !== v) { el.__html = v; el.innerHTML = v; } } };   // bygg bara om när innehållet ändrats
+    if (CHOICE_LIKE(type)) { el.style.display = "none"; if (el.__html !== "") { el.__html = ""; el.innerHTML = ""; } return; }
     el.style.display = "flex";
     const i = st.qIndex;
     const nRight = list.filter(p => isRight(G, p.id, i, st)).length;
     const rightLine = `<div class="alt-sub">✅ ${nRight} av ${list.length} hade rätt</div>`;
 
     if (type === "type") {
-      if (!revealed) { el.innerHTML = `<div class="alt-hint">✍️ Skriv ditt svar i mobilen!</div>`; return; }
+      if (!revealed) { out.h = `<div class="alt-hint">✍️ Skriv ditt svar i mobilen!</div>`; return; }
       const groups = Object.create(null);
       list.forEach(p => {
         const a = ans[p.id]; if (!a || typeof a.text !== "string") return;
@@ -3914,7 +3948,7 @@
         groups[key].n++;
       });
       const rows = Object.values(groups).sort((a, b) => (b.right - a.right) || (b.n - a.n)).slice(0, 10);
-      el.innerHTML = `
+      out.h = `
         <div class="alt-correct">✓ ${esc(correctText(st))}</div>
         ${((st.correct || {}).accepted || []).length > 1 ? `<div class="alt-sub">Godkänt även: ${esc(st.correct.accepted.slice(1).join(", "))}</div>` : ""}
         ${rightLine}
@@ -3925,10 +3959,10 @@
     if (type === "puzzle") {
       const lab = cur.labels;
       if (!revealed) {
-        el.innerHTML = `<div class="alt-hint">🧩 Sortera i rätt ordning i mobilen!${lab ? `<br><span class="alt-sub">${esc(lab.first)} ⬆ först · sist ⬇ ${esc(lab.last)}</span>` : ""}</div>`;
+        out.h = `<div class="alt-hint">🧩 Sortera i rätt ordning i mobilen!${lab ? `<br><span class="alt-sub">${esc(lab.first)} ⬆ först · sist ⬇ ${esc(lab.last)}</span>` : ""}</div>`;
         return;
       }
-      el.innerHTML = `
+      out.h = `
         ${lab && lab.first ? `<div class="alt-sub">⬆ ${esc(lab.first)}</div>` : ""}
         <div class="alt-order">${(Array.isArray(st.correct) ? st.correct : []).map((d, k) => `
           <div class="alt-order-row" style="background:${KCOLORS[d]};"><span class="n">${k + 1}</span><span class="s">${SHAPES[d]}</span><span>${esc((cur.items || [])[d])}</span></div>`).join("")}
@@ -3943,12 +3977,12 @@
       const pos = v => Math.max(0, Math.min(100, ((v - cur.min) / span) * 100));
       const unit = cur.unit ? " " + esc(cur.unit) : "";
       if (!revealed) {
-        el.innerHTML = `<div class="alt-hint">🎚️ Dra reglaget i mobilen!</div><div class="alt-sub">Mellan ${fmtNum(cur.min)} och ${fmtNum(cur.max)}${unit}</div>`;
+        out.h = `<div class="alt-hint">🎚️ Dra reglaget i mobilen!</div><div class="alt-sub">Mellan ${fmtNum(cur.min)} och ${fmtNum(cur.max)}${unit}</div>`;
         return;
       }
       const c = st.correct || { value: NaN, margin: 0 };
       const dots = list.map(p => ans[p.id]).filter(a => a && typeof a.value === "number");
-      el.innerHTML = `
+      out.h = `
         <div class="alt-correct">✓ ${esc(correctText(st))}</div>
         ${c.margin > 0 ? `<div class="alt-sub">Godkänt: ±${fmtNum(c.margin)}${unit} (närmare = fler poäng)</div>` : `<div class="alt-sub">Måste vara exakt</div>`}
         <div class="slider-track">
@@ -5287,9 +5321,11 @@ ${EX.poll}
     if (pDrag || (e.button !== undefined && e.button > 0)) return;
     const row = e.currentTarget;
     const rows = [...document.querySelectorAll("#p-puzzle .p-puzzle-row")];
-    const r0 = rows[0].getBoundingClientRect(), r1 = rows[1] ? rows[1].getBoundingClientRect() : null;
+    // Radernas verkliga lägen och höjder (en rad med lång text kan vara högre än de andra)
+    const rects = rows.map(r => { const b = r.getBoundingClientRect(); return { top: b.top, bottom: b.bottom, mid: b.top + b.height / 2, h: b.height }; });
     const k = Number(row.dataset.k);
-    pDrag = { row, rows, k, target: k, startY: e.clientY, id: e.pointerId, step: r1 ? r1.top - r0.top : r0.height + 8 };
+    const gap = rects[1] ? Math.max(0, rects[1].top - rects[0].bottom) : 8;
+    pDrag = { row, rows, rects, k, target: k, startY: e.clientY, id: e.pointerId, shift: rects[k].h + gap };
     try { row.setPointerCapture(e.pointerId); } catch (err) {}
     row.classList.add("dragging");
     document.getElementById("p-puzzle").classList.add("is-dragging");
@@ -5301,16 +5337,19 @@ ${EX.poll}
   }
   function puzzleDragMove(e) {
     const d = pDrag; if (!d || e.pointerId !== d.id) return;
-    const n = d.rows.length;
-    const dy = Math.max(-d.k * d.step, Math.min((n - 1 - d.k) * d.step, e.clientY - d.startY));
+    const n = d.rows.length, me = d.rects[d.k];
+    const dy = Math.max(d.rects[0].top - me.top, Math.min(d.rects[n - 1].bottom - me.bottom, e.clientY - d.startY));
     d.row.style.transform = `translateY(${dy}px) scale(1.05)`;
-    const t = Math.max(0, Math.min(n - 1, d.k + Math.round(dy / d.step)));
+    // Ny plats: den dragna radens kant har passerat mitten på en annan rad
+    let t = d.k;
+    for (let j = d.k + 1; j < n; j++) if (me.bottom + dy > d.rects[j].mid) t = j;
+    for (let j = d.k - 1; j >= 0; j--) if (me.top + dy < d.rects[j].mid) t = j;
     if (t !== d.target) { d.target = t; buzz(8); }
     d.rows.forEach((r, j) => {
       if (j === d.k) return;
       let off = 0;
-      if (d.k < t && j > d.k && j <= t) off = -d.step;
-      if (d.k > t && j < d.k && j >= t) off = d.step;
+      if (d.k < t && j > d.k && j <= t) off = -d.shift;
+      if (d.k > t && j < d.k && j >= t) off = d.shift;
       r.style.transform = off ? `translateY(${off}px)` : "";
     });
   }
@@ -5435,7 +5474,7 @@ ${EX.poll}
     const raw = PG.state || {};
     const st = Object.assign({}, raw, { qIndex: Number.isInteger(raw.qIndex) ? raw.qIndex : -1, total: numOr0(raw.total), timer: numOr0(raw.timer), preview: numOr0(raw.preview) });
     $("p-topbar").style.display = "flex";
-    $("p-name").innerHTML = avatarOf(me) + " " + esc(me.name);
+    setHtml("p-name", avatarOf(me) + " " + esc(me.name));   // bygg bara om när figur/namn ändrats (annars laddas bilden om vid varje uppdatering)
     $("p-score").textContent = fmt(me.score) + " p";
     const mt = myTeam(), pt = $("p-team");
     if (pt) {
@@ -5464,7 +5503,7 @@ ${EX.poll}
     if (key === pViewKey) {
       const t = $("p-timer");
       if (t) t.textContent = st.paused ? "⏸" : `⏱ ${st.timer}`;
-      const pv = $("p-preview"); if (pv) pv.textContent = st.paused ? "⏸" : st.preview;
+      const pv = $("p-preview"); if (pv) pv.textContent = st.paused ? "⏸" : previewShown(st);
       const pn = $("p-pausenote"); if (pn) pn.style.display = st.paused ? "block" : "none";
       return;
     }
@@ -5508,7 +5547,7 @@ ${EX.poll}
           <span class="pw-t">${icon} ${label}</span>
           <span class="pw-d">${stake ? `Rätt: <b>+${fmt(Math.round(stake * m))} p</b> · Fel: <b>−${fmt(stake)} p</b>` : "Inget att förlora"}</span></button>`;
       v.innerHTML = `
-        <div class="p-qmeta"><span>${TYPES[type].icon} FRÅGA ${i + 1} / ${st.total}${cur.double ? " · ⚡ 2X" : ""}</span><span>⏳ <b id="p-preview">${st.paused ? "⏸" : st.preview}</b></span></div>
+        <div class="p-qmeta"><span>${TYPES[type].icon} FRÅGA ${i + 1} / ${st.total}${cur.double ? " · ⚡ 2X" : ""}</span><span>⏳ <b id="p-preview">${st.paused ? "⏸" : previewShown(st)}</b></span></div>
         <div class="p-qtext">${esc(cur.q)}</div>${cur.img ? `<div class="p-imghint">🖼️ Titta på bilden på storskärmen!</div>` : ""}
         <div class="p-aon-head">💀 ALL OR NOTHING ${left === 1 ? "· SISTA FRÅGAN" : ""}<br><span>Din multiplikator: <b>${fmtMult(m)}</b>${m > 1 ? " – du ligger efter, chansa!" : ""}</span></div>
         ${btn("safe", "🛡️", "Säker", 0)}
@@ -5522,7 +5561,7 @@ ${EX.poll}
         <div class="p-qmeta"><span>${TYPES[type].icon} FRÅGA ${i + 1} / ${st.total}${cur.double ? " · ⚡ 2X" : ""}</span><span>${TYPES[type].label}</span></div>
         <div class="p-qtext">${esc(cur.q)}</div>${cur.img ? `<div class="p-imghint">🖼️ Titta på bilden på storskärmen!</div>` : ""}
         <div class="p-card"><div style="font-size:44px;">📖</div><h2>Läs frågan…</h2>
-          <p>Svarsalternativen kommer om</p><div class="p-rank" id="p-preview">${st.paused ? "⏸" : st.preview}</div></div>`;
+          <p>Svarsalternativen kommer om</p><div class="p-rank" id="p-preview">${st.paused ? "⏸" : previewShown(st)}</div></div>`;
     } else if (st.phase === "question") {
       const cur = st.current || {};
       const type = qType(cur);
